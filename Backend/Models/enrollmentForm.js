@@ -1,0 +1,102 @@
+import mongoose from 'mongoose';
+export const enrollmentForm = new mongoose.Schema({
+    screeningId:{
+        type: String,
+        unique: true,
+        required: true
+    },
+    healthFacility:{
+        type: String,
+        enum: ['Bondo', 'Siaya', 'Kuoyo', 'Lumumba'],
+        required: true
+    },
+    DoB:{
+        type: Date,
+        required: true
+    },
+    Age:{
+        months:{
+            type: Number,
+            required: true
+        },
+        years:{
+            type: Number,
+            required: true
+        }
+    },
+    maritalStatus:{
+        type: String,
+        enum: ['Married', 'Single', 'Divorced', 'Widowed'],
+        required: true
+    },
+    HusbandName:{
+        type: String,
+        required: function() {
+            return this.maritalStatus === 'Married';
+        }
+    },
+    villageOfResidence:{
+        type: String,
+        required: true
+    },
+    educationLevel:{
+        type: String,
+        enum:["Never Attended School", "Primary", "Secondary", "University/Collage"],
+        required: true
+    },
+    subjectOccupation: {
+        type: String,
+        enum:["Farmer", "Business woman", "Fisherman/Fish monger",
+            "Home maker","Salaried worker","Other"],
+        required: true
+    },
+    otherOccupation:{
+        type: String,
+        required: function() {
+            return this.subjectOccupation === 'Other';
+        }
+    },
+    height:{
+        type: Number,
+        required: true
+    },
+    weight:{
+        type: Number,
+        required: true
+    },
+    vitalSigns:{
+        temperature:{
+            value:{
+                type: Number,
+                required: true
+            },
+            location:{
+                type: String,
+                enum: ['Axillary', 'Oral', 'Tympanic'],
+                required: true
+            }
+        },
+        respiratoryRate:{
+            type: Number,
+            required: true
+        },
+        pulseRate:{
+            type: Number,
+            required: true
+        },
+        bloodPressure:{
+            systolic:{
+                type: Number,
+                required: true
+            },
+            diastolic:{
+                type: Number,
+                required: true
+            }
+        }
+    },
+    estGestAge:{
+        type: Number,
+        required: true
+    }
+});
