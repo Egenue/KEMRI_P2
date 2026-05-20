@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-export const deliveryForm = new mongoose.Schema({
+const deliveryForm = new mongoose.Schema(
+    {
     interviewDate:{
         type: Date,
         required: true,
@@ -99,7 +100,7 @@ export const deliveryForm = new mongoose.Schema({
         deliveryPersonnel:{
             value:{
                 type: String,
-            enum:["Doctor", "Clinical Officer", "Nurse", "Midwife", "Traditional Birth Attendant",
+                enum:["Doctor", "Clinical Officer", "Nurse", "Midwife", "Traditional Birth Attendant",
                 "Village Health Worker", "Other", "Don't know"]
             },
             other:{
@@ -122,12 +123,79 @@ export const deliveryForm = new mongoose.Schema({
                 }
             },
             csectionIndication:{
-                type: String,
-                required: function(){
-                    return this.choices === "C-section"
+                options:{
+                    type: String,enum:[
+                        "Prolonged labour", "Fetal distress", "Meconium-stained amniotic fluid", "Antepartum hemorrhage",
+                        "Pre-eclempic toxemia", "cephalopelvic disproportion", "Malpresentation", "Elective C-section",
+                        "Pregnancy-induced hypertension", "Other", "Don't know"
+                    ],
+                    required: function(){
+                        return this.choices === "C-section"
+                    }
+                },
+                otherOption:{
+                    type: String,
+                    required: function (){
+                        return this.options === "Other"
+                    }
                 }
             }
         }
-
+    },
+    closeOut:{
+        interviewDate:{
+            type: Date,
+            required: true,
+            default: Date.now
+        },
+        sreeningId:{
+            type: String,
+            required: true
+        },
+        dateOfTermination:{
+            type: Date,
+            required: true,
+            default: Date.now
+        },
+        participantStatus:{
+            choicesStudy:{
+                type: String,
+                enum:["Completed study visits", "Participation terminated prior to completion of study visits",
+                "Screen failure before enrollment"]
+            },
+            incompleteReason:{
+                incompletionOptions:{
+                    type: String,
+                    enum:["Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
+                    "Study terminated by sponsor", "Withrawal by participant", "Other"]
+                },
+                deathOption:{
+                    type: Date,
+                    required: function (){
+                        return this.incompletionOptions === "Death"
+                    }
+                },
+                protocalDeviation:{
+                    type: String,
+                    required: function (){
+                        return this.incompletionOptions === "Protocol deviation"
+                    }
+                },
+                withdrawalReason:{
+                    type: String,
+                    required: function (){
+                        return this.incompleteReason === "Withdrawal by participant"
+                    }
+                },
+                otherReason:{
+                    type: String,
+                    required: function (){
+                        return this.incompleteReason === "Other"
+                    }
+                }
+            }
+        }
     }
 });
+
+export default deliveryForm ;
