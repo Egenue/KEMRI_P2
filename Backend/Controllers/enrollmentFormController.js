@@ -2,10 +2,11 @@ import enrollmentForm from "../Models/enrollmentForm.js";
  
 const getAllEnrollmentForms = async (req, res) => {
     try{
-        const data = await enrollmentForm.find();
+        const enrollmentData = await enrollmentForm.find();
+        return res.status(200).json({data:enrollmentData});
     }
     catch(error){
-        return("Could not fetch data: ", error)
+        return res.status(500).json({"message":"Could not get all emrollment forms", error: error.message})
     }
 }
 
@@ -15,10 +16,7 @@ const newEnrollmentForm = async (req, res) => {
             screeningId,
             healthFacility,
             DoB,
-            Age:{
-                months,
-                years
-            },
+            Age:{months,years},
             maritalStatus,
             husbandName,
             villageOfResidence,
@@ -28,28 +26,14 @@ const newEnrollmentForm = async (req, res) => {
             height,
             weight,
             vitalSigns:{
-                temperature:{
-                    value,
-                    location
-                },
+                temperature:{value,location},
                 respiratoryRate,
                 pulseRate,
-                bloodPressure:{
-                    systolic,diastolic
-                }
+                bloodPressure:{systolic,diastolic}
             },
             estGestAge
         } = req.body;
-        
-        if (!screeningId || !DoB || !healthFacility) {
-            return res.status(400).json({
-                message: "Please fill in all required fields: screeningId, DoB, and healthFacility."
-            });
-        }
-        const exists = await enrollmentForm.finOne({$or: [screeningId, HusbandName]});
-        if (exists){
-            return ('This enrollment form aready exists !')
-        }
+
         const newEnrollmentForm = new enrollmentForm({
             screeningId,
             healthFacility,
@@ -78,14 +62,23 @@ const newEnrollmentForm = async (req, res) => {
                 }
             },
             estGestAge
-    });
-
-    await newEnrollmentForm.save();
-
-    return res.status(200).json({"message":"Enrolment Form Saved", data: newEnrollmentForm});
+        });
+        
+        if (!screeningId || !DoB || !healthFacility) {
+            return res.status(400).json({
+                message: "Please fill in all required fields: screeningId, DoB, and healthFacility."
+            });
+        }
+        const exists = await enrollmentForm.finOne({$or: [screeningId, HusbandName]});
+        if (exists){
+            return ('This enrollment form aready exists !')
+        }else{
+            await newEnrollmentForm.save();
+            return res.status(200).json({data: newEnrollmentForm});
+        }
     }
     catch(error){
-        return ("Could not save new enrollment form: ", error);
+        returnres.status(500).json({"message":"Could not create new Enrollment Form", error:error.message});
     }
     
 }
@@ -96,12 +89,12 @@ const getOneEnrollmentForm = async (req, res) => {
         const enrolmentFormDoc = await enrollmentForm.findOneById(id);
         if(!enrolmentFormDoc){
             return res.status(404).json({"message":"Enrollment form not found"});
+        }else{
+            return res.status(200).json({"message":"Enrollment form found", data: enrolmentFormDoc});
         }
-
-        return res.status(200).json({"message":"Enrollment form found", data: enrolmentFormDoc});
     }
     catch(error){
-        return ("Error, could not get enrollmentForm : ", error)
+        return res.status(500).json({ message: "Error, could not get enrollment form", error: error.message });
     }
 }
 
@@ -111,17 +104,14 @@ const deleteEnrollmentForm = async (req, res) => {
         const enrolmentFormDoc = await enrollmentForm.findOneById(id);
         if(!enrolmentFormDoc){
            return res.status(404).json({"message":"Enrollment form not found"});
+        }else{
+            await enrolmentFormDoc.findByIdAndDelete(id)
+            res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
-        enrolmentFormDoc.delete((err, results) => {
-            if (err) {
-                return res.status(500).json({ success: false, error: err.message });
-            } else {
-                res.status(200).json({ success: true, message: 'Deleted successfully' });
-            }
-        });
-    }catch(error){
-        return ("Error, Could not delete enrollment form", error);
+    }
+    catch(error){
+        return res.status(500).json({ message: "Error, could not delete enrollment form", error: error.message });
     }
 }
 
-export default {newEnrollmentForm, getAllEnrollmentForms, getOneEnrollmentForm, deleteEnrollmentForm};
+export {newEnrollmentForm, getAllEnrollmentForms, getOneEnrollmentForm, deleteEnrollmentForm};

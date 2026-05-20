@@ -123,7 +123,7 @@ const deliveryForm = new mongoose.Schema(
                 }
             },
             csectionIndication:{
-                options:{
+                csectOptions:{
                     type: String,enum:[
                         "Prolonged labour", "Fetal distress", "Meconium-stained amniotic fluid", "Antepartum hemorrhage",
                         "Pre-eclempic toxemia", "cephalopelvic disproportion", "Malpresentation", "Elective C-section",
@@ -131,19 +131,19 @@ const deliveryForm = new mongoose.Schema(
                     ],
                     required: function(){
                         return this.choices === "C-section"
-                    }
+                    },
                 },
                 otherOption:{
                     type: String,
                     required: function (){
-                        return this.options === "Other"
+                        return this.csectOptions === "Other"
                     }
                 }
             }
         }
     },
     closeOut:{
-        interviewDate:{
+        closeOutInterviewDate:{
             type: Date,
             required: true,
             default: Date.now
