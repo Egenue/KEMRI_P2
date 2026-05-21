@@ -5,8 +5,6 @@ import connection from './Config/database.js';
 import router from './Routes/formRoutes.js';
 
 dotenv.config();
-await connection();
-
 
 const app = express();
 const PORT = process.env.PORT;
@@ -37,6 +35,13 @@ app.use(cors({
 app.use(express.json());
 app.use("/api", router);
 
-app.listen( PORT, () => {
-    return console.log(`Server running on Port ${PORT}`);
+app.listen(PORT, async () => {
+    console.log(`Server running on Port ${PORT}`);
+    
+    try {
+        await connection();
+        console.log("Database connected successfully.");
+    } catch (err) {
+        console.error("Database connection failed:", err.message);
+    }
 });
