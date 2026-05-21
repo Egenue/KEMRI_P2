@@ -12,11 +12,25 @@ const app = express();
 const PORT = process.env.PORT;
 
 //      CORS configuration      //
-const corsOrigins = [process.env.CORS1, process.env.CORS2, process.env.CORS3] ;
+const allowedOrigins = [
+  process.env.ORIGIN1,
+  process.env.ORIGIN2,
+  process.env.ORIGIN3,
+  process.env.ORIGIN4
+].map(url => url?.replace(/\/$/, "")); 
+
 app.use(cors({
-    origin: corsOrigins,
-    methods:['PUT', 'GET', 'DELETE', 'POST'],
-    credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`Blocked by CORS: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 
