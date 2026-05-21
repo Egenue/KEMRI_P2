@@ -4,7 +4,7 @@ const createDeliveryForm = async (req, res) => {
     try{
         const {
             interviewDate,
-            deliverySreeningId,
+            deliveryScreeningId,
             physicalExam = {},
             bodyMassIndex = {},
             motherAbnormality = {},
@@ -43,7 +43,7 @@ const createDeliveryForm = async (req, res) => {
         const {csectOptions,otherOption} = csectionIndication;
 
         const newDeliveryForm = new deliveryForm({
-            deliverySreeningId,
+            deliveryScreeningId,
             interviewDate,
             physicalExam ,
             bodyMassIndex ,
@@ -52,11 +52,9 @@ const createDeliveryForm = async (req, res) => {
             closeOut
         });
 
-        const id = req.body.deliverySreeningId ;
+        const exists = await deliveryForm.findOne({deliveryScreeningId});
 
-        const exists = await deliveryForm.findById(id);
-
-        if (!interviewDate || !bodyMassIndex){
+        if (!deliveryScreeningId || !interviewDate || !bodyMassIndex){
             return res.status(500).json({"message":"Please fill in all fields"});
         }else if(exists){
             res.status(404).json({"message":"Form already exists !!"});
@@ -72,17 +70,19 @@ const createDeliveryForm = async (req, res) => {
 
 const getdeliveryForms = async (req, res) => {
     try{
-        const deliveryFormData = await deliveryForm.find();
+        const deliveryFormData = await deliveryForm.find({});
         return res.status(200).json({data:deliveryFormData});
     }catch (error){
         return ("ERROR!! Could not get delivery form: ", error);
     }
 }
 
-const getOneDeliveryForm = async (res, req) => {
+const getOneDeliveryForm = async (req, res) => {
     try{
-        const id = req.body.deliverySreeningId;
-        const delFormData = await deliveryForm.findById(id);
+        const id = req.body.deliveryScreeningId ;
+        const delFormData = await deliveryForm.findOne({
+            $or:[{deliveryScreeningId:req.body.deliveryScreeningId}]
+        });
 
         if(!delFormData){
             res.status(200).json("Form not found !!");
@@ -96,8 +96,8 @@ const getOneDeliveryForm = async (res, req) => {
 
 const deleteOneDeliveryForm = async (req, res) => {
     try{
-        const id = req.body.deliverySreeningId;
-        const oneDelveryForm = await deliveryForm.findById(id);
+        const id = req.body.deliveryScreeningId;
+        const oneDelveryForm = await deliveryForm.findOne({id});
         if(!oneDelveryForm){
             return res.status(401).json({"message":"Form not found"});
         }else{

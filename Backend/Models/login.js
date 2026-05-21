@@ -12,6 +12,12 @@ const login = mongoose.Schema({
         unique: true
     },
 
+    userRole: {
+        type: String,
+        enum: ['Data Manager', 'Field Technician', 'Admin'],
+        required: true
+    },
+
     password: {
         type: String,
         required: true

@@ -3,12 +3,29 @@ import bcrypt from 'bcryptjs';
 
 const createLogin = async (req, res) => {
     try {
-        const { email, userName, password, dateCreated } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const dateCreate = await new Date();
-        const newLogin = new login({ email, userName, password: hashedPassword, dateCreated: dateCreate});
-        await newLogin.save();
-        res.status(201).json(newLogin);
+        const { email, userName, password, dateCreated, userRole } = req.body;
+
+        const exists = await login.findOne({
+            $or:[{email: req.body.email},{userName: req.body.userName}]
+        });
+        const validPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
+        if (!validPass.test(password)){
+            return res.status(400).json({"message":"Password does not meet requirement"});
+        }else if (exists){
+            return res.status(401).json({"message":"User already exists"});
+        }else{
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const dateCreate = await new Date();
+            const newLogin = new login({
+                email,
+                userName,
+                password: hashedPassword,
+                dateCreated: dateCreate,
+                userRole
+            });
+            await newLogin.save();
+            res.status(201).json(newLogin);
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

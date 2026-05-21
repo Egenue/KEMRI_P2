@@ -6,7 +6,7 @@ const deliveryFormSchema = new mongoose.Schema(
         required: true,
         default: Date.now
     },
-    deliverySreeningId:{
+    deliveryScreeningId:{
         type: String,
         unique: true,
         required: true

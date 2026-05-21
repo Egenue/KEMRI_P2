@@ -3,3 +3,4 @@ package-lock.json
 .env
 .gitignore
 KEMRI_P1*
+KEMRI_P2*

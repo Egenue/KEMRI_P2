@@ -6,10 +6,12 @@ const connection = async () => {
     const MONGO_CLUSTER = process.env.MONGO_CLUSTER;
     const MONGO_DB = process.env.MONGO_DB;
 
-    const MONGO_UR = `mongodb+srv://${MONGO_USER}:${encodeURIComponent(MONGO_PASSWORD)}@${MONGO_CLUSTER}/${MONGO_DB}?retryWrites=true&w=majority`;
+    const MONGO_UR = `mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_CLUSTER}/${MONGO_DB}?retryWrites=true&w=majority`;
     try{
         await mongoose.connect(MONGO_UR);
-        return console.log('Successful Connection to MongoDB');
+        return console.log('Successful Connection to MongoDB',
+            'Database USER', MONGO_USER,
+            'Database ', MONGO_DB);
     }
     catch(error){
         console.log('Could not connect to db:', error)
