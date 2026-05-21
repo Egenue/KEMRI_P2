@@ -91,11 +91,11 @@ const newEnrollmentForm = async (req, res) => {
 const getOneEnrollmentForm = async (req, res) => {
     try{
         const {id} = req.params;
-        const enrolmentFormDoc = await EnrollmentForm.findOneById(id);
+        const enrolmentFormDoc = await EnrollmentForm.findById(id);
         if(!enrolmentFormDoc){
             return res.status(404).json({"message":"Enrollment form not found"});
         }else{
-            return res.status(200).json({"message":"Enrollment form found", data: enrolmentFormDoc});
+            return res.status(201).json({"message":"Enrollment form found", data: enrolmentFormDoc});
         }
     }
     catch(error){
@@ -106,7 +106,7 @@ const getOneEnrollmentForm = async (req, res) => {
 const deleteEnrollmentForm = async (req, res) => {
     try{
         const {id} = req.params;
-        const enrolmentFormDoc = await EnrollmentForm.findOneById(id);
+        const enrolmentFormDoc = await EnrollmentForm.findById(id);
         if(!enrolmentFormDoc){
            return res.status(404).json({"message":"Enrollment form not found"});
         }else{
