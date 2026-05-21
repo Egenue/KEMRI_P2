@@ -23,8 +23,7 @@ const login = mongoose.Schema({
     },
 
     dateCreated: {
-        type: Date,
-        default: Date.now
+        type: Date
     }
 })
 export default mongoose.model('Login', login);

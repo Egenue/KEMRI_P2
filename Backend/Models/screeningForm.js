@@ -18,6 +18,8 @@ const screeningFormSchema = new mongoose.Schema({
     },
     DoB:{
         type: Date,
+        min: '1972-01-01',
+        max: '2006-01-01',
         required: true
     },
     Age:{
@@ -71,7 +73,8 @@ const screeningFormSchema = new mongoose.Schema({
     },
     lastMenstrualPeriod:{
         date:{
-            type: Date
+            type: Date,
+            default: Date.now
         },
         unknown:{
             type: Boolean,
@@ -80,7 +83,7 @@ const screeningFormSchema = new mongoose.Schema({
     },
     fundalHeight:{
         type: Number,
-        required: false
+        required: true
     },
     inclusionCriteria:{
         residentWithin15km:{
@@ -134,15 +137,18 @@ const screeningFormSchema = new mongoose.Schema({
         },
         consentedToParticipate:{
             type: String,
-            enum: ['Yes', 'No']
+            enum: ['Yes', 'No'],
+            required: function (){
+                return this.meetsAllCriteria === "Yes"
+            }
         },
         reasonForRefusal:{
             type: String,
             enum: ['Needs to consult', 'Other'],
-            default: null
-        },
-        refusalDetails:{
-            type: String
+            default: null,
+            required: function (){
+                return this.consentedToParticipate === "No"
+            }
         }
     },
     createdAt:{
@@ -155,6 +161,6 @@ const screeningFormSchema = new mongoose.Schema({
     }
 });
 
-const screeningForm = mongoose.model('deliveryForm', screeningFormSchema);
+const screeningForm = mongoose.model('screeningForm', screeningFormSchema);
 
 export default screeningForm;

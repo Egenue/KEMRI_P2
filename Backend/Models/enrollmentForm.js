@@ -12,6 +12,8 @@ const enrollmentFormSchema = new mongoose.Schema({
     },
     DoB:{
         type: Date,
+        min: '1972-01-01',
+        max: '2006-01-01',
         required: true
     },
     Age:{

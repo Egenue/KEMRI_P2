@@ -3,7 +3,8 @@ import deliveryForm from '../Models/deliveryForm.js';
 const createDeliveryForm = async (req, res) => {
     try{
         const {
-            interviewDate = {},
+            interviewDate,
+            deliverySreeningId,
             physicalExam = {},
             bodyMassIndex = {},
             motherAbnormality = {},
@@ -15,28 +16,34 @@ const createDeliveryForm = async (req, res) => {
 
         const {unknown,value} = bodyMassIndex ;
 
-        const {motherWeight,vitalSigns = {},respiratoryRate,pulseRate,bloodPressure = {}} = physicalExam ;
+        const {motherWeight,vitalSigns = {}} = physicalExam ;
+
+        const {temperature = {},respiratoryRate,pulseRate,bloodPressure = {}, oxygenSaturation = {}} = vitalSigns;
 
         const {systolic,diastolic} = bloodPressure ;
 
-        const {temperature,location} = vitalSigns;
+        const {tempValue, location} = temperature ;
+
+        const {oxygenValue, oxygenOptions} = oxygenSaturation ;
 
         const {closeOutInterviewDate,sreeningId,dateOfTermination,participantStatus = {}} = closeOut ;
+
         const {choicesStudy,incompleteReason = {}} = participantStatus ;
-        const {incompletionOptions,deathOption,protocalDeviation,withdrawalReason,otherReason} = incompleteReason;
+
+        const {incompletionOptions,adverseEvent,deathOption,protocalDeviation,withdrawalReason,otherReason} = incompleteReason;
 
         const {deliveryDate,deliveryTime,deliveryPlace = {},deliveryPersonnel = {},deliveryMode = {}} = deliveryHistory ;
 
-
         const {deliveryPersValue,otherPersonnel} = deliveryPersonnel;
 
-        const {deliverychoices,otherLocation,otherFacility} = deliveryPlace ;
+        const {deliveryChoices,otherLocation,otherFacility} = deliveryPlace ;
 
         const {choices,otherMode,csectionIndication = {}} = deliveryMode ;
 
         const {csectOptions,otherOption} = csectionIndication;
 
         const newDeliveryForm = new deliveryForm({
+            deliverySreeningId,
             interviewDate,
             physicalExam ,
             bodyMassIndex ,
@@ -45,7 +52,7 @@ const createDeliveryForm = async (req, res) => {
             closeOut
         });
 
-        const {id} = req.params;
+        const id = req.body.deliverySreeningId ;
 
         const exists = await deliveryForm.findById(id);
 
@@ -74,7 +81,7 @@ const getdeliveryForms = async (req, res) => {
 
 const getOneDeliveryForm = async (res, req) => {
     try{
-        const {id} = req.params;
+        const id = req.body.deliverySreeningId;
         const delFormData = await deliveryForm.findById(id);
 
         if(!delFormData){
@@ -89,7 +96,7 @@ const getOneDeliveryForm = async (res, req) => {
 
 const deleteOneDeliveryForm = async (req, res) => {
     try{
-        const {id} = req.params;
+        const id = req.body.deliverySreeningId;
         const oneDelveryForm = await deliveryForm.findById(id);
         if(!oneDelveryForm){
             return res.status(401).json({"message":"Form not found"});

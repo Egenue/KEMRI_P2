@@ -6,57 +6,74 @@ const deliveryFormSchema = new mongoose.Schema(
         required: true,
         default: Date.now
     },
+    deliverySreeningId:{
+        type: String,
+        unique: true,
+        required: true
+    },
     physicalExam:{
         motherWeight:{
             type: Number,
             required: true
         },
         vitalSigns:{
-        temperature:{
-            value:{
+            temperature:{
+                tempValue:{
+                    type: Number,
+                    required: true
+                },
+                location:{
+                    type: String,
+                    enum: ['Axillary', 'Oral', 'Tympanic'],
+                    required: true
+                }
+            },
+            respiratoryRate:{
                 type: Number,
                 required: true
             },
-            location:{
-                type: String,
-                enum: ['Axillary', 'Oral', 'Tympanic'],
-                required: true
-            }
-        },
-        respiratoryRate:{
-            type: Number,
-            required: true
-        },
-        pulseRate:{
-            type: Number,
-            required: true
-        },
-        bloodPressure:{
-            systolic:{
+            pulseRate:{
                 type: Number,
                 required: true
             },
-            diastolic:{
-                type: Number,
-                required: true
+            bloodPressure:{
+                systolic:{
+                    type: Number,
+                    required: true
+                },
+                diastolic:{
+                    type: Number,
+                    required: true
+                }
+            },
+            oxygenSaturation:{
+                oxygenValue:{
+                    type: Number,
+                    required: true
+                },
+                oxygenOptions:{
+                    type: String,
+                    enum:['On room air', 'With supplemental oxygen'],
+                    required: true
+                }
             }
-        }
-    },
+        },
     },
     bodyMassIndex:{
-        unknown:{
-            type: Boolean,
-            default: false
-        },
         value:{
             type: Number,
+            required: true,
+            default: null
+        },
+        unknown:{
+            type: Boolean,
             required: function(){
-                return this.unknown === false;
+                return this.value === null
             }
-        }
+        },
     },
     motherAbnormality:{
-        value:{
+        motherAbnomValue:{
             type:String,
             enum:["Yes", "No"],
             required: true
@@ -80,7 +97,7 @@ const deliveryFormSchema = new mongoose.Schema(
             match: /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/
         },
         deliveryPlace:{
-            choices:{
+            deliveryChoices:{
                 type: String,
                 enum:["Bondo", "Lumumba", "Siaya", "Home","Other Location", "Other hospital/clinic"]
             },
@@ -98,12 +115,12 @@ const deliveryFormSchema = new mongoose.Schema(
             }
         },
         deliveryPersonnel:{
-            value:{
+            deliveryPersValue:{
                 type: String,
                 enum:["Doctor", "Clinical Officer", "Nurse", "Midwife", "Traditional Birth Attendant",
                 "Village Health Worker", "Other", "Don't know"]
             },
-            other:{
+            otherPersonnel:{
                 type: String,
                 required: function(){
                     return this.value === "Other"
@@ -124,8 +141,9 @@ const deliveryFormSchema = new mongoose.Schema(
             },
             csectionIndication:{
                 csectOptions:{
-                    type: String,enum:[
-                        "Prolonged labour", "Fetal distress", "Meconium-stained amniotic fluid", "Antepartum hemorrhage",
+                    type: String,
+                    enum:[
+                        "Prolonged labour",  "Fetal distress", "Meconium-stained amniotic fluid", "Antepartum hemorrhage",
                         "Pre-eclempic toxemia", "cephalopelvic disproportion", "Malpresentation", "Elective C-section",
                         "Pregnancy-induced hypertension", "Other", "Don't know"
                     ],
@@ -150,6 +168,7 @@ const deliveryFormSchema = new mongoose.Schema(
         },
         sreeningId:{
             type: String,
+            unique: true,
             required: true
         },
         dateOfTermination:{
@@ -166,8 +185,14 @@ const deliveryFormSchema = new mongoose.Schema(
             incompleteReason:{
                 incompletionOptions:{
                     type: String,
-                    enum:["Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
+                    enum:["Adverse event","Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
                     "Study terminated by sponsor", "Withrawal by participant", "Other"]
+                },
+                adverseEvent:{
+                    type: String,
+                    required: function(){
+                        return this.incompletionOptions === "Adverse event"
+                    }
                 },
                 deathOption:{
                     type: Date,

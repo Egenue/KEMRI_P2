@@ -26,8 +26,8 @@ router.get('/getoneDelivery/:id', getOneDeliveryForm);
 router.delete('/deleteDelivery/:id', deleteOneDeliveryForm);
 
 //Screening Routes
-router.get('/getScreeninForms', getAllSreeningForms);
 router.post('/createScreeningForm', createScreeningForm);
+router.get('/getScreeninForms', getAllSreeningForms);
 router.get('/getOneScreeningForm/:id', getOneScreeningForm);
 router.delete('/deleteScreeningForm/:id', deleteScreeningForm);
 

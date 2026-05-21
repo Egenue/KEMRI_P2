@@ -1,5 +1,4 @@
-import EnrollmentForm from "../Models/enrollmentForm";
-import screeningForm  from "../Models/screeningForm";
+import screeningForm  from "../Models/screeningForm.js";
 
 const createScreeningForm = async (req, res) => {
     try{
@@ -21,7 +20,7 @@ const createScreeningForm = async (req, res) => {
         updatedAt
     } = req.body ;
 
-    const {meetsAllCriteria,consentedToParticipate,reasonForRefusal,refusalDetails} = eligibility ;
+    const {meetsAllCriteria,consentedToParticipate,reasonForRefusal} = eligibility ;
 
     const {multiplePregancy,fisturaRepairOrSpinalDeformity,unableToGiveInformedConsent} = exclusionCriteria ;
 
@@ -61,7 +60,7 @@ const createScreeningForm = async (req, res) => {
         updatedAt
     });
 
-    const exists = screeningForm.findOne({
+    const exists = await screeningForm.findOne({
         $or:[
             {screeningId: screeningId}
         ]
@@ -87,14 +86,14 @@ const getOneScreeningForm = async (req, res) => {
             $or: [{screeningId: req.body.screeningId}]
         }) ;
 
-        if(!exists){
+        if(!existing){
             return res.status(404).json({"message":"The screening form was not found !!"});
         }else{
             return res.status(201).json({"message":"Screening form found !!", data: existing});
         }
 
     }catch (error){
-        return res.status(500).json({"message":"Operation failed", error: erro.message});
+        return res.status(500).json({"message":"Operation failed", error: error.message});
     }
 }
 
@@ -129,7 +128,7 @@ const deleteScreeningForm = async (req, res) => {
             })
         }
     }catch(error){
-        return res.status(500).json({"message":"Could not delete form", error: eroor.message});
+        return res.status(500).json({"message":"Could not delete form", error: error.message});
     }
 }
 

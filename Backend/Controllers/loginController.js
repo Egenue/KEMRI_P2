@@ -3,9 +3,10 @@ import bcrypt from 'bcryptjs';
 
 const createLogin = async (req, res) => {
     try {
-        const { email, userName, password } = req.body;
+        const { email, userName, password, dateCreated } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newLogin = new login({ email, userName, password: hashedPassword });
+        const dateCreate = await new Date();
+        const newLogin = new login({ email, userName, password: hashedPassword, dateCreated: dateCreate});
         await newLogin.save();
         res.status(201).json(newLogin);
     } catch (error) {
@@ -52,16 +53,16 @@ const userLogin = async (req, res) => {
     try {
         const { email, password, dateLoggedIn } = req.body;
         const user = await login.findOne({ email });
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        }else if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
+        }else{
+            user.dateLoggedIn = dateLoggedIn;
+            await user.save();
+            res.status(200).json({ message: 'Login successful', user, dateLoggedIn: dateLoggedIn.toDateString()});
         }
-        user.dateLoggedIn = dateLoggedIn;
-        await user.save();
-        res.status(200).json({ message: 'Login successful', user, dateLoggedIn: Intl.DateTimeFormat('en-US').format(dateLoggedIn) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
