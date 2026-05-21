@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Lock, UserRound, ShieldCheck, HelpCircle, Loader } from 'lucide-react';
+import { Lock, UserRound, ShieldCheck, Loader } from 'lucide-react';
 import { User, UserRole } from '../types';
 import { loginAPI } from '../lib/apiClient';
 
@@ -51,7 +51,7 @@ export default function Login({ onLogin }: LoginProps) {
 
     try {
       // Call Backend API for authentication
-      const result = await loginAPI.userLogin(username.trim(), password);
+      const result = await loginAPI.userLogin(username.trim(), password) as { user: { userRole: string } };
       
       const actualName = fullName.trim() || username;
       const userInitials = getInitials(actualName);
@@ -79,24 +79,6 @@ export default function Login({ onLogin }: LoginProps) {
     }
   };
 
-  const handleQuickLogin = (presetRole: UserRole) => {
-    if (presetRole === 'manager') {
-      onLogin({
-        username: 'manager',
-        fullName: 'Patrobas Agwata',
-        initials: 'PA',
-        role: 'manager'
-      });
-    } else {
-      onLogin({
-        username: 'tech',
-        fullName: 'Samuel Otieno',
-        initials: 'SO',
-        role: 'technician'
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <motion.div 
@@ -104,7 +86,7 @@ export default function Login({ onLogin }: LoginProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="sm:mx-auto sm:w-full sm:max-w-md text-center"
-      >
+        >
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 text-white mb-4 shadow-lg shadow-indigo-200">
           <ShieldCheck className="w-8 h-8" />
         </div>
@@ -129,49 +111,6 @@ export default function Login({ onLogin }: LoginProps) {
                 {error}
               </div>
             )}
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
-                User Role
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRole('manager');
-                    setUsername('manager');
-                    setFullName('Patrobas Agwata');
-                  }}
-                  className={`py-3 px-4 flex flex-col items-center justify-center rounded-xl border text-sm font-medium transition-all ${
-                    role === 'manager'
-                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 ring-2 ring-indigo-600/10'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                  }`}
-                  id="role-btn-manager"
-                >
-                  <span className="font-semibold text-sm">Data Manager</span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">Edit & Submit Data</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRole('technician');
-                    setUsername('tech');
-                    setFullName('Samuel Otieno');
-                  }}
-                  className={`py-3 px-4 flex flex-col items-center justify-center rounded-xl border text-sm font-medium transition-all ${
-                    role === 'technician'
-                      ? 'border-indigo-600 bg-indigo-50/50 text-indigo-700 ring-2 ring-indigo-600/10'
-                      : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                  }`}
-                  id="role-btn-tech"
-                >
-                  <span className="font-semibold text-sm">Field Tech</span>
-                  <span className="text-[10px] text-slate-400 mt-0.5">Read-Only View</span>
-                </button>
-              </div>
-            </div>
-
             <div>
               <label htmlFor="username" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                 Username
@@ -253,45 +192,6 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
           </form>
 
-          <div className="mt-6 border-t border-slate-100 pt-6">
-            <h4 className="text-xs font-semibold text-slate-500 flex items-center gap-1.5 uppercase tracking-wider mb-3">
-              <HelpCircle className="w-4 h-4 text-indigo-500" />
-              Developer Credentials Guide
-            </h4>
-            <div className="space-y-2 text-xs text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-              <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200/50">
-                <span className="font-medium text-slate-800">1. Data Manager Portal</span>
-                <button 
-                  type="button"
-                  onClick={() => handleQuickLogin('manager')}
-                  className="px-2.5 py-1 text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-all cursor-pointer"
-                  id="quick-login-manager-btn"
-                >
-                  Quick Login
-                </button>
-              </div>
-              <p className="text-[11px] text-slate-400 px-1">
-                Username: <code className="font-mono text-slate-700 bg-slate-100 px-1 rounded">manager</code> &bull; Password: <code className="font-mono text-slate-700 bg-slate-100 px-1 rounded">manager123</code> <br />
-                User initials recorded: <strong className="text-indigo-600 font-mono">PA</strong> (Patrobas Agwata)
-              </p>
-
-              <div className="flex justify-between items-center bg-white p-2 rounded-lg mt-3 border border-slate-200/50">
-                <span className="font-medium text-slate-800">2. Field Technician Portal</span>
-                <button 
-                  type="button"
-                  onClick={() => handleQuickLogin('technician')}
-                  className="px-2.5 py-1 text-[10px] font-bold text-white bg-slate-600 hover:bg-slate-700 rounded-md transition-all cursor-pointer"
-                  id="quick-login-tech-btn"
-                >
-                  Quick Login
-                </button>
-              </div>
-              <p className="text-[11px] text-slate-400 px-1">
-                Username: <code className="font-mono text-slate-700 bg-slate-100 px-1 rounded">tech</code> &bull; Password: <code className="font-mono text-slate-700 bg-slate-100 px-1 rounded">tech123</code> <br />
-                User initials recorded: <strong className="text-indigo-600 font-mono">SO</strong> (Samuel Otieno)
-              </p>
-            </div>
-          </div>
         </div>
       </motion.div>
     </div>
