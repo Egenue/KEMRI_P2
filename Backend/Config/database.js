@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const connection = async () => {
     const MONGO_USER = process.env.MONGO_USER;
