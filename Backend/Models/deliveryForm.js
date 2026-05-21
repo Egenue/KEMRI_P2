@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const deliveryForm = new mongoose.Schema(
+const deliveryFormSchema = new mongoose.Schema(
     {
     interviewDate:{
         type: Date,
@@ -197,5 +197,7 @@ const deliveryForm = new mongoose.Schema(
         }
     }
 });
+
+const deliveryForm = mongoose.model('deliveryForm', deliveryFormSchema);
 
 export default deliveryForm ;

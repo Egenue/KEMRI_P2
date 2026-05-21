@@ -1,22 +1,32 @@
 import express from 'express';
+import { createLogin, getAllLogins, getLoginById, deleteLogin, userLogin } from '../Controllers/loginController.js';
 import {newEnrollmentForm, getAllEnrollmentForms, getOneEnrollmentForm, deleteEnrollmentForm} from '../Controllers/enrollmentFormController.js';
 import {createDeliveryForm, getdeliveryForms, getOneDeliveryForm, deleteOneDeliveryForm} from '../Controllers/deliveryFormController.js'
 
-const route = express.Router();
+const router = express.Router();
+
+//Login routes
+router.post('/createLogin', createLogin);
+router.post('/userLogin', userLogin);
+router.get('/allLogin', getAllLogins);
+router.delete('/deleteLogin/:id', deleteLogin);
+router.get('/loginId/:id', getLoginById);
 
 // Enrollment Form Routes
-route.post('/createNew', newEnrollmentForm);
-route.get('/getenrolls', getAllEnrollmentForms);
-route.get("/getOne/:id", getOneEnrollmentForm);
-route.delete("/deleteOne/:id", deleteEnrollmentForm);
+router.post('/createEnrollment', newEnrollmentForm);
+router.get('/getEnrollment', getAllEnrollmentForms);
+router.get("/getOneEnrollment/:id", getOneEnrollmentForm);
+router.delete("/deleteOne/:id", deleteEnrollmentForm);
 
 // Delivery Form Routes
-route.post('/createdelivery', createDeliveryForm);
-route.get('/getdelivery', getdeliveryForms);
-route.get('/getonedelivery', getOneDeliveryForm);
-route.delete('/deletedelivery', deleteOneDeliveryForm);
+router.post('/createDelivery', createDeliveryForm);
+router.get('/getDelivery', getdeliveryForms);
+router.get('/getoneDelivery', getOneDeliveryForm);
+router.delete('/deleteDelivery', deleteOneDeliveryForm);
+
+
 
 //Screening Routes
 
 
-export default route;
+export default router;

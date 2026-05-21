@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const screeningForm = new mongoose.Schema({
+const screeningFormSchema = new mongoose.Schema({
     screeningId:{
         type: String,
         unique: true,
@@ -154,5 +154,7 @@ const screeningForm = new mongoose.Schema({
         default: Date.now
     }
 });
+
+const screeningForm = mongoose.model('deliveryForm', screeningFormSchema);
 
 export default screeningForm;

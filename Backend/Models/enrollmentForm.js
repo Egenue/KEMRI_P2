@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const enrollmentForm = new mongoose.Schema({
+const enrollmentFormSchema = new mongoose.Schema({
     screeningId:{
         type: String,
         unique: true,
@@ -29,7 +29,7 @@ const enrollmentForm = new mongoose.Schema({
         enum: ['Married', 'Single', 'Divorced', 'Widowed'],
         required: true
     },
-    husbandName:{
+    HusbandName:{
         type: String,
         required: function() {
             return this.maritalStatus === 'Married';
@@ -101,4 +101,6 @@ const enrollmentForm = new mongoose.Schema({
     }
 });
 
-export default enrollmentForm;
+const EnrollmentForm = mongoose.model('EnrollmentForm', enrollmentFormSchema);
+
+export default EnrollmentForm;

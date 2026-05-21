@@ -1,8 +1,8 @@
-import enrollmentForm from "../Models/enrollmentForm.js";
+import EnrollmentForm from "../Models/enrollmentForm.js";
  
 const getAllEnrollmentForms = async (req, res) => {
     try{
-        const enrollmentData = await enrollmentForm.find();
+        const enrollmentData = await EnrollmentForm.find({});
         return res.status(200).json({data:enrollmentData});
     }
     catch(error){
@@ -18,7 +18,7 @@ const newEnrollmentForm = async (req, res) => {
             DoB,
             Age:{months,years},
             maritalStatus,
-            husbandName,
+            HusbandName,
             villageOfResidence,
             educationLevel,
             subjectOccupation,
@@ -34,7 +34,7 @@ const newEnrollmentForm = async (req, res) => {
             estGestAge
         } = req.body;
 
-        const newEnrollmentForm = new enrollmentForm({
+        const newEnrollmentForm = new EnrollmentForm({
             screeningId,
             healthFacility,
             DoB,
@@ -43,7 +43,7 @@ const newEnrollmentForm = async (req, res) => {
                 years
             },
             maritalStatus,
-            husbandName,
+            HusbandName,
             villageOfResidence,
             educationLevel,
             subjectOccupation,
@@ -69,7 +69,12 @@ const newEnrollmentForm = async (req, res) => {
                 message: "Please fill in all required fields: screeningId, DoB, and healthFacility."
             });
         }
-        const exists = await enrollmentForm.finOne({$or: [screeningId, HusbandName]});
+        const exists = await EnrollmentForm.findOne({
+            $or: [
+                {screeningId: req.body.screeningId},
+                {HusbandName: req.body.HusbandName}
+            ]
+        });
         if (exists){
             return ('This enrollment form aready exists !')
         }else{
@@ -78,7 +83,7 @@ const newEnrollmentForm = async (req, res) => {
         }
     }
     catch(error){
-        returnres.status(500).json({"message":"Could not create new Enrollment Form", error:error.message});
+        return res.status(500).json({"message":"Could not create new Enrollment Form", error:error.message});
     }
     
 }
@@ -86,7 +91,7 @@ const newEnrollmentForm = async (req, res) => {
 const getOneEnrollmentForm = async (req, res) => {
     try{
         const {id} = req.params;
-        const enrolmentFormDoc = await enrollmentForm.findOneById(id);
+        const enrolmentFormDoc = await EnrollmentForm.findOneById(id);
         if(!enrolmentFormDoc){
             return res.status(404).json({"message":"Enrollment form not found"});
         }else{
@@ -101,7 +106,7 @@ const getOneEnrollmentForm = async (req, res) => {
 const deleteEnrollmentForm = async (req, res) => {
     try{
         const {id} = req.params;
-        const enrolmentFormDoc = await enrollmentForm.findOneById(id);
+        const enrolmentFormDoc = await EnrollmentForm.findOneById(id);
         if(!enrolmentFormDoc){
            return res.status(404).json({"message":"Enrollment form not found"});
         }else{
