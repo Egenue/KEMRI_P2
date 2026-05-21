@@ -1,0 +1,6 @@
+{
+  "name": "Clinical Study Workflow Manager",
+  "description": "A secure digitized workflow management and data collection application for Screening, Enrolment, Delivery, and Closeout with role-based access control, validations, and real-time facility metrics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
