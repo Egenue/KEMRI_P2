@@ -70,10 +70,11 @@ const userLogin = async (req, res) => {
     try {
         const { email, password, dateLoggedIn } = req.body;
         const user = await login.findOne({ email });
-        const isMatch = await bcrypt.compare(password, user.password);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
-        }else if (!isMatch) {
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }else{
             user.dateLoggedIn = dateLoggedIn;
