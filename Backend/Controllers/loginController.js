@@ -68,8 +68,8 @@ const getLoginById = async (req, res) => {
 
 const userLogin = async (req, res) => {
     try {
-        const { email, password, dateLoggedIn } = req.body;
-        const user = await login.findOne({ email });
+        const { userName, password, dateLoggedIn } = req.body;
+        const user = await login.findOne({ userName });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
