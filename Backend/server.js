@@ -11,11 +11,11 @@ const PORT = process.env.PORT;
 
 //      CORS configuration      //
 const defaultOrigins = [
-    ORIGIN1 || 'https://localhost:3000',
-    ORIGIN2 || "https://localhost:3001",
-    ORIGIN3 ||"https://localhost:3002",
-    ORIGIN4 || "https://localhost:3003",
-    CORS_ORIGIN || 'https://kemri-p2.vercel.app'
+    process.env.ORIGIN1 || "http://localhost:3000",
+    process.env.ORIGIN2 || "http://localhost:3001",
+    process.env.ORIGIN3 || "http://localhost:3002",
+    process.env.ORIGIN4 || "http://localhost:3003",
+    process.env.CORS_ORIGIN || "https://kemri-p2.vercel.app"
 ];
 
 const configuredOrigins = (process.env.CORS_ORIGIN )
