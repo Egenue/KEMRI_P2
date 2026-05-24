@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Check, Lock, ShieldAlert, HeartCrack, Skull } from 'lucide-react';
@@ -27,7 +22,6 @@ export default function CloseoutForm({
   userInitials,
   readOnly = false
 }: CloseoutFormProps) {
-  // Main states
   const [screeningId, setScreeningId] = useState('');
   const [dateOfInterview, setDateOfInterview] = useState('');
   const [dateOfStudyTermination, setDateOfStudyTermination] = useState('');
@@ -36,7 +30,6 @@ export default function CloseoutForm({
   const [discontinuationReasonDetail, setDiscontinuationReasonDetail] = useState('');
   const [deathDate, setDeathDate] = useState('');
 
-  // Auto pre-fill today's dates
   useEffect(() => {
     if (existingRecord) {
       setScreeningId(existingRecord.screeningId);

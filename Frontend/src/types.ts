@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 export type UserRole = 'manager' | 'technician';
 
 export interface User {
@@ -10,26 +5,26 @@ export interface User {
   fullName: string;
   initials: string;
   role: UserRole;
+  email: string;
 }
 
 export type HealthFacility = 'Bondo' | 'Siaya' | 'Kuoyo' | 'Lumumba';
 
 export interface AuditFields {
-  submittedBy: string; // User initials
-  submittedAt: string; // ISO date-time string
-  updatedBy?: string; // User initials of last editor
+  submittedBy: string;
+  submittedAt: string;
+  updatedBy?: string;
   updatedAt?: string; 
 }
 
 export interface ScreeningRecord extends AuditFields {
-  screeningId: string; // Unique primary key, format "SCR-XXXX"
-  dateOfInterview: string; // YYYY-MM-DD
+  screeningId: string;
+  dateOfInterview: string;
   facility: HealthFacility;
-  dateOfBirth: string; // YYYY-MM-DD (between 1972-01-01 and 2006-01-01)
+  dateOfBirth: string;
   ageYears: number;
   ageMonths: number;
-  
-  // A. Initial assessment
+
   heightCm: number;
   weightKg: number;
   temperatureC: number;
@@ -38,36 +33,32 @@ export interface ScreeningRecord extends AuditFields {
   pulseRate: number;
   bloodPressureSys: number;
   bloodPressureDia: number;
-  lmpDate: string; // YYYY-MM-DD or 'Unknown'
+  lmpDate: string;
   fundalHeightCm: number;
 
-  // B. Inclusion Criteria
   incVillage15km: boolean;
   incPregnancyConfirmed: boolean;
   incGestation31wks: boolean;
   incHivConsent: boolean;
   incWillingDelivery: boolean;
 
-  // C. Exclusion Criteria
   excMultiplePregnancy: 'Yes' | 'No' | 'Don\'t Know';
   excDeformityFistula: 'Yes' | 'No' | 'Don\'t Know';
   excInformedConsentUnable: 'Yes' | 'No';
 
-  // D. Study Eligibility
-  isEligible: boolean; // Auto-calculated based on rules
+  isEligible: boolean;
   womanConsented: 'Yes' | 'No';
   refusalReason?: 'Needs to consult' | 'Other' | '';
   refusalReasonOther?: string;
 }
 
 export interface EnrolmentRecord extends AuditFields {
-  screeningId: string; // Unique key, foreign key to ScreeningRecord
+  screeningId: string;
   facility: HealthFacility;
-  dateOfBirth: string; // Pre-filled but editable
+  dateOfBirth: string;
   ageYears: number;
   ageMonths: number;
 
-  // D. Demographics
   maritalStatus: 'Single' | 'Married' | 'Widowed' | 'Other';
   husbandName?: string;
   villageOfResidence: string;
@@ -75,7 +66,6 @@ export interface EnrolmentRecord extends AuditFields {
   occupation: 'Farmer' | 'Business woman' | 'Fisherman/ Fish monger' | 'Home maker' | 'Salaried worker' | 'Other, Specify';
   occupationOther?: string;
 
-  // Assessments (pre-filled from screening/editable)
   heightCm: number;
   weightKg: number;
   temperatureC: number;
@@ -88,8 +78,8 @@ export interface EnrolmentRecord extends AuditFields {
 }
 
 export interface DeliveryRecord extends AuditFields {
-  screeningId: string; // Unique key, foreign key to EnrolmentRecord
-  dateOfInterview: string; // YYYY-MM-DD
+  screeningId: string;
+  dateOfInterview: string;
 
   // A. Physical Examination
   motherWeightKg: number; // Postpartum

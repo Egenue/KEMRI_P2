@@ -385,6 +385,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
+                min="100"
+                max="200"
                 required
                 disabled={readOnly}
                 placeholder="--- cm"
@@ -393,6 +395,9 @@ export default function ScreeningForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f1-height"
               />
+              {typeof heightCm === 'number' && (heightCm < 100 || heightCm > 200) && (
+                <p className="text-xs text-red-500 mt-1">Height should be 100-200 cm</p>
+              )}
             </div>
 
             <div>
@@ -402,6 +407,8 @@ export default function ScreeningForm({
               <input
                 type="number"
                 step="0.1"
+                min="30"
+                max="150"
                 required
                 disabled={readOnly}
                 placeholder="--.- kg"
@@ -410,6 +417,9 @@ export default function ScreeningForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f1-weight"
               />
+              {typeof weightKg === 'number' && (weightKg < 30 || weightKg > 150) && (
+                <p className="text-xs text-red-500 mt-1">Weight should be 30-150 kg</p>
+              )}
             </div>
 
             <div>
@@ -420,6 +430,8 @@ export default function ScreeningForm({
                 <input
                   type="number"
                   step="0.1"
+                  min="35.0"
+                  max="41.0"
                   required
                   disabled={readOnly}
                   placeholder="--.- C"
@@ -428,6 +440,12 @@ export default function ScreeningForm({
                   className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-l-lg text-slate-900 text-sm focus:z-10 focus:outline-hidden"
                   id="f1-temp"
                 />
+                {typeof temperatureC === 'number' && temperatureC < 36.0 && (
+                  <p className="text-xs text-red-600 mt-1 font-semibold">⚠ Hypothermia</p>
+                )}
+                {typeof temperatureC === 'number' && temperatureC > 38.5 && (
+                  <p className="text-xs text-red-600 mt-1 font-semibold">⚠ High Fever</p>
+                )}
                 <select
                   value={tempMethod}
                   disabled={readOnly}
@@ -448,6 +466,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
+                min="12"
+                max="30"
                 required
                 disabled={readOnly}
                 placeholder="-- breaths/min"
@@ -456,6 +476,9 @@ export default function ScreeningForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f1-resprate"
               />
+              {typeof respiratoryRate === 'number' && (respiratoryRate < 12 || respiratoryRate > 30) && (
+                <p className="text-xs text-red-500 mt-1">RR: 12-30 breaths/min</p>
+              )}
             </div>
 
             <div>
@@ -464,6 +487,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
+                min="40"
+                max="160"
                 required
                 disabled={readOnly}
                 placeholder="-- beats/min"
@@ -472,6 +497,9 @@ export default function ScreeningForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f1-pulserate"
               />
+              {typeof pulseRate === 'number' && (pulseRate < 40 || pulseRate > 160) && (
+                <p className="text-xs text-red-500 mt-1">PR: 40-160 beats/min</p>
+              )}
             </div>
 
             <div>
@@ -481,6 +509,8 @@ export default function ScreeningForm({
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"
+                  min="70"
+                  max="190"
                   required
                   disabled={readOnly}
                   placeholder="Sys"
@@ -492,6 +522,8 @@ export default function ScreeningForm({
                 <span className="text-slate-400 font-bold">&#47;</span>
                 <input
                   type="number"
+                  min="40"
+                  max="120"
                   required
                   disabled={readOnly}
                   placeholder="Dia"
@@ -500,6 +532,9 @@ export default function ScreeningForm({
                   className="block w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center"
                   id="f1-bp-dia"
                 />
+                {typeof bloodPressureSys === 'number' && typeof bloodPressureDia === 'number' && bloodPressureSys <= bloodPressureDia && (
+                  <p className="text-xs text-red-600 mt-1 font-semibold col-span-3">Systolic must be &lt; Diastolic</p>
+                )}
                 <span className="text-slate-400 text-[10px] font-mono whitespace-nowrap">mm Hg</span>
               </div>
             </div>
@@ -538,6 +573,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
+                min="10"
+                max="45"
                 required
                 disabled={readOnly}
                 placeholder="-- cm"
@@ -546,6 +583,9 @@ export default function ScreeningForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f1-fundal"
               />
+              {typeof fundalHeightCm === 'number' && (fundalHeightCm < 10 || fundalHeightCm > 45) && (
+                <p className="text-xs text-red-500 mt-1">Fundal height: 10-45 cm</p>
+              )}
             </div>
           </div>
         </div>

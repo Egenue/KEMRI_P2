@@ -14,6 +14,7 @@ interface LoginProps {
 }
 
 export default function Login({ onLogin }: LoginProps) {
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -37,6 +38,12 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
     setIsLoading(true);
 
+    if (!email.trim()) {
+      setError('Please enter an email');
+      setIsLoading(false);
+      return;
+    }
+
     if (!username.trim()) {
       setError('Please enter a username');
       setIsLoading(false);
@@ -51,7 +58,7 @@ export default function Login({ onLogin }: LoginProps) {
 
     try {
       // Call Backend API for authentication
-      const result = await loginAPI.userLogin(username.trim(), password) as { user: { userRole: string } };
+      const result = await loginAPI.userLogin(email.trim(), username.trim(), fullName.trim(), password) as { user: { userRole: string } };
       
       const actualName = fullName.trim() || username;
       const userInitials = getInitials(actualName);
@@ -70,7 +77,8 @@ export default function Login({ onLogin }: LoginProps) {
         username: username.trim(),
         fullName: actualName,
         initials: userInitials,
-        role: mappedRole
+        role: mappedRole,
+        email: email.trim()
       });
     } catch (err: any) {
       setError(err.message || 'Invalid credentials. Please try again.');
@@ -111,6 +119,22 @@ export default function Login({ onLogin }: LoginProps) {
                 {error}
               </div>
             )}
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900 placeholder-slate-400 text-sm transition-all"
+                placeholder="user@example.com"
+              />
+            </div>
+
             <div>
               <label htmlFor="username" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                 Username

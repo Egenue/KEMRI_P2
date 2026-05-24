@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { 
@@ -104,7 +99,6 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       });
   };
 
-  // Export to CSV helper
   const exportToCSV = () => {
     const dataset = filteredAndSortedRecords();
     if (dataset.length === 0) return;
@@ -130,7 +124,6 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
     document.body.removeChild(link);
   };
 
-  // Export to JSON helper
   const exportToJSON = () => {
     const dataset = filteredAndSortedRecords();
     if (dataset.length === 0) return;

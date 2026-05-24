@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from '../types';
 import { getDatabase, saveDatabase, resetDatabase } from './db';
 import { screeningAPI, enrollmentAPI, deliveryAPI } from './apiClient';
@@ -24,9 +19,6 @@ interface FormActionsContext {
   activeTab: ActiveTab;
 }
 
-/**
- * Form Actions Factory - Centralized form submission and data manipulation handlers
- */
 export const createFormActions = (context: FormActionsContext) => {
   const {
     setCurrentUser,
@@ -41,9 +33,6 @@ export const createFormActions = (context: FormActionsContext) => {
     db,
   } = context;
 
-  /**
-   * Display toast notification
-   */
   const showToast = (message: string, type: NotificationType = 'success') => {
     setNotification({ message, type });
     setTimeout(() => {
@@ -51,9 +40,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }, 4000);
   };
 
-  /**
-   * Fetch data from Backend API
-   */
   const fetchDataFromBackend = async () => {
     try {
       setIsLoading(true);
@@ -85,9 +71,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Handle user login
-   */
   const handleLogin = (user: User) => {
     setCurrentUser(user);
     localStorage.setItem('study_workflow_user', JSON.stringify(user));
@@ -96,9 +79,6 @@ export const createFormActions = (context: FormActionsContext) => {
     fetchDataFromBackend();
   };
 
-  /**
-   * Handle user logout
-   */
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('study_workflow_user');
@@ -108,9 +88,6 @@ export const createFormActions = (context: FormActionsContext) => {
     showToast('Securely signed out of database session.', 'info');
   };
 
-  /**
-   * Handle database reset to demo data
-   */
   const handleResetDemoData = () => {
     if (confirm('Are you sure you want to restore the trial database to original baseline patients? This updates all 4 tables.')) {
       const refreshedDb = resetDatabase();
@@ -121,9 +98,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Save Screening Form
-   */
   const handleSaveScreening = async (record: ScreeningRecord) => {
     try {
       setIsLoading(true);
@@ -155,9 +129,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Save Enrollment Form
-   */
   const handleSaveEnrolment = async (record: EnrolmentRecord) => {
     try {
       setIsLoading(true);
@@ -189,9 +160,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Save Delivery Form
-   */
   const handleSaveDelivery = async (record: DeliveryRecord) => {
     try {
       setIsLoading(true);
@@ -223,9 +191,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Save Closeout Form
-   */
   const handleSaveCloseout = (record: CloseoutRecord) => {
     const closeoutList = [...db.closeout];
     const existingIdx = closeoutList.findIndex(c => c.screeningId === record.screeningId);
@@ -246,9 +211,6 @@ export const createFormActions = (context: FormActionsContext) => {
     setActiveTab('records');
   };
 
-  /**
-   * Trigger editing tab redirect
-   */
   const handleEditRecordTrigger = (
     table: 'screening' | 'enrolment' | 'delivery' | 'closeout',
     record: any
@@ -262,20 +224,12 @@ export const createFormActions = (context: FormActionsContext) => {
     setActiveTab(table);
   };
 
-  /**
-   * Trigger detail viewer modal
-   */
   const handleViewRecordTrigger = (
     table: 'screening' | 'enrolment' | 'delivery' | 'closeout',
     record: any
   ) => {
-    // This would be handled by parent component state
-    // Just a placeholder for consistency
   };
 
-  /**
-   * Delete record with cascade deletion
-   */
   const handleDeleteRecord = async (
     table: 'screening' | 'enrolment' | 'delivery' | 'closeout',
     screeningId: string
@@ -288,7 +242,6 @@ export const createFormActions = (context: FormActionsContext) => {
     try {
       setIsLoading(true);
 
-      // Call Backend API to delete
       if (table === 'screening') {
         await screeningAPI.deleteScreeningForm(screeningId);
       } else if (table === 'enrolment') {
@@ -300,7 +253,6 @@ export const createFormActions = (context: FormActionsContext) => {
       const tableData = [...db[table]];
       const filtered = tableData.filter((item: any) => item.screeningId !== screeningId);
 
-      // Also Cascade delete dependent tables to preserve study workflow
       let updatedDb = { ...db, [table]: filtered };
       if (table === 'screening') {
         await Promise.all([
@@ -336,9 +288,6 @@ export const createFormActions = (context: FormActionsContext) => {
     }
   };
 
-  /**
-   * Cancel editing and reset state
-   */
   const handleCancelEdit = () => {
     setEditRecord(null);
     setEditTable(null);

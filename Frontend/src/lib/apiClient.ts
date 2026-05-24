@@ -1,10 +1,4 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 interface ApiResponse<T> {
   data?: T;
   message?: string;
@@ -174,11 +168,13 @@ export const loginAPI = {
     });
   },
 
-  async userLogin(email: string, password: string) {
+  async userLogin(email: string, userName: string, fullName: string, password: string) {
     return apiRequest('/userLogin', {
       method: 'POST',
       body: JSON.stringify({
         email,
+        userName,
+        fullName,
         password,
         dateLoggedIn: new Date(),
       }),

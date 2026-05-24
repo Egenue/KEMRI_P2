@@ -297,6 +297,8 @@ export default function DeliveryForm({
               <input
                 type="number"
                 step="0.1"
+                min="40"
+                max="240"
                 required
                 disabled={readOnly}
                 placeholder="--.- kg"
@@ -305,6 +307,9 @@ export default function DeliveryForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-hidden"
                 id="f3-weight"
               />
+              {typeof motherWeightKg === 'number' && (motherWeightKg < 40 || motherWeightKg > 240) && (
+                <p className="text-xs text-red-500 mt-1">Weight: 40-240 kg</p>
+              )}
             </div>
 
             <div>
@@ -315,6 +320,8 @@ export default function DeliveryForm({
                 <input
                   type="number"
                   step="0.1"
+                  min="35"
+                  max="42"
                   required
                   disabled={readOnly}
                   placeholder="--.-"
@@ -343,6 +350,8 @@ export default function DeliveryForm({
               </label>
               <input
                 type="number"
+                min="12"
+                max="30"
                 required
                 disabled={readOnly}
                 placeholder="RR breaths/min"
@@ -351,6 +360,9 @@ export default function DeliveryForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f3-resprate"
               />
+              {typeof respiratoryRate === 'number' && (respiratoryRate < 12 || respiratoryRate > 30) && (
+                <p className="text-xs text-red-500 mt-1">RR: 12-30 breaths/min</p>
+              )}
             </div>
 
             <div>
@@ -359,6 +371,8 @@ export default function DeliveryForm({
               </label>
               <input
                 type="number"
+                min="40"
+                max="120"
                 required
                 disabled={readOnly}
                 placeholder="PR beats/min"
@@ -367,6 +381,9 @@ export default function DeliveryForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f3-pulserate"
               />
+              {typeof pulseRate === 'number' && (pulseRate < 40 || pulseRate > 120) && (
+                <p className="text-xs text-red-500 mt-1">PR: 40-120 beats/min</p>
+              )}
             </div>
 
             <div>
@@ -376,6 +393,8 @@ export default function DeliveryForm({
               <div className="flex items-center gap-1">
                 <input
                   type="number"
+                  min="70"
+                  max="200"
                   required
                   disabled={readOnly}
                   placeholder="Sys"
@@ -387,6 +406,8 @@ export default function DeliveryForm({
                 <span className="text-slate-400 font-bold">&#47;</span>
                 <input
                   type="number"
+                  min="40"
+                  max="120"
                   required
                   disabled={readOnly}
                   placeholder="Dia"
@@ -397,6 +418,11 @@ export default function DeliveryForm({
                 />
                 <span className="text-slate-400 text-[10px] font-mono whitespace-nowrap">mm Hg</span>
               </div>
+              {(typeof bloodPressureSys === 'number' || typeof bloodPressureDia === 'number') && 
+               ((typeof bloodPressureSys === 'number' && (bloodPressureSys < 70 || bloodPressureSys > 200)) ||
+                (typeof bloodPressureDia === 'number' && (bloodPressureDia < 40 || bloodPressureDia > 120))) && (
+                <p className="text-xs text-red-500 mt-1">BP: 70-200/40-120 mmHg</p>
+              )}
             </div>
 
             <div>
@@ -406,6 +432,8 @@ export default function DeliveryForm({
               <div className="relative">
                 <input
                   type="number"
+                  min="85"
+                  max="100"
                   required
                   disabled={readOnly}
                   placeholder="---"
@@ -415,6 +443,9 @@ export default function DeliveryForm({
                   id="f3-oxygensat"
                 />
                 <span className="absolute right-3 top-2 text-slate-400 text-sm font-bold">%</span>
+                {typeof oxygenSaturation === 'number' && (oxygenSaturation < 85 || oxygenSaturation > 100) && (
+                  <p className="text-xs text-red-500 mt-1">O₂ Sat: 85-100%</p>
+                )}
               </div>
             </div>
 

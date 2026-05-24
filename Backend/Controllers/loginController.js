@@ -68,18 +68,39 @@ const getLoginById = async (req, res) => {
 
 const userLogin = async (req, res) => {
     try {
-        const { userName, password, dateLoggedIn } = req.body;
-        const user = await login.findOne({ userName });
+        const { email, userName, fullName, password, dateLoggedIn } = req.body;
+        
+        let user = await login.findOne({ email });
+        if (!user) {
+            user = await login.findOne({ userName });
+        }
+        
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+        
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
-        }else{
-            user.dateLoggedIn = dateLoggedIn;
+        } else {
+            user.dateLoggedIn = new Date(dateLoggedIn);
+            if (fullName) {
+                user.fullName = fullName;
+            }
             await user.save();
-            res.status(200).json({ message: 'Login successful', user, dateLoggedIn: dateLoggedIn.toDateString()});
+            res.status(200).json({ 
+                message: 'Login successful', 
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    userName: user.userName,
+                    fullName: user.fullName,
+                    userRole: user.userRole,
+                    dateLoggedIn: user.dateLoggedIn,
+                    dateCreated: user.dateCreated
+                },
+                dateLoggedIn: new Date(dateLoggedIn).toDateString()
+            });
         }
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -1,11 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * Calculates years and months between DOB and the interview date.
- */
 export function calculateAge(dobString: string, interviewDateString: string): { years: number; months: number } {
   if (!dobString) return { years: 0, months: 0 };
   
@@ -37,9 +29,6 @@ export function calculateAge(dobString: string, interviewDateString: string): { 
   };
 }
 
-/**
- * Validates if the date of birth lies between Jan 1, 1972 and Jan 1, 2006 (inclusive).
- */
 export function isValidDob(dobString: string): boolean {
   if (!dobString) return false;
   const dob = new Date(dobString);
@@ -51,9 +40,7 @@ export function isValidDob(dobString: string): boolean {
   return dob >= minDate && dob <= maxDate;
 }
 
-/**
- * Formats a Date (or YYYY-MM-DD string) to DD/MMM/YYYY or returns empty/placeholder
- */
+
 export function formatToDdmMmyyyy(dateInput: string | Date | undefined): string {
   if (!dateInput) return '';
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;

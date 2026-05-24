@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React from 'react';
 import { motion } from 'motion/react';
 import { 
@@ -27,20 +22,17 @@ interface DashboardProps {
 export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProps) {
   const facilities: HealthFacility[] = ['Bondo', 'Siaya', 'Kuoyo', 'Lumumba'];
 
-  // Global counts
   const totalScreened = db.screening.length;
   const totalEligible = db.screening.filter(s => s.isEligible && s.womanConsented === 'Yes').length;
   const totalEnrolled = db.enrolment.length;
   const totalDelivered = db.delivery.length;
   const totalClosedOut = db.closeout.length;
 
-  // Compute facility analytics
   const facilityStats = facilities.map(fac => {
     const screened = db.screening.filter(s => s.facility === fac).length;
     const eligible = db.screening.filter(s => s.facility === fac && s.isEligible && s.womanConsented === 'Yes').length;
     const enrolled = db.enrolment.filter(e => e.facility === fac).length;
     
-    // For delivered, we cross-reference the screen index to find its facility
     const delivered = db.delivery.filter(del => {
       const screenRec = db.screening.find(s => s.screeningId === del.screeningId);
       return screenRec?.facility === fac;
