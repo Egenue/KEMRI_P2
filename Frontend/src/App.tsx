@@ -20,7 +20,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from './types';
-import { getDatabase, saveDatabase, resetDatabase } from './lib/db';
 import { screeningAPI, enrollmentAPI, deliveryAPI } from './lib/apiClient';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
@@ -76,8 +75,6 @@ export default function App() {
     } catch (error: any) {
       console.error('Error fetching data from backend:', error);
       setApiError(error.message || 'Failed to fetch data from server');
-      // Fallback to local database if backend is unavailable
-      setDb(getDatabase());
     } finally {
       setIsLoading(false);
     }
@@ -125,12 +122,18 @@ export default function App() {
   };
 
   const handleResetDemoData = () => {
-    if (confirm('Are you sure you want to restore the trial database to original baseline patients? This updates all 4 tables.')) {
-      const refreshedDb = resetDatabase();
-      setDb(refreshedDb);
+    const confirmed = window.confirm(
+      'Are you sure you want to reset all clinic data? This action cannot be undone.'
+    );
+    
+    if (confirmed) {
+      setDb({ screening: [], enrolment: [], delivery: [], closeout: [] });
       setEditRecord(null);
       setEditTable(null);
-      showToast('Database reset to original baseline clinical profiles.', 'success');
+      setViewRecord(null);
+      setViewTable(null);
+      setActiveTab('dashboard');
+      showToast('Clinic database has been reset successfully.', 'success');
     }
   };
 
@@ -245,7 +248,6 @@ export default function App() {
 
     const updatedDb = { ...db, closeout: closeoutList };
     setDb(updatedDb);
-    saveDatabase(updatedDb);
     setEditRecord(null);
     setEditTable(null);
     setActiveTab('records');

@@ -7,6 +7,13 @@ interface ApiResponse<T> {
 
 
 const transformScreeningToBackend = (record: any) => {
+  // Helper function to convert boolean to Yes/No string
+  const boolToYesNo = (value: boolean | string | null): string => {
+    if (value === null || value === undefined) return 'No';
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+    return value;
+  };
+
   return {
     screeningId: record.screeningId,
     interviewDate: new Date(record.dateOfInterview),
@@ -36,20 +43,20 @@ const transformScreeningToBackend = (record: any) => {
     },
     fundalHeight: record.fundalHeightCm,
     inclusionCriteria: {
-      residentWithin15km: record.incVillage15km,
-      pregnancyConfirmed: record.incPregnancyConfirmed,
-      gestationLessThan31Weeks: record.incGestation31wks,
-      consentsToHIVTesting: record.incHivConsent,
-      willingToDeliverAtStudyHospital: record.incWillingDelivery,
+      residentWithin15km: boolToYesNo(record.incVillage15km),
+      pregnancyConfirmed: boolToYesNo(record.incPregnancyConfirmed),
+      gestationLessThan31Weeks: boolToYesNo(record.incGestation31wks),
+      consentsToHIVTesting: boolToYesNo(record.incHivConsent),
+      willingToDeliverAtStudyHospital: boolToYesNo(record.incWillingDelivery),
     },
     exclusionCriteria: {
-      multiplePregancy: record.excMultiplePregnancy,
-      fisturaRepairOrSpinalDeformity: record.excDeformityFistula,
-      unableToGiveInformedConsent: record.excInformedConsentUnable,
+      multiplePregancy: record.excMultiplePregnancy || 'No',
+      fisturaRepairOrSpinalDeformity: record.excDeformityFistula || 'No',
+      unableToGiveInformedConsent: boolToYesNo(record.excInformedConsentUnable),
     },
     eligibility: {
-      meetsAllCriteria: record.isEligible,
-      consentedToParticipate: record.womanConsented === 'Yes',
+      meetsAllCriteria: boolToYesNo(record.isEligible),
+      consentedToParticipate: boolToYesNo(record.womanConsented === 'Yes'),
       reasonForRefusal: record.refusalReason || '',
     },
     createdAt: new Date(),

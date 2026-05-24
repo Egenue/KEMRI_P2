@@ -20,28 +20,6 @@ const createScreeningForm = async (req, res) => {
         updatedAt
     } = req.body ;
 
-    const {meetsAllCriteria,consentedToParticipate,reasonForRefusal} = eligibility ;
-
-    const {multiplePregancy,fisturaRepairOrSpinalDeformity,unableToGiveInformedConsent} = exclusionCriteria ;
-
-    const {
-        residentWithin15km,
-        pregnancyConfirmed,
-        gestationLessThan31Weeks,
-        consentsToHIVTesting,
-        willingToDeliverAtStudyHospital
-    } = inclusionCriteria ;
-
-    const { lmpdate,lmpunknown} = lastMenstrualPeriod ; 
-
-    const {temperature = {},respiratoryRate,pulseRate,bloodPressure = {}} = vitalSigns;
-
-    const {value,location} = temperature;
-
-    const {systolic,diastolic} = bloodPressure ;
-
-    const { months, years} = Age ;
-
     const newScreeningForm = new screeningForm({
         screeningId,
         interviewDate,

@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 
 const createLogin = async (req, res) => {
     try {
-        const { email, userName, password, dateCreated, userRole } = req.body;
+        const {fullName, email, userName, password, dateCreated, userRole } = req.body;
 
         const exists = await login.findOne({
-            $or:[{email: req.body.email},{userName: req.body.userName}]
+            $or:[{email: req.body.email},{userName: req.body.userName},{fullName: req.body.fullName}]
         });
         const validPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
         if (!validPass.test(password)){
@@ -17,6 +17,7 @@ const createLogin = async (req, res) => {
             const hashedPassword = await bcrypt.hash(password, 10);
             const dateCreate = await new Date();
             const newLogin = new login({
+                fullName,
                 email,
                 userName,
                 password: hashedPassword,
@@ -91,13 +92,11 @@ const userLogin = async (req, res) => {
             res.status(200).json({ 
                 message: 'Login successful', 
                 user: {
-                    _id: user._id,
                     email: user.email,
                     userName: user.userName,
                     fullName: user.fullName,
                     userRole: user.userRole,
-                    dateLoggedIn: user.dateLoggedIn,
-                    dateCreated: user.dateCreated
+                    dateLoggedIn: user.dateLoggedIn
                 },
                 dateLoggedIn: new Date(dateLoggedIn).toDateString()
             });
