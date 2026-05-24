@@ -14,34 +14,40 @@ const transformScreeningToBackend = (record: any) => {
     return value;
   };
 
+  // Helper function to ensure numeric values are valid
+  const ensureNumber = (value: any, defaultValue: number = 0): number => {
+    const num = Number(value);
+    return !isNaN(num) && isFinite(num) ? num : defaultValue;
+  };
+
   return {
     screeningId: record.screeningId,
     interviewDate: new Date(record.dateOfInterview),
     healthFacility: record.facility,
     DoB: new Date(record.dateOfBirth),
     Age: {
-      months: record.ageMonths,
-      years: record.ageYears,
+      months: ensureNumber(record.ageMonths),
+      years: ensureNumber(record.ageYears),
     },
-    height: record.heightCm,
-    weight: record.weightKg,
+    height: ensureNumber(record.heightCm),
+    weight: ensureNumber(record.weightKg),
     vitalSigns: {
       temperature: {
-        value: record.temperatureC,
-        location: record.tempMethod,
+        value: ensureNumber(record.temperatureC),
+        location: record.tempMethod || 'Oral',
       },
-      respiratoryRate: record.respiratoryRate,
-      pulseRate: record.pulseRate,
+      respiratoryRate: ensureNumber(record.respiratoryRate),
+      pulseRate: ensureNumber(record.pulseRate),
       bloodPressure: {
-        systolic: record.bloodPressureSys,
-        diastolic: record.bloodPressureDia,
+        systolic: ensureNumber(record.bloodPressureSys),
+        diastolic: ensureNumber(record.bloodPressureDia),
       },
     },
     lastMenstrualPeriod: {
       date: record.lmpDate === 'Unknown' ? new Date() : new Date(record.lmpDate),
       unknown: record.lmpDate === 'Unknown',
     },
-    fundalHeight: record.fundalHeightCm,
+    fundalHeight: ensureNumber(record.fundalHeightCm),
     inclusionCriteria: {
       residentWithin15km: boolToYesNo(record.incVillage15km),
       pregnancyConfirmed: boolToYesNo(record.incPregnancyConfirmed),

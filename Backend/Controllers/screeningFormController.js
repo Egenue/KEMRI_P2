@@ -20,6 +20,33 @@ const createScreeningForm = async (req, res) => {
         updatedAt
     } = req.body ;
 
+    // Validate required fields FIRST
+    if (!screeningId || !interviewDate || !healthFacility || !DoB){
+        return res.status(400).json({"message":"Please fill in the required fields !!"});
+    }
+
+    // Check if form already exists
+    const exists = await screeningForm.findOne({
+        screeningId: screeningId
+    });
+
+    if(exists){
+        return res.status(409).json({"message":"This form already exists"}) ;
+    }
+
+    // Ensure all enum fields have valid string values
+    const sanitizeExclusionCriteria = {
+        multiplePregancy: exclusionCriteria.multiplePregancy || 'No',
+        fisturaRepairOrSpinalDeformity: exclusionCriteria.fisturaRepairOrSpinalDeformity || 'No',
+        unableToGiveInformedConsent: exclusionCriteria.unableToGiveInformedConsent || 'No'
+    };
+
+    const sanitizeEligibility = {
+        meetsAllCriteria: eligibility.meetsAllCriteria || 'No',
+        consentedToParticipate: eligibility.consentedToParticipate || 'No',
+        reasonForRefusal: eligibility.reasonForRefusal || ''
+    };
+
     const newScreeningForm = new screeningForm({
         screeningId,
         interviewDate,
@@ -32,28 +59,17 @@ const createScreeningForm = async (req, res) => {
         lastMenstrualPeriod,
         fundalHeight,
         inclusionCriteria ,
-        exclusionCriteria ,
-        eligibility ,
+        exclusionCriteria: sanitizeExclusionCriteria,
+        eligibility: sanitizeEligibility,
         createdAt,
         updatedAt
     });
 
-    const exists = await screeningForm.findOne({
-        $or:[
-            {screeningId: screeningId}
-        ]
-    })
-
-    if (!screeningId || !interviewDate || !healthFacility || !DoB){
-        return res.status(404).json({"message":"Please fill in the required fields !!"});
-    }else if(exists){
-        return res.status(405).json({"message":"This form already exists"}) ;
-    }else{
-        await newScreeningForm.save();
-        return res.status(200).json({"message":"Successful!! Form saved", data: newScreeningForm});
-    }
+    await newScreeningForm.save();
+    return res.status(200).json({"message":"Successful!! Form saved", data: newScreeningForm});
 
     }catch(error){
+        console.error('Screening form creation error:', error);
         return res.status(500).json({"message":"Error!! Could not create new Screening form", error: error.message});
     }
 }
