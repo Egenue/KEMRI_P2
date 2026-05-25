@@ -28,6 +28,8 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
   const totalDelivered = db.delivery.length;
   const totalClosedOut = db.closeout.length;
 
+  const timeNow = new Date().toLocaleString('en-US');
+
   const facilityStats = facilities.map(fac => {
     const screened = db.screening.filter(s => s.healthFacility === fac).length;
     const eligible = db.screening.filter(s => s.healthFacility === fac && s.eligibility.meetsAllCriteria === 'Yes' && s.eligibility.consentedToParticipate === 'Yes').length;
@@ -91,7 +93,7 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
               </span>
             )}
             <span className="inline-flex items-center gap-1 bg-slate-800/80 px-2.5 py-1 text-xs rounded-lg text-slate-300 font-mono">
-              System Time: 2026-05-21
+              System Time: {timeNow}
             </span>
           </div>
         </div>

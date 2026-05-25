@@ -18,7 +18,7 @@ export default function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('manager');
+  const [role, setRole] = useState<UserRole>('technician');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,8 +67,11 @@ export default function Login({ onLogin }: LoginProps) {
       const backendUserRole = result.user?.userRole || role;
       const roleMapping: Record<string, UserRole> = {
         'admin': 'admin',
+        'Admin': 'admin',
         'manager': 'manager',
+        'Data Manager': 'manager',
         'technician': 'technician',
+        'Field Technician': 'technician',
         'data_manager': 'manager',
         'field_tech': 'technician',
         'administrator': 'admin',
