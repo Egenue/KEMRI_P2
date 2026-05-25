@@ -66,10 +66,12 @@ export default function Login({ onLogin }: LoginProps) {
       // Extract user role from backend response
       const backendUserRole = result.user?.userRole || role;
       const roleMapping: Record<string, UserRole> = {
+        'admin': 'admin',
         'manager': 'manager',
         'technician': 'technician',
         'data_manager': 'manager',
         'field_tech': 'technician',
+        'administrator': 'admin',
       };
       const mappedRole = roleMapping[backendUserRole] || role;
 

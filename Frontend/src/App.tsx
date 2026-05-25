@@ -87,7 +87,7 @@ export default function App() {
   // Initialize DB and authenticate from session if exists
   useEffect(() => {
     // Load active session from storage if present
-    const cachedUser = localStorage.getItem('study_workflow_user');
+    const cachedUser = sessionStorage.getItem('study_workflow_user');
     if (cachedUser) {
       try {
         const user = JSON.parse(cachedUser);
@@ -98,6 +98,14 @@ export default function App() {
         console.error('Failed reading session cache', e);
       }
     }
+
+    // Security: Clear session on reload or navigating back/away
+    const handleUnload = () => {
+      sessionStorage.removeItem('study_workflow_user');
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
   }, []);
 
   // Display notification logs
@@ -110,7 +118,7 @@ export default function App() {
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
-    localStorage.setItem('study_workflow_user', JSON.stringify(user));
+    sessionStorage.setItem('study_workflow_user', JSON.stringify(user));
     showToast(`Logged in successfully as ${user.fullName} (${user.initials})`, 'success');
     // Fetch data after login
     fetchDataFromBackend();
@@ -118,7 +126,7 @@ export default function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('study_workflow_user');
+    sessionStorage.removeItem('study_workflow_user');
     setEditRecord(null);
     setEditTable(null);
     setActiveTab('dashboard');
@@ -149,12 +157,20 @@ export default function App() {
       const existingIdx = screeningList.findIndex(s => s.screeningId === record.screeningId);
 
       if (existingIdx !== -1) {
-        // Update existing record
+        // Update existing record - ONLY ADMIN
+        if (currentUser?.role !== 'admin') {
+          showToast('Update restricted: Only Administrators can modify existing clinical records.', 'error');
+          return;
+        }
         await screeningAPI.updateScreeningForm(record.screeningId, record);
         screeningList[existingIdx] = record;
         showToast(`Screening Record ${record.screeningId} successfully updated.`, 'success');
       } else {
-        // Create new record
+        // Create new record - ADMIN or MANAGER
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'manager') {
+          showToast('Permissions restricted: You do not have authority to enter new data.', 'error');
+          return;
+        }
         await screeningAPI.createScreeningForm(record);
         screeningList.push(record);
         showToast(`New Screening Record ${record.screeningId} saved of ${record.healthFacility} center.`, 'success');
@@ -181,12 +197,20 @@ export default function App() {
       const existingIdx = enrolmentList.findIndex(e => e.screeningId === record.screeningId);
 
       if (existingIdx !== -1) {
-        // Update existing record
+        // Update existing record - ONLY ADMIN
+        if (currentUser?.role !== 'admin') {
+          showToast('Update restricted: Only Administrators can modify existing enrolment records.', 'error');
+          return;
+        }
         await enrollmentAPI.updateEnrollmentForm(record.screeningId, record);
         enrolmentList[existingIdx] = record;
         showToast(`Enrolment Record ${record.screeningId} successfully updated.`, 'success');
       } else {
-        // Create new record
+        // Create new record - ADMIN or MANAGER
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'manager') {
+          showToast('Permissions restricted: You do not have authority to enter new data.', 'error');
+          return;
+        }
         await enrollmentAPI.createEnrollmentForm(record);
         enrolmentList.push(record);
         showToast(`Subject ${record.screeningId} successfully enrolled in ${record.healthFacility} study cohort.`, 'success');
@@ -213,12 +237,20 @@ export default function App() {
       const existingIdx = deliveryList.findIndex(d => d.deliveryScreeningId === record.deliveryScreeningId);
 
       if (existingIdx !== -1) {
-        // Update existing record
+        // Update existing record - ONLY ADMIN
+        if (currentUser?.role !== 'admin') {
+          showToast('Update restricted: Only Administrators can modify delivery logs.', 'error');
+          return;
+        }
         await deliveryAPI.updateDeliveryForm(record.deliveryScreeningId, record);
         deliveryList[existingIdx] = record;
         showToast(`Postpartum delivery records for ID ${record.deliveryScreeningId} successfully updated.`, 'success');
       } else {
-        // Create new record
+        // Create new record - ADMIN or MANAGER
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'manager') {
+          showToast('Permissions restricted: You do not have authority to enter new data.', 'error');
+          return;
+        }
         await deliveryAPI.createDeliveryForm(record);
         deliveryList.push(record);
         showToast(`Postpartum delivery history captured for screening ID ${record.deliveryScreeningId}.`, 'success');
@@ -245,12 +277,20 @@ export default function App() {
       const existingIdx = closeoutList.findIndex(c => c.sreeningId === record.sreeningId);
 
       if (existingIdx !== -1) {
-        // Update existing record
+        // Update existing record - ONLY ADMIN
+        if (currentUser?.role !== 'admin') {
+          showToast('Update restricted: Only Administrators can modify closeout data.', 'error');
+          return;
+        }
         await closeoutAPI.updateCloseoutForm(record.sreeningId, record);
         closeoutList[existingIdx] = record;
         showToast(`Closeout termination metrics of ID ${record.sreeningId} successfully updated.`, 'success');
       } else {
-        // Create new record
+        // Create new record - ADMIN or MANAGER
+        if (currentUser?.role !== 'admin' && currentUser?.role !== 'manager') {
+          showToast('Permissions restricted: You do not have authority to enter new data.', 'error');
+          return;
+        }
         await closeoutAPI.createCloseoutForm(record);
         closeoutList.push(record);
         showToast(`Closeout graduation record submitted for study ID ${record.sreeningId}.`, 'success');
@@ -271,8 +311,8 @@ export default function App() {
 
   // Trigger editing tab redirect
   const handleEditRecordTrigger = (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', record: any) => {
-    if (currentUser?.role !== 'manager') {
-      showToast('Action Restricted: Only Data Managers hold write authority.', 'error');
+    if (currentUser?.role !== 'admin') {
+      showToast('Action Restricted: Only Administrators hold edit authority.', 'error');
       return;
     }
     setEditTable(table);
@@ -287,8 +327,8 @@ export default function App() {
   };
 
   const handleDeleteRecord = async (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', recordId: string) => {
-    if (currentUser?.role !== 'manager') {
-      showToast('Deletions restricted: Only Data Managers hold permissions.', 'error');
+    if (currentUser?.role !== 'admin') {
+      showToast('Deletions restricted: Only Administrators hold permissions.', 'error');
       return;
     }
 
@@ -489,8 +529,8 @@ export default function App() {
                     {currentUser.fullName}
                   </span>
                   <span className="text-[10px] text-slate-400 capitalize font-medium flex items-center gap-1 justify-end font-mono">
-                    <ShieldCheck className={`w-3 h-3 ${currentUser.role === 'manager' ? 'text-emerald-500' : 'text-amber-500'}`} />
-                    {currentUser.role === 'manager' ? 'Data Manager' : 'Field Tech (View-Only)'}
+                    <ShieldCheck className={`w-3 h-3 ${currentUser.role === 'admin' ? 'text-indigo-500' : currentUser.role === 'manager' ? 'text-emerald-500' : 'text-amber-500'}`} />
+                    {currentUser.role === 'admin' ? 'Administrator' : currentUser.role === 'manager' ? 'Data Manager' : 'Field Tech (View-Only)'}
                   </span>
                 </div>
               </div>
@@ -568,14 +608,16 @@ export default function App() {
       {/* Main Workspace Frame container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         
-        {/* Banner notification stating write permissions of role if technician */}
-        {currentUser.role === 'technician' && activeTab !== 'dashboard' && activeTab !== 'records' && (
+        {/* Banner notification stating write permissions of role */}
+        {(currentUser.role === 'technician' || currentUser.role === 'manager') && activeTab !== 'dashboard' && activeTab !== 'records' && (
           <div className="mb-6 bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-center gap-3.5 text-xs text-amber-800 max-w-5xl mx-auto shadow-2xs">
             <AlertOctagon className="w-5 h-5 text-amber-500 shrink-0" />
             <div>
-              <strong className="font-bold underline">Field Technician Restriction Rule Active:</strong>
+              <strong className="font-bold underline">Role-Based Access Control Active:</strong>
               <p className="mt-0.5 text-slate-600 leading-relaxed font-sans">
-                You possess View-Only study parameters. All medical intake controls, inputs, and criteria checkboxes below are disabled. Contact the Data Manager (John/Patrobas Initials "PA") to update study details.
+                {currentUser.role === 'technician' 
+                  ? 'As a Field Technician, you have View-Only access. Data entry and modification are disabled.' 
+                  : 'As a Data Manager, you can Enter New Data, but editing or deleting existing records is restricted to Administrators.'}
               </p>
             </div>
           </div>
@@ -615,7 +657,7 @@ export default function App() {
             existingRecord={editTable === 'screening' ? editRecord : undefined}
             records={db.screening}
             userInitials={currentUser.initials}
-            readOnly={currentUser.role === 'technician'}
+            readOnly={currentUser.role === 'technician' || (currentUser.role === 'manager' && editRecord !== null)}
           />
         )}
 
@@ -631,7 +673,7 @@ export default function App() {
             screeningRecords={db.screening}
             enrolledRecords={db.enrolment}
             userInitials={currentUser.initials}
-            readOnly={currentUser.role === 'technician'}
+            readOnly={currentUser.role === 'technician' || (currentUser.role === 'manager' && editRecord !== null)}
           />
         )}
 
@@ -651,7 +693,7 @@ export default function App() {
             enrolledRecords={db.enrolment}
             deliveryRecords={db.delivery}
             userInitials={currentUser.initials}
-            readOnly={currentUser.role === 'technician'}
+            readOnly={currentUser.role === 'technician' || (currentUser.role === 'manager' && editRecord !== null)}
           />
         )}
 
@@ -667,7 +709,7 @@ export default function App() {
             screeningRecords={db.screening}
             closeoutRecords={db.closeout}
             userInitials={currentUser.initials}
-            readOnly={currentUser.role === 'technician'}
+            readOnly={currentUser.role === 'technician' || (currentUser.role === 'manager' && editRecord !== null)}
           />
         )}
       </main>

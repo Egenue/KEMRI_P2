@@ -74,10 +74,15 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
             Welcome to the Clinical Trial digitized database. Here you can monitor, enter, and review mother cohorts across all participating centers. High-fidelity screening and validation guidelines are currently active.
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5">
-            {userRole === 'manager' ? (
+            {userRole === 'admin' ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-medium rounded-lg text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                Active: Administrator (Full Control)
+              </span>
+            ) : userRole === 'manager' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium rounded-lg text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                Active: Data Manager Permissions
+                Active: Data Manager (View & Enter)
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 font-medium rounded-lg text-xs">
@@ -324,7 +329,7 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3.5">
-            {userRole === 'manager' ? (
+            {userRole === 'admin' || userRole === 'manager' ? (
               <>
                 <button 
                   onClick={() => onNavigateTab('screening')}

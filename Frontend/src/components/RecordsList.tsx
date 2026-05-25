@@ -15,14 +15,14 @@ import {
   Layers,
   FileSpreadsheet
 } from 'lucide-react';
-import { DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from '../types';
+import { DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord, UserRole } from '../types';
 import { formatToDdmMmyyyy } from '../lib/dateUtils';
 
 interface RecordsListProps {
   db: DatabaseState;
   onEditRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', record: any) => void;
   onViewRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', record: any) => void;
-  userRole: 'manager' | 'technician';
+  userRole: UserRole;
   onDeleteRecord?: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', id: string) => void;
 }
 
@@ -226,7 +226,13 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
 
           <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-500 font-mono">
             <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0" />
-            <span>Logged Roles: {userRole === 'manager' ? 'Data Manager (Full Access)' : 'Field Tech (Read-Only View)'}</span>
+            <span>
+              Logged Role: {
+                userRole === 'admin' ? 'Administrator (Full CRUD)' : 
+                userRole === 'manager' ? 'Data Manager (View & Enter)' : 
+                'Field Tech (Read-Only View)'
+              }
+            </span>
           </div>
         </div>
       </div>
@@ -434,7 +440,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         <Eye className="w-3.5 h-3.5" /> View
                       </button>
                       
-                      {userRole === 'manager' && (
+                      {userRole === 'admin' && (
                         <button
                           onClick={() => onEditRecord(activeTable, record)}
                           type="button"
@@ -445,7 +451,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         </button>
                       )}
 
-                      {userRole === 'manager' && onDeleteRecord && (
+                      {userRole === 'admin' && onDeleteRecord && (
                         <button
                           onClick={() => {
                             if (confirm(`Are you sure you want to delete record ${sId}?`)) {
