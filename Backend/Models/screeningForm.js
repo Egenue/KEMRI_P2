@@ -139,7 +139,7 @@ const screeningFormSchema = new mongoose.Schema({
             type: String,
             enum: ['Yes', 'No'],
             required: function (){
-                return this.meetsAllCriteria === "Yes"
+                return this.eligibility && this.eligibility.meetsAllCriteria === "Yes"
             }
         },
         reasonForRefusal:{
@@ -147,7 +147,7 @@ const screeningFormSchema = new mongoose.Schema({
             enum: ['Needs to consult', 'Other', null],
             default: null,
             required: function (){
-                return this.consentedToParticipate === "No"
+                return this.eligibility && this.eligibility.consentedToParticipate === "No"
             }
         }
     },

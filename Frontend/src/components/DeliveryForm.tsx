@@ -189,7 +189,7 @@ export default function DeliveryForm({
         deliveryTime: timeOfDelivery,
         deliveryPlace: {
           deliveryChoices: deliveryLocation as any,
-          otherLocation: deliveryLocation === 'Other location' ? deliveryLocationSpecify : '',
+          otherLocation: deliveryLocation === 'Other Location' ? deliveryLocationSpecify : '',
           otherFacility: deliveryLocation === 'Other hospital/clinic' ? deliveryLocationSpecify : '',
         },
         deliveryPersonnel: {

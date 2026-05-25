@@ -62,13 +62,13 @@ const deliveryFormSchema = new mongoose.Schema(
     bodyMassIndex:{
         value:{
             type: Number,
-            required: true,
+            required: false,
             default: null
         },
         unknown:{
             type: Boolean,
             required: function(){
-                return this.value === null
+                return this.bodyMassIndex && this.bodyMassIndex.value === null
             }
         },
     },
@@ -81,7 +81,7 @@ const deliveryFormSchema = new mongoose.Schema(
         specifics:{
             type: String,
             required: function(){
-                return this.value === "Yes";
+                return this.motherAbnormality && this.motherAbnormality.motherAbnomValue === "Yes";
             }
         }
     },
@@ -104,13 +104,13 @@ const deliveryFormSchema = new mongoose.Schema(
             otherLocation:{
                 type: String,
                 required: function(){
-                    return this.choices === "Other Location"
+                    return this.deliveryHistory && this.deliveryHistory.deliveryPlace && this.deliveryHistory.deliveryPlace.deliveryChoices === "Other Location"
                 }
             },
             otherFacility:{
                 type: String,
                 required: function(){
-                    return this.choices === "Other hospital/clinic"
+                    return this.deliveryHistory && this.deliveryHistory.deliveryPlace && this.deliveryHistory.deliveryPlace.deliveryChoices === "Other hospital/clinic"
                 }
             }
         },
@@ -123,7 +123,7 @@ const deliveryFormSchema = new mongoose.Schema(
             otherPersonnel:{
                 type: String,
                 required: function(){
-                    return this.value === "Other"
+                    return this.deliveryHistory && this.deliveryHistory.deliveryPersonnel && this.deliveryHistory.deliveryPersonnel.deliveryPersValue === "Other"
                 }
             }
         },
@@ -136,7 +136,7 @@ const deliveryFormSchema = new mongoose.Schema(
             otherMode:{
                 type: String,
                 required: function(){
-                    return this.choices === "Other"
+                    return this.deliveryHistory && this.deliveryHistory.deliveryMode && this.deliveryHistory.deliveryMode.choices === "Other"
                 }
             },
             csectionIndication:{
@@ -148,13 +148,15 @@ const deliveryFormSchema = new mongoose.Schema(
                         "Pregnancy-induced hypertension", "Other", "Don't know"
                     ],
                     required: function(){
-                        return this.choices === "C-section"
+                        return this.deliveryHistory && this.deliveryHistory.deliveryMode && this.deliveryHistory.deliveryMode.choices === "C-section"
                     },
                 },
                 otherOption:{
                     type: String,
                     required: function (){
-                        return this.csectOptions === "Other"
+                        return this.deliveryHistory && this.deliveryHistory.deliveryMode && 
+                               this.deliveryHistory.deliveryMode.csectionIndication && 
+                               this.deliveryHistory.deliveryMode.csectionIndication.csectOptions === "Other"
                     }
                 }
             }
@@ -163,59 +165,72 @@ const deliveryFormSchema = new mongoose.Schema(
     closeOut:{
         closeOutInterviewDate:{
             type: Date,
-            required: true,
+            required: false,
             default: Date.now
         },
         sreeningId:{
             type: String,
             unique: true,
-            required: true
+            sparse: true,
+            required: false
         },
         dateOfTermination:{
             type: Date,
-            required: true,
+            required: false,
             default: Date.now
         },
         participantStatus:{
             choicesStudy:{
                 type: String,
                 enum:["Completed study visits", "Participation terminated prior to completion of study visits",
-                "Screen failure before enrollment"]
+                "Screen failure before enrollment"],
+                required: false
             },
             incompleteReason:{
                 incompletionOptions:{
                     type: String,
                     enum:["Adverse event","Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
-                    "Study terminated by sponsor", "Withrawal by participant", "Other"]
+                    "Study terminated by sponsor", "Withrawal by participant", "Other"],
+                    required: false
                 },
                 adverseEvent:{
                     type: String,
                     required: function(){
-                        return this.incompletionOptions === "Adverse event"
+                        return this.closeOut && this.closeOut.participantStatus && 
+                               this.closeOut.participantStatus.incompleteReason && 
+                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Adverse event"
                     }
                 },
                 deathOption:{
                     type: Date,
                     required: function (){
-                        return this.incompletionOptions === "Death"
+                        return this.closeOut && this.closeOut.participantStatus && 
+                               this.closeOut.participantStatus.incompleteReason && 
+                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Death"
                     }
                 },
                 protocalDeviation:{
                     type: String,
                     required: function (){
-                        return this.incompletionOptions === "Protocol deviation"
+                        return this.closeOut && this.closeOut.participantStatus && 
+                               this.closeOut.participantStatus.incompleteReason && 
+                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Protocol deviation"
                     }
                 },
                 withdrawalReason:{
                     type: String,
                     required: function (){
-                        return this.incompleteReason === "Withdrawal by participant"
+                        return this.closeOut && this.closeOut.participantStatus && 
+                               this.closeOut.participantStatus.incompleteReason && 
+                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Withdrawal by participant"
                     }
                 },
                 otherReason:{
                     type: String,
                     required: function (){
-                        return this.incompleteReason === "Other"
+                        return this.closeOut && this.closeOut.participantStatus && 
+                               this.closeOut.participantStatus.incompleteReason && 
+                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Other"
                     }
                 }
             }
