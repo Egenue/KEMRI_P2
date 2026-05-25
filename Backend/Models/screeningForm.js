@@ -144,7 +144,7 @@ const screeningFormSchema = new mongoose.Schema({
         },
         reasonForRefusal:{
             type: String,
-            enum: ['Needs to consult', 'Other'],
+            enum: ['Needs to consult', 'Other', null],
             default: null,
             required: function (){
                 return this.consentedToParticipate === "No"

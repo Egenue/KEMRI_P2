@@ -7,11 +7,20 @@ interface ApiResponse<T> {
 
 
 const transformScreeningToBackend = (record: any) => {
-  // Helper function to convert boolean to Yes/No string
-  const boolToYesNo = (value: boolean | string | null): string => {
+  // Helper function to convert boolean to Yes/No string (STRICT - no empty strings)
+  const boolToYesNo = (value: boolean | string | null): 'Yes' | 'No' => {
     if (value === null || value === undefined) return 'No';
     if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-    return value;
+    if (value === 'Yes') return 'Yes';
+    if (value === 'No') return 'No';
+    // Default to 'No' for any unexpected values
+    return 'No';
+  };
+
+  // Helper function for exclusion criteria that allow "Don't Know"
+  const exclusionValue = (value: any): 'Yes' | 'No' | "Don't Know" => {
+    if (value === "Don't Know") return "Don't Know";
+    return boolToYesNo(value);
   };
 
   // Helper function to ensure numeric values are valid
@@ -20,51 +29,81 @@ const transformScreeningToBackend = (record: any) => {
     return !isNaN(num) && isFinite(num) ? num : defaultValue;
   };
 
+  // Helper function to ensure valid dates
+  const ensureDate = (value: any, defaultDate?: Date): Date => {
+    if (!value) return defaultDate || new Date();
+    const date = new Date(value);
+    return date.getTime() > 0 ? date : (defaultDate || new Date());
+  };
+
+  // Determine if woman consented
+  const consentedToParticipate = record.womanConsented === 'Yes' ? 'Yes' : 'No';
+
+  // Build eligibility object with proper reasonForRefusal handling
+  const sanitizedEligibility: any = {
+    meetsAllCriteria: boolToYesNo(record.isEligible),
+    consentedToParticipate: consentedToParticipate,
+  };
+
+  // Only add reasonForRefusal if woman did NOT consent
+  // When she consented, OMIT the field entirely so Mongoose uses the default (null)
+  if (consentedToParticipate === 'No') {
+    // When refused, reasonForRefusal must be 'Needs to consult' or 'Other'
+    const validReasons = ['Needs to consult', 'Other'];
+    sanitizedEligibility.reasonForRefusal = validReasons.includes(record.refusalReason)
+      ? record.refusalReason
+      : 'Other'; // Default to 'Other' if invalid
+  }
+  // Note: When consentedToParticipate is 'Yes', reasonForRefusal is NOT included in the object
+
+  // Ensure all exclusion criteria fields have valid enum values
+  // Note: multiplePregancy and fisturaRepairOrSpinalDeformity allow "Don't Know"
+  const sanitizedExclusion = {
+    multiplePregancy: exclusionValue(record.excMultiplePregnancy),
+    fisturaRepairOrSpinalDeformity: exclusionValue(record.excDeformityFistula),
+    unableToGiveInformedConsent: boolToYesNo(record.excInformedConsentUnable),
+  };
+
+  // Ensure all inclusion criteria fields have valid enum values (STRICTLY 'Yes' or 'No')
+  const sanitizedInclusion = {
+    residentWithin15km: boolToYesNo(record.incVillage15km),
+    pregnancyConfirmed: boolToYesNo(record.incPregnancyConfirmed),
+    gestationLessThan31Weeks: boolToYesNo(record.incGestation31wks),
+    consentsToHIVTesting: boolToYesNo(record.incHivConsent),
+    willingToDeliverAtStudyHospital: boolToYesNo(record.incWillingDelivery),
+  };
+
   return {
-    screeningId: record.screeningId,
-    interviewDate: new Date(record.dateOfInterview),
-    healthFacility: record.facility,
-    DoB: new Date(record.dateOfBirth),
+    screeningId: String(record.screeningId || '').trim(),
+    interviewDate: ensureDate(record.dateOfInterview),
+    healthFacility: String(record.facility || 'Bondo'),
+    DoB: ensureDate(record.dateOfBirth),
     Age: {
-      months: ensureNumber(record.ageMonths),
-      years: ensureNumber(record.ageYears),
+      months: Math.max(0, Math.min(9, ensureNumber(record.ageMonths))),
+      years: Math.max(10, Math.min(50, ensureNumber(record.ageYears))),
     },
-    height: ensureNumber(record.heightCm),
-    weight: ensureNumber(record.weightKg),
+    height: Math.max(50, Math.min(300, ensureNumber(record.heightCm))),
+    weight: Math.max(20, Math.min(150, ensureNumber(record.weightKg))),
     vitalSigns: {
       temperature: {
-        value: ensureNumber(record.temperatureC),
-        location: record.tempMethod || 'Oral',
+        value: Math.max(35, Math.min(42, ensureNumber(record.temperatureC))),
+        location: String(record.tempMethod || 'Oral'),
       },
-      respiratoryRate: ensureNumber(record.respiratoryRate),
-      pulseRate: ensureNumber(record.pulseRate),
+      respiratoryRate: Math.max(10, Math.min(60, ensureNumber(record.respiratoryRate))),
+      pulseRate: Math.max(30, Math.min(180, ensureNumber(record.pulseRate))),
       bloodPressure: {
-        systolic: ensureNumber(record.bloodPressureSys),
-        diastolic: ensureNumber(record.bloodPressureDia),
+        systolic: Math.max(60, Math.min(200, ensureNumber(record.bloodPressureSys))),
+        diastolic: Math.max(40, Math.min(120, ensureNumber(record.bloodPressureDia))),
       },
     },
     lastMenstrualPeriod: {
-      date: record.lmpDate === 'Unknown' ? new Date() : new Date(record.lmpDate),
-      unknown: record.lmpDate === 'Unknown',
+      date: record.lmpDate === 'Unknown' ? ensureDate(null) : ensureDate(record.lmpDate),
+      unknown: record.lmpDate === 'Unknown' || !record.lmpDate,
     },
-    fundalHeight: ensureNumber(record.fundalHeightCm),
-    inclusionCriteria: {
-      residentWithin15km: boolToYesNo(record.incVillage15km),
-      pregnancyConfirmed: boolToYesNo(record.incPregnancyConfirmed),
-      gestationLessThan31Weeks: boolToYesNo(record.incGestation31wks),
-      consentsToHIVTesting: boolToYesNo(record.incHivConsent),
-      willingToDeliverAtStudyHospital: boolToYesNo(record.incWillingDelivery),
-    },
-    exclusionCriteria: {
-      multiplePregancy: record.excMultiplePregnancy || 'No',
-      fisturaRepairOrSpinalDeformity: record.excDeformityFistula || 'No',
-      unableToGiveInformedConsent: boolToYesNo(record.excInformedConsentUnable),
-    },
-    eligibility: {
-      meetsAllCriteria: boolToYesNo(record.isEligible),
-      consentedToParticipate: boolToYesNo(record.womanConsented === 'Yes'),
-      reasonForRefusal: record.refusalReason || '',
-    },
+    fundalHeight: Math.max(0, Math.min(40, ensureNumber(record.fundalHeightCm))),
+    inclusionCriteria: sanitizedInclusion,
+    exclusionCriteria: sanitizedExclusion,
+    eligibility: sanitizedEligibility,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -145,6 +184,16 @@ async function apiRequest<T>(
   const url = `${API_BASE_URL}${endpoint}`;
   
   try {
+    // Log the request data for debugging
+    if (options.body && typeof options.body === 'string') {
+      try {
+        const bodyData = JSON.parse(options.body);
+        console.log(`[API Request] ${endpoint}`, bodyData);
+      } catch (e) {
+        // Silently fail JSON parsing
+      }
+    }
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -155,7 +204,9 @@ async function apiRequest<T>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      const errorMessage = errorData.message || errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+      console.error(`[API Error] ${endpoint}:`, errorMessage, errorData);
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
@@ -211,9 +262,13 @@ export const loginAPI = {
 export const screeningAPI = {
   async createScreeningForm(formData: any) {
     const backendData = transformScreeningToBackend(formData);
+    
+    // Log the transformed data for debugging
+    console.log('[Screening Form Data Being Sent]', JSON.stringify(backendData, null, 2));
+    
     return apiRequest('/createScreeningForm', {
       method: 'POST',
-      body: JSON.stringify(backendData),
+      body: backendData ? JSON.stringify(backendData) : null,
     });
   },
 
