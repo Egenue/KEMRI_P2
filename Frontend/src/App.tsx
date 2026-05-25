@@ -20,7 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from './types';
-import { screeningAPI, enrollmentAPI, deliveryAPI } from './lib/apiClient';
+import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI } from './lib/apiClient';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import ScreeningForm from './components/ScreeningForm';
@@ -56,21 +56,23 @@ export default function App() {
       setIsLoading(true);
       setApiError(null);
 
-      const [screeningRes, enrollmentRes, deliveryRes] = await Promise.all([
+      const [screeningRes, enrollmentRes, deliveryRes, closeoutRes] = await Promise.all([
         screeningAPI.getAllScreeningForms() as Promise<{ data: any[] }>,
         enrollmentAPI.getAllEnrollmentForms() as Promise<{ data: any[] }>,
         deliveryAPI.getAllDeliveryForms() as Promise<{ data: any[] }>,
+        closeoutAPI.getAllCloseoutForms() as Promise<{ data: any[] }>,
       ]);
 
       const screeningData = screeningRes.data || [];
       const enrollmentData = enrollmentRes.data || [];
       const deliveryData = deliveryRes.data || [];
+      const closeoutData = closeoutRes.data || [];
 
       setDb({
         screening: screeningData,
         enrolment: enrollmentData,
         delivery: deliveryData,
-        closeout: [] // Closeout is not integrated with backend yet
+        closeout: closeoutData
       });
     } catch (error: any) {
       console.error('Error fetching data from backend:', error);
@@ -234,23 +236,35 @@ export default function App() {
   };
 
   // Closeout Save Handlers
-  const handleSaveCloseout = (record: CloseoutRecord) => {
-    const closeoutList = [...db.closeout];
-    const existingIdx = closeoutList.findIndex(c => c.sreeningId === record.sreeningId);
+  const handleSaveCloseout = async (record: CloseoutRecord) => {
+    try {
+      setIsLoading(true);
+      const closeoutList = [...db.closeout];
+      const existingIdx = closeoutList.findIndex(c => c.sreeningId === record.sreeningId);
 
-    if (existingIdx !== -1) {
-      closeoutList[existingIdx] = record;
-      showToast(`Closeout termination metrics of ID ${record.sreeningId} successfully updated.`, 'success');
-    } else {
-      closeoutList.push(record);
-      showToast(`Closeout graduation record submitted for study ID ${record.sreeningId}.`, 'success');
+      if (existingIdx !== -1) {
+        // Update existing record
+        await closeoutAPI.updateCloseoutForm(record.sreeningId, record);
+        closeoutList[existingIdx] = record;
+        showToast(`Closeout termination metrics of ID ${record.sreeningId} successfully updated.`, 'success');
+      } else {
+        // Create new record
+        await closeoutAPI.createCloseoutForm(record);
+        closeoutList.push(record);
+        showToast(`Closeout graduation record submitted for study ID ${record.sreeningId}.`, 'success');
+      }
+
+      const updatedDb = { ...db, closeout: closeoutList };
+      setDb(updatedDb);
+      setEditRecord(null);
+      setEditTable(null);
+      setActiveTab('records');
+    } catch (error: any) {
+      showToast(`Error saving closeout record: ${error.message}`, 'error');
+      console.error('Error saving closeout:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    const updatedDb = { ...db, closeout: closeoutList };
-    setDb(updatedDb);
-    setEditRecord(null);
-    setEditTable(null);
-    setActiveTab('records');
   };
 
   // Trigger editing tab redirect
@@ -286,6 +300,8 @@ export default function App() {
         await enrollmentAPI.deleteEnrollmentForm(recordId);
       } else if (table === 'delivery') {
         await deliveryAPI.deleteDeliveryForm(recordId);
+      } else if (table === 'closeout') {
+        await closeoutAPI.deleteCloseoutForm(recordId);
       }
 
       const tableData = [...db[table]];
@@ -303,19 +319,26 @@ export default function App() {
             .map(e => enrollmentAPI.deleteEnrollmentForm(e.screeningId)),
           ...db.delivery
             .filter(d => d.deliveryScreeningId === recordId)
-            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId))
+            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId)),
+          ...db.closeout
+            .filter(c => c.sreeningId === recordId)
+            .map(c => closeoutAPI.deleteCloseoutForm(c.sreeningId))
         ]);
         updatedDb.enrolment = db.enrolment.filter(e => e.screeningId !== recordId);
         updatedDb.delivery = db.delivery.filter(d => d.deliveryScreeningId !== recordId);
         updatedDb.closeout = db.closeout.filter(c => c.sreeningId !== recordId);
         showToast(`Deleted Screening ID ${recordId} and cascaded deletions across study modules.`, 'info');
       } else if (table === 'enrolment') {
-        await Promise.all(
-          db.delivery
+        await Promise.all([
+          ...db.delivery
             .filter(d => d.deliveryScreeningId === recordId)
-            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId))
-        );
+            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId)),
+          ...db.closeout
+            .filter(c => c.sreeningId === recordId)
+            .map(c => closeoutAPI.deleteCloseoutForm(c.sreeningId))
+        ]);
         updatedDb.delivery = db.delivery.filter(d => d.deliveryScreeningId !== recordId);
+        updatedDb.closeout = db.closeout.filter(c => c.sreeningId !== recordId);
         showToast(`Deleted Enrolment Record of ${recordId} and removed postpartum entries.`, 'info');
       } else {
         showToast(`Record ${recordId} deleted securely.`, 'info');

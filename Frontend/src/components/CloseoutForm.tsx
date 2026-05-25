@@ -142,11 +142,14 @@ export default function CloseoutForm({
                 id="f4-screening-id-select"
               >
                 <option value="">-- Available Trial Screening IDs --</option>
-                {screeningRecords.map(cand => (
-                  <option key={cand.screeningId} value={cand.screeningId}>
-                    {cand.screeningId} - {cand.healthFacility} ({cand.eligibility.meetsAllCriteria === 'Yes' ? 'Eligible' : 'Screen Fail'})
-                  </option>
-                ))}
+                {screeningRecords
+                  .filter(cand => !closeoutRecords.some(c => c.sreeningId === cand.screeningId))
+                  .map(cand => (
+                    <option key={cand.screeningId} value={cand.screeningId}>
+                      {cand.screeningId} - {cand.healthFacility} ({cand.eligibility.meetsAllCriteria === 'Yes' ? 'Eligible' : 'Screen Fail'})
+                    </option>
+                  ))
+                }
               </select>
             )}
           </div>

@@ -172,11 +172,40 @@ export const deliveryAPI = {
   },
 };
 
+export const closeoutAPI = {
+  async createCloseoutForm(formData: any) {
+    return apiRequest('/createCloseout', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+    });
+  },
+
+  async getAllCloseoutForms() {
+    return apiRequest('/getCloseout', { method: 'GET' });
+  },
+
+  async getCloseoutFormById(id: string) {
+    return apiRequest(`/getOneCloseout/${id}`, { method: 'GET' });
+  },
+
+  async deleteCloseoutForm(id: string) {
+    return apiRequest(`/deleteCloseout/${id}`, { method: 'DELETE' });
+  },
+
+  async updateCloseoutForm(id: string, formData: any) {
+    return apiRequest(`/updateCloseout/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(formData),
+    });
+  },
+};
+
 export const apiClient = {
   login: loginAPI,
   screening: screeningAPI,
   enrollment: enrollmentAPI,
   delivery: deliveryAPI,
+  closeout: closeoutAPI,
 };
 
 export default apiClient;
