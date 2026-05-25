@@ -22,23 +22,33 @@ export default function CloseoutForm({
   userInitials,
   readOnly = false
 }: CloseoutFormProps) {
+  // State
   const [screeningId, setScreeningId] = useState('');
   const [dateOfInterview, setDateOfInterview] = useState('');
   const [dateOfStudyTermination, setDateOfStudyTermination] = useState('');
-  const [participantStatus, setParticipantStatus] = useState<'Completed study visits' | 'Participation terminated prior to completion of study visits' | 'Screen failure before enrolment'>('Completed study visits');
-  const [discontinuationReason, setDiscontinuationReason] = useState<'Adverse event' | 'Death' | 'Lost to follow-up' | 'Physician decision' | 'Protocol deviation' | 'Screen failure' | 'Study terminated by sponsor' | 'Withdrawal by participant' | 'Other' | ''>('');
+  const [participantStatus, setParticipantStatus] = useState<"Completed study visits" | "Participation terminated prior to completion of study visits" | "Screen failure before enrollment">('Completed study visits');
+  const [discontinuationReason, setDiscontinuationReason] = useState<"" | "Other" | "Adverse event" | "Death" | "Lost to follow-up" | "Physician decision" | "Protocol deviation" | "Screen failure" | "Study terminated by sponsor" | "Withrawal by participant">('');
   const [discontinuationReasonDetail, setDiscontinuationReasonDetail] = useState('');
   const [deathDate, setDeathDate] = useState('');
 
+
   useEffect(() => {
     if (existingRecord) {
-      setScreeningId(existingRecord.screeningId);
-      setDateOfInterview(existingRecord.dateOfInterview);
-      setDateOfStudyTermination(existingRecord.dateOfStudyTermination);
-      setParticipantStatus(existingRecord.participantStatus);
-      setDiscontinuationReason(existingRecord.discontinuationReason || '');
-      setDiscontinuationReasonDetail(existingRecord.discontinuationReasonDetail || '');
-      setDeathDate(existingRecord.deathDate || '');
+      setScreeningId(existingRecord.sreeningId);
+      setDateOfInterview(existingRecord.closeOutInterviewDate);
+      setDateOfStudyTermination(existingRecord.dateOfTermination);
+      setParticipantStatus(existingRecord.participantStatus.choicesStudy);
+      if (existingRecord.participantStatus.incompleteReason) {
+        setDiscontinuationReason(existingRecord.participantStatus.incompleteReason.incompletionOptions || '');
+        setDiscontinuationReasonDetail(
+          existingRecord.participantStatus.incompleteReason.adverseEvent ||
+          existingRecord.participantStatus.incompleteReason.protocalDeviation ||
+          existingRecord.participantStatus.incompleteReason.withdrawalReason ||
+          existingRecord.participantStatus.incompleteReason.otherReason ||
+          ''
+        );
+        setDeathDate(existingRecord.participantStatus.incompleteReason.deathOption || '');
+      }
     } else {
       const todayISO = new Date().toISOString().split('T')[0];
       setDateOfInterview(todayISO);
@@ -66,21 +76,25 @@ export default function CloseoutForm({
     }
 
     const record: CloseoutRecord = {
-      screeningId,
-      dateOfInterview,
-      dateOfStudyTermination,
-      participantStatus,
-      discontinuationReason: participantStatus !== 'Completed study visits' ? discontinuationReason : '',
-      discontinuationReasonDetail: (participantStatus !== 'Completed study visits' && ['Adverse event', 'Protocol deviation', 'Withdrawal by participant', 'Other'].includes(discontinuationReason)) ? discontinuationReasonDetail : '',
-      deathDate: (participantStatus !== 'Completed study visits' && discontinuationReason === 'Death') ? deathDate : '',
-      submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
-      submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
-      updatedBy: existingRecord ? userInitials : undefined,
-      updatedAt: existingRecord ? new Date().toISOString() : undefined,
+      sreeningId: screeningId,
+      closeOutInterviewDate: dateOfInterview,
+      dateOfTermination: dateOfStudyTermination,
+      participantStatus: {
+        choicesStudy: participantStatus,
+        incompleteReason: participantStatus !== 'Completed study visits' ? {
+          incompletionOptions: discontinuationReason as any,
+          adverseEvent: discontinuationReason === 'Adverse event' ? discontinuationReasonDetail : undefined,
+          deathOption: discontinuationReason === 'Death' ? deathDate : undefined,
+          protocalDeviation: discontinuationReason === 'Protocol deviation' ? discontinuationReasonDetail : undefined,
+          withdrawalReason: discontinuationReason === 'Withdrawal by participant' ? discontinuationReasonDetail : undefined,
+          otherReason: discontinuationReason === 'Other' ? discontinuationReasonDetail : undefined,
+        } : undefined,
+      },
     };
 
     onSave(record);
   };
+
 
   return (
     <div className="bg-white border border-slate-150 rounded-2xl p-6 md:p-8 space-y-8 max-w-4xl mx-auto shadow-amber-100/30">
@@ -130,7 +144,7 @@ export default function CloseoutForm({
                 <option value="">-- Available Trial Screening IDs --</option>
                 {screeningRecords.map(cand => (
                   <option key={cand.screeningId} value={cand.screeningId}>
-                    {cand.screeningId} - {cand.facility} ({cand.isEligible ? 'Eligible' : 'Screen Fail'})
+                    {cand.screeningId} - {cand.healthFacility} ({cand.eligibility.meetsAllCriteria === 'Yes' ? 'Eligible' : 'Screen Fail'})
                   </option>
                 ))}
               </select>
@@ -188,7 +202,7 @@ export default function CloseoutForm({
             {[
               { id: 'Completed study visits', label: 'Completed Study Visits' },
               { id: 'Participation terminated prior to completion of study visits', label: 'Terminated Prior to Completion' },
-              { id: 'Screen failure before enrolment', label: 'Screen Failure Before enrolment' }
+              { id: 'Screen failure before enrollment', label: 'Screen Failure Before enrollment' }
             ].map(status => (
               <button
                 key={status.id}
@@ -199,7 +213,7 @@ export default function CloseoutForm({
                   if (status.id === 'Completed study visits') {
                     setDiscontinuationReason('');
                     setDiscontinuationReasonDetail('');
-                  } else if (status.id === 'Screen failure before enrolment') {
+                  } else if (status.id === 'Screen failure before enrollment') {
                     setDiscontinuationReason('Screen failure');
                   } else {
                     setDiscontinuationReason('');
@@ -239,13 +253,13 @@ export default function CloseoutForm({
                 { val: 'Protocol deviation', lbl: 'Protocol Deviation' },
                 { val: 'Screen failure', lbl: 'Screen Failure' },
                 { val: 'Study terminated by sponsor', lbl: 'Terminated by Sponsor' },
-                { val: 'Withdrawal by participant', lbl: 'Withdrawal by Participant' },
+                { val: 'Withrawal by participant', lbl: 'Withdrawal by Participant' },
                 { val: 'Other', lbl: 'Other (specify)' }
               ].map(reason => (
                 <button
                   key={reason.val}
                   type="button"
-                  disabled={readOnly || participantStatus === 'Screen failure before enrolment'}
+                  disabled={readOnly || participantStatus === 'Screen failure before enrollment'}
                   onClick={() => setDiscontinuationReason(reason.val as any)}
                   className={`p-3 border text-left rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
                     discontinuationReason === reason.val
@@ -289,7 +303,7 @@ export default function CloseoutForm({
             )}
 
             {/* Custom specification Text Detail */}
-            {['Adverse event', 'Protocol deviation', 'Withdrawal by participant', 'Other'].includes(discontinuationReason) && (
+            {['Adverse event', 'Protocol deviation', 'Withrawal by participant', 'Other'].includes(discontinuationReason) && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.99 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -310,6 +324,7 @@ export default function CloseoutForm({
                 />
               </motion.div>
             )}
+
           </motion.div>
         )}
 

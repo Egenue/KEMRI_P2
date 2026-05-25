@@ -73,39 +73,40 @@ export default function ScreeningForm({
   useEffect(() => {
     if (existingRecord) {
       setScreeningId(existingRecord.screeningId);
-      setDateOfInterview(existingRecord.dateOfInterview);
-      setFacility(existingRecord.facility);
-      setDateOfBirth(existingRecord.dateOfBirth);
-      setAgeYears(existingRecord.ageYears);
-      setAgeMonths(existingRecord.ageMonths);
-      setHeightCm(existingRecord.heightCm);
-      setWeightKg(existingRecord.weightKg);
-      setTemperatureC(existingRecord.temperatureC);
-      setTempMethod(existingRecord.tempMethod);
-      setRespiratoryRate(existingRecord.respiratoryRate);
-      setPulseRate(existingRecord.pulseRate);
-      setBloodPressureSys(existingRecord.bloodPressureSys);
-      setBloodPressureDia(existingRecord.bloodPressureDia);
-      if (existingRecord.lmpDate === 'Unknown') {
+      setDateOfInterview(existingRecord.interviewDate);
+      setFacility(existingRecord.healthFacility);
+      setDateOfBirth(existingRecord.DoB);
+      setAgeYears(existingRecord.Age.years);
+      setAgeMonths(existingRecord.Age.months);
+      setHeightCm(existingRecord.height);
+      setWeightKg(existingRecord.weight);
+      setTemperatureC(existingRecord.vitalSigns.temperature.value);
+      setTempMethod(existingRecord.vitalSigns.temperature.location);
+      setRespiratoryRate(existingRecord.vitalSigns.respiratoryRate);
+      setPulseRate(existingRecord.vitalSigns.pulseRate);
+      setBloodPressureSys(existingRecord.vitalSigns.bloodPressure.systolic);
+      setBloodPressureDia(existingRecord.vitalSigns.bloodPressure.diastolic);
+      if (existingRecord.lastMenstrualPeriod.unknown) {
         setLmpUnknown(true);
         setLmpDate('');
       } else {
         setLmpUnknown(false);
-        setLmpDate(existingRecord.lmpDate);
+        setLmpDate(existingRecord.lastMenstrualPeriod.date);
       }
-      setFundalHeightCm(existingRecord.fundalHeightCm);
-      setIncVillage15km(existingRecord.incVillage15km);
-      setIncPregnancyConfirmed(existingRecord.incPregnancyConfirmed);
-      setIncGestation31wks(existingRecord.incGestation31wks);
-      setIncHivConsent(existingRecord.incHivConsent);
-      setIncWillingDelivery(existingRecord.incWillingDelivery);
-      setExcMultiplePregnancy(existingRecord.excMultiplePregnancy as any);
-      setExcDeformityFistula(existingRecord.excDeformityFistula as any);
-      setExcInformedConsentUnable(existingRecord.excInformedConsentUnable as any);
-      setWomanConsented(existingRecord.womanConsented);
-      setRefusalReason(existingRecord.refusalReason || '');
-      setRefusalReasonOther(existingRecord.refusalReasonOther || '');
-      setIsEligible(existingRecord.isEligible);
+      setFundalHeightCm(existingRecord.fundalHeight);
+      setIncVillage15km(existingRecord.inclusionCriteria.residentWithin15km === 'Yes');
+      setIncPregnancyConfirmed(existingRecord.inclusionCriteria.pregnancyConfirmed === 'Yes');
+      setIncGestation31wks(existingRecord.inclusionCriteria.gestationLessThan31Weeks === 'Yes');
+      setIncHivConsent(existingRecord.inclusionCriteria.consentsToHIVTesting === 'Yes');
+      setIncWillingDelivery(existingRecord.inclusionCriteria.willingToDeliverAtStudyHospital === 'Yes');
+      setExcMultiplePregnancy(existingRecord.exclusionCriteria.multiplePregancy);
+      setExcDeformityFistula(existingRecord.exclusionCriteria.fisturaRepairOrSpinalDeformity);
+      setExcInformedConsentUnable(existingRecord.exclusionCriteria.unableToGiveInformedConsent);
+      setWomanConsented(existingRecord.eligibility.consentedToParticipate);
+      setRefusalReason(existingRecord.eligibility.reasonForRefusal || '');
+      // refusalReasonOther is not in types anymore as it's not in backend, 
+      // but let's see if we should keep it for UI.
+      setIsEligible(existingRecord.eligibility.meetsAllCriteria === 'Yes');
     } else {
       // Auto pre-fills
       setDateOfInterview(new Date().toISOString().split('T')[0]);
@@ -202,35 +203,56 @@ export default function ScreeningForm({
       return;
     }
 
+    if (womanConsented === 'No' && !refusalReason) {
+      alert('Please select a reason for refusal.');
+      return;
+    }
+
     const record: ScreeningRecord = {
       screeningId: screeningId.toUpperCase().trim(),
-      dateOfInterview,
-      facility,
-      dateOfBirth,
-      ageYears,
-      ageMonths,
-      heightCm: Number(heightCm) || 0,
-      weightKg: Number(weightKg) || 0,
-      temperatureC: Number(temperatureC) || 0,
-      tempMethod,
-      respiratoryRate: Number(respiratoryRate) || 0,
-      pulseRate: Number(pulseRate) || 0,
-      bloodPressureSys: Number(bloodPressureSys) || 0,
-      bloodPressureDia: Number(bloodPressureDia) || 0,
-      lmpDate: lmpUnknown ? 'Unknown' : lmpDate,
-      fundalHeightCm: Number(fundalHeightCm) || 0,
-      incVillage15km: incVillage15km!,
-      incPregnancyConfirmed: incPregnancyConfirmed!,
-      incGestation31wks: incGestation31wks!,
-      incHivConsent: incHivConsent!,
-      incWillingDelivery: incWillingDelivery!,
-      excMultiplePregnancy: excMultiplePregnancy!,
-      excDeformityFistula: excDeformityFistula!,
-      excInformedConsentUnable: excInformedConsentUnable!,
-      isEligible,
-      womanConsented,
-      refusalReason: womanConsented === 'No' ? refusalReason : '',
-      refusalReasonOther: (womanConsented === 'No' && refusalReason === 'Other') ? refusalReasonOther : '',
+      interviewDate: dateOfInterview,
+      healthFacility: facility,
+      DoB: dateOfBirth,
+      Age: {
+        years: ageYears,
+        months: ageMonths,
+      },
+      height: Number(heightCm) || 0,
+      weight: Number(weightKg) || 0,
+      vitalSigns: {
+        temperature: {
+          value: Number(temperatureC) || 0,
+          location: tempMethod,
+        },
+        respiratoryRate: Number(respiratoryRate) || 0,
+        pulseRate: Number(pulseRate) || 0,
+        bloodPressure: {
+          systolic: Number(bloodPressureSys) || 0,
+          diastolic: Number(bloodPressureDia) || 0,
+        },
+      },
+      lastMenstrualPeriod: {
+        date: lmpUnknown ? null : (lmpDate || null),
+        unknown: lmpUnknown,
+      },
+      fundalHeight: Number(fundalHeightCm) || 0,
+      inclusionCriteria: {
+        residentWithin15km: incVillage15km ? 'Yes' : 'No',
+        pregnancyConfirmed: incPregnancyConfirmed ? 'Yes' : 'No',
+        gestationLessThan31Weeks: incGestation31wks ? 'Yes' : 'No',
+        consentsToHIVTesting: incHivConsent ? 'Yes' : 'No',
+        willingToDeliverAtStudyHospital: incWillingDelivery ? 'Yes' : 'No',
+      },
+      exclusionCriteria: {
+        multiplePregancy: excMultiplePregnancy!,
+        fisturaRepairOrSpinalDeformity: excDeformityFistula!,
+        unableToGiveInformedConsent: excInformedConsentUnable!,
+      },
+      eligibility: {
+        meetsAllCriteria: isEligible ? 'Yes' : 'No',
+        consentedToParticipate: womanConsented as 'Yes' | 'No',
+        reasonForRefusal: womanConsented === 'No' ? (refusalReason as any) : null,
+      },
       submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
       submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
       updatedBy: existingRecord ? userInitials : undefined,
@@ -239,6 +261,7 @@ export default function ScreeningForm({
 
     onSave(record);
   };
+
 
   return (
     <div className="bg-white border border-slate-150 rounded-2xl shadow-xs p-6 md:p-8 space-y-8 max-w-5xl mx-auto shadow-indigo-100/30">

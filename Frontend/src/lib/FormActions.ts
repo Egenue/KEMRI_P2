@@ -113,7 +113,7 @@ export const createFormActions = (context: FormActionsContext) => {
         // Create new record
         await screeningAPI.createScreeningForm(record);
         screeningList.push(record);
-        showToast(`New Screening Record ${record.screeningId} saved of ${record.facility} center.`, 'success');
+        showToast(`New Screening Record ${record.screeningId} saved of ${record.healthFacility} center.`, 'success');
       }
 
       const updatedDb = { ...db, screening: screeningList };
@@ -144,7 +144,7 @@ export const createFormActions = (context: FormActionsContext) => {
         // Create new record
         await enrollmentAPI.createEnrollmentForm(record);
         enrolmentList.push(record);
-        showToast(`Subject ${record.screeningId} successfully enrolled in ${record.facility} study cohort.`, 'success');
+        showToast(`Subject ${record.screeningId} successfully enrolled in ${record.healthFacility} study cohort.`, 'success');
       }
 
       const updatedDb = { ...db, enrolment: enrolmentList };
@@ -164,18 +164,18 @@ export const createFormActions = (context: FormActionsContext) => {
     try {
       setIsLoading(true);
       const deliveryList = [...db.delivery];
-      const existingIdx = deliveryList.findIndex(d => d.screeningId === record.screeningId);
+      const existingIdx = deliveryList.findIndex(d => d.deliveryScreeningId === record.deliveryScreeningId);
 
       if (existingIdx !== -1) {
         // Update existing record
-        await deliveryAPI.updateDeliveryForm(record.screeningId, record);
+        await deliveryAPI.updateDeliveryForm(record.deliveryScreeningId, record);
         deliveryList[existingIdx] = record;
-        showToast(`Postpartum delivery records for ID ${record.screeningId} successfully updated.`, 'success');
+        showToast(`Postpartum delivery records for ID ${record.deliveryScreeningId} successfully updated.`, 'success');
       } else {
         // Create new record
         await deliveryAPI.createDeliveryForm(record);
         deliveryList.push(record);
-        showToast(`Postpartum delivery history captured for screening ID ${record.screeningId}.`, 'success');
+        showToast(`Postpartum delivery history captured for screening ID ${record.deliveryScreeningId}.`, 'success');
       }
 
       const updatedDb = { ...db, delivery: deliveryList };
@@ -193,14 +193,14 @@ export const createFormActions = (context: FormActionsContext) => {
 
   const handleSaveCloseout = (record: CloseoutRecord) => {
     const closeoutList = [...db.closeout];
-    const existingIdx = closeoutList.findIndex(c => c.screeningId === record.screeningId);
+    const existingIdx = closeoutList.findIndex(c => c.sreeningId === record.sreeningId);
 
     if (existingIdx !== -1) {
       closeoutList[existingIdx] = record;
-      showToast(`Closeout termination metrics of ID ${record.screeningId} successfully updated.`, 'success');
+      showToast(`Closeout termination metrics of ID ${record.sreeningId} successfully updated.`, 'success');
     } else {
       closeoutList.push(record);
-      showToast(`Closeout graduation record submitted for study ID ${record.screeningId}.`, 'success');
+      showToast(`Closeout graduation record submitted for study ID ${record.sreeningId}.`, 'success');
     }
 
     const updatedDb = { ...db, closeout: closeoutList };
@@ -232,7 +232,7 @@ export const createFormActions = (context: FormActionsContext) => {
 
   const handleDeleteRecord = async (
     table: 'screening' | 'enrolment' | 'delivery' | 'closeout',
-    screeningId: string
+    recordId: string
   ) => {
     if (currentUser?.role !== 'manager') {
       showToast('Deletions restricted: Only Data Managers hold permissions.', 'error');
@@ -243,40 +243,43 @@ export const createFormActions = (context: FormActionsContext) => {
       setIsLoading(true);
 
       if (table === 'screening') {
-        await screeningAPI.deleteScreeningForm(screeningId);
+        await screeningAPI.deleteScreeningForm(recordId);
       } else if (table === 'enrolment') {
-        await enrollmentAPI.deleteEnrollmentForm(screeningId);
+        await enrollmentAPI.deleteEnrollmentForm(recordId);
       } else if (table === 'delivery') {
-        await deliveryAPI.deleteDeliveryForm(screeningId);
+        await deliveryAPI.deleteDeliveryForm(recordId);
       }
 
       const tableData = [...db[table]];
-      const filtered = tableData.filter((item: any) => item.screeningId !== screeningId);
+      const filtered = tableData.filter((item: any) => {
+        const itemId = item.screeningId || item.deliveryScreeningId || item.sreeningId;
+        return itemId !== recordId;
+      });
 
       let updatedDb = { ...db, [table]: filtered };
       if (table === 'screening') {
         await Promise.all([
           ...db.enrolment
-            .filter(e => e.screeningId === screeningId)
+            .filter(e => e.screeningId === recordId)
             .map(e => enrollmentAPI.deleteEnrollmentForm(e.screeningId)),
           ...db.delivery
-            .filter(d => d.screeningId === screeningId)
-            .map(d => deliveryAPI.deleteDeliveryForm(d.screeningId)),
+            .filter(d => d.deliveryScreeningId === recordId)
+            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId)),
         ]);
-        updatedDb.enrolment = db.enrolment.filter(e => e.screeningId !== screeningId);
-        updatedDb.delivery = db.delivery.filter(d => d.screeningId !== screeningId);
-        updatedDb.closeout = db.closeout.filter(c => c.screeningId !== screeningId);
-        showToast(`Deleted Screening ID ${screeningId} and cascaded deletions across study modules.`, 'info');
+        updatedDb.enrolment = db.enrolment.filter(e => e.screeningId !== recordId);
+        updatedDb.delivery = db.delivery.filter(d => d.deliveryScreeningId !== recordId);
+        updatedDb.closeout = db.closeout.filter(c => c.sreeningId !== recordId);
+        showToast(`Deleted Screening ID ${recordId} and cascaded deletions across study modules.`, 'info');
       } else if (table === 'enrolment') {
         await Promise.all(
           db.delivery
-            .filter(d => d.screeningId === screeningId)
-            .map(d => deliveryAPI.deleteDeliveryForm(d.screeningId))
+            .filter(d => d.deliveryScreeningId === recordId)
+            .map(d => deliveryAPI.deleteDeliveryForm(d.deliveryScreeningId))
         );
-        updatedDb.delivery = db.delivery.filter(d => d.screeningId !== screeningId);
-        showToast(`Deleted Enrolment Record of ${screeningId} and removed postpartum entries.`, 'info');
+        updatedDb.delivery = db.delivery.filter(d => d.deliveryScreeningId !== recordId);
+        showToast(`Deleted Enrolment Record of ${recordId} and removed postpartum entries.`, 'info');
       } else {
-        showToast(`Record ${screeningId} deleted securely.`, 'info');
+        showToast(`Record ${recordId} deleted securely.`, 'info');
       }
 
       setDb(updatedDb);
@@ -287,6 +290,7 @@ export const createFormActions = (context: FormActionsContext) => {
       setIsLoading(false);
     }
   };
+
 
   const handleCancelEdit = () => {
     setEditRecord(null);

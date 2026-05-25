@@ -77,16 +77,17 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
     
     return dataset
       .filter(record => {
-        const matchesQuery = record.screeningId.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || '';
+        const matchesQuery = sId.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
           (record.submittedBy && record.submittedBy.toLowerCase().includes(searchQuery.toLowerCase().trim())) ||
           (record.villageOfResidence && record.villageOfResidence.toLowerCase().includes(searchQuery.toLowerCase().trim()));
           
-        const facilityField = record.facility || '';
+        const facilityField = record.healthFacility || '';
         // Delivery cross-reference facility if needed
         let recordFacility = facilityField;
         if (activeTable === 'delivery' || activeTable === 'closeout') {
-          const correspondingScreening = db.screening.find(s => s.screeningId === record.screeningId);
-          recordFacility = correspondingScreening?.facility || '';
+          const correspondingScreening = db.screening.find(s => s.screeningId === sId);
+          recordFacility = correspondingScreening?.healthFacility || '';
         }
 
         const matchesFacility = facilityFilter === 'All' || recordFacility === facilityFilter;
@@ -95,6 +96,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       })
       .sort((a, b) => {
         const factor = sortDirection === 'asc' ? 1 : -1;
+        // Handle nested sort fields if necessary
         return compare(a, b, sortField) * factor;
       });
   };
@@ -103,10 +105,25 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
     const dataset = filteredAndSortedRecords();
     if (dataset.length === 0) return;
 
-    const headers = Object.keys(dataset[0]);
+    // For CSV export, we might want to flatten the object
+    const flatten = (obj: any, prefix = ''): any => {
+      return Object.keys(obj).reduce((acc: any, k) => {
+        const pre = prefix.length ? prefix + '_' : '';
+        if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+          Object.assign(acc, flatten(obj[k], pre + k));
+        } else {
+          acc[pre + k] = obj[k];
+        }
+        return acc;
+      }, {});
+    };
+
+    const flattenedDataset = dataset.map(d => flatten(d));
+    const headers = Object.keys(flattenedDataset[0]);
+    
     const csvContent = [
       headers.join(','), // Header row
-      ...dataset.map(row => 
+      ...flattenedDataset.map(row => 
         headers.map(header => {
           const val = row[header];
           return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
@@ -123,6 +140,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
     link.click();
     document.body.removeChild(link);
   };
+
 
   const exportToJSON = () => {
     const dataset = filteredAndSortedRecords();
@@ -332,31 +350,33 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                 )}
               </thead>
               <tbody className="bg-white divide-y divide-slate-100">
-                {filteredAndSortedRecords().map((record: any) => (
-                  <tr key={record.screeningId} className="hover:bg-slate-50/50 transition-all text-slate-800">
+                {filteredAndSortedRecords().map((record: any) => {
+                  const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || '';
+                  return (
+                  <tr key={sId} className="hover:bg-slate-50/50 transition-all text-slate-800">
                     {/* Unique Screening ID Column */}
                     <td className="px-6 py-4 whitespace-nowrap text-xs font-bold font-mono text-indigo-900 border-l-4 border-l-indigo-600/30">
-                      {record.screeningId}
+                      {sId}
                     </td>
 
                     {/* Screening Custom Fields Row */}
                     {activeTable === 'screening' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.facility}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfInterview)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.ageYears}y {record.ageMonths}m</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.interviewDate)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.Age.years}y {record.Age.months}m</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-semibold">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            record.womanConsented === 'Yes' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
+                            record.eligibility.consentedToParticipate === 'Yes' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
                           }`}>
-                            {record.womanConsented}
+                            {record.eligibility.consentedToParticipate}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-center">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold ${
-                            record.isEligible ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-rose-700'
+                            record.eligibility.meetsAllCriteria === 'Yes' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-rose-700'
                           }`}>
-                            {record.isEligible ? 'Passed' : 'Fail'}
+                            {record.eligibility.meetsAllCriteria === 'Yes' ? 'Passed' : 'Fail'}
                           </span>
                         </td>
                       </>
@@ -365,7 +385,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                     {/* Enrolment Custom Fields Row */}
                     {activeTable === 'enrolment' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.facility}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[120px]">{record.villageOfResidence}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.maritalStatus}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[120px]">{record.educationLevel}</td>
@@ -375,19 +395,19 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                     {/* Delivery Custom Fields Row */}
                     {activeTable === 'delivery' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfDelivery)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.deliveryLocation}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.deliveredBy}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[150px]">{record.modeOfDelivery}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.deliveryHistory.deliveryDate)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.deliveryHistory.deliveryPlace.deliveryChoices}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.deliveryHistory.deliveryPersonnel.deliveryPersValue}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[150px]">{record.deliveryHistory.deliveryMode.choices}</td>
                       </>
                     )}
 
                     {/* Closeout Custom Fields Row */}
                     {activeTable === 'closeout' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfStudyTermination)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[180px]">{record.participantStatus}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-rose-700 font-bold">{record.discontinuationReason || 'Graduated (Visits OK)'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfTermination)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[180px]">{record.participantStatus.choicesStudy}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-rose-700 font-bold">{record.participantStatus.incompleteReason?.incompletionOptions || 'Graduated (Visits OK)'}</td>
                       </>
                     )}
 
@@ -409,7 +429,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         onClick={() => onViewRecord(activeTable, record)}
                         type="button"
                         className="p-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-md transition-all inline-flex items-center gap-1 cursor-pointer"
-                        id={`btn-view-${record.screeningId}`}
+                        id={`btn-view-${sId}`}
                       >
                         <Eye className="w-3.5 h-3.5" /> View
                       </button>
@@ -419,7 +439,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                           onClick={() => onEditRecord(activeTable, record)}
                           type="button"
                           className="p-1 px-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-md transition-all inline-flex items-center gap-1 cursor-pointer"
-                          id={`btn-edit-${record.screeningId}`}
+                          id={`btn-edit-${sId}`}
                         >
                           <Edit3 className="w-3.5 h-3.5" /> Edit
                         </button>
@@ -428,21 +448,23 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                       {userRole === 'manager' && onDeleteRecord && (
                         <button
                           onClick={() => {
-                            if (confirm(`Are you sure you want to delete record ${record.screeningId}?`)) {
-                              onDeleteRecord(activeTable, record.screeningId);
+                            if (confirm(`Are you sure you want to delete record ${sId}?`)) {
+                              onDeleteRecord(activeTable, sId);
                             }
                           }}
                           type="button"
                           className="p-1 hover:bg-red-50 text-red-500 rounded-md transition-all cursor-pointer"
-                          id={`btn-delete-${record.screeningId}`}
+                          id={`btn-delete-${sId}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </td>
                   </tr>
-                ))}
+                );
+                })}
               </tbody>
+
             </table>
           </div>
         )}

@@ -44,7 +44,7 @@ const createScreeningForm = async (req, res) => {
     const sanitizeEligibility = {
         meetsAllCriteria: eligibility.meetsAllCriteria || 'No',
         consentedToParticipate: eligibility.consentedToParticipate || 'No',
-        reasonForRefusal: eligibility.reasonForRefusal || ''
+        reasonForRefusal: eligibility.reasonForRefusal || null
     };
 
     const newScreeningForm = new screeningForm({

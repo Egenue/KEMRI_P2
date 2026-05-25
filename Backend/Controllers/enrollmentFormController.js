@@ -16,7 +16,7 @@ const newEnrollmentForm = async (req, res) => {
             screeningId,
             healthFacility,
             DoB,
-            Age:{months,years},
+            Age = {},
             maritalStatus,
             HusbandName,
             villageOfResidence,
@@ -25,20 +25,20 @@ const newEnrollmentForm = async (req, res) => {
             otherOccupation,
             height,
             weight,
-            vitalSigns:{
-                temperature:{value,location},
-                respiratoryRate,
-                pulseRate,
-                bloodPressure:{systolic,diastolic}
-            },
+            vitalSigns = {},
             estGestAge
         } = req.body;
+
+        const { months, years } = Age;
+        const { temperature = {}, respiratoryRate, pulseRate, bloodPressure = {} } = vitalSigns;
+        const { value, location } = temperature;
+        const { systolic, diastolic } = bloodPressure;
 
         const newEnrollmentForm = new EnrollmentForm({
             screeningId,
             healthFacility,
             DoB,
-            Age:{
+            Age: {
                 months,
                 years
             },
@@ -50,20 +50,21 @@ const newEnrollmentForm = async (req, res) => {
             otherOccupation,
             height,
             weight,
-            vitalSigns:{
-                temperature:{
+            vitalSigns: {
+                temperature: {
                     value,
                     location
                 },
                 respiratoryRate,
                 pulseRate,
-                bloodPressure:{
-                    systolic,diastolic
+                bloodPressure: {
+                    systolic,
+                    diastolic
                 }
             },
             estGestAge
         });
-        
+
         if (!screeningId || !DoB || !healthFacility) {
             return res.status(400).json({
                 message: "Please fill in all required fields: screeningId, DoB, and healthFacility."
@@ -71,15 +72,15 @@ const newEnrollmentForm = async (req, res) => {
         }
         const exists = await EnrollmentForm.findOne({
             $or: [
-                {screeningId: req.body.screeningId},
-                {HusbandName: req.body.HusbandName}
+                { screeningId: req.body.screeningId },
+                { HusbandName: req.body.HusbandName }
             ]
         });
-        if (exists){
-            return ('This enrollment form aready exists !')
-        }else{
+        if (exists) {
+            return res.status(409).json({ "message": "This enrollment form already exists !" });
+        } else {
             await newEnrollmentForm.save();
-            return res.status(200).json({data: newEnrollmentForm});
+            return res.status(200).json({ data: newEnrollmentForm });
         }
     }
     catch(error){
@@ -110,7 +111,7 @@ const deleteEnrollmentForm = async (req, res) => {
         if(!enrolmentFormDoc){
            return res.status(404).json({"message":"Enrollment form not found"});
         }else{
-            await enrolmentFormDoc.findByIdAndDelete(id)
+            await EnrollmentForm.findByIdAndDelete(id)
             res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
     }

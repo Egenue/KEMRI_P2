@@ -36,11 +36,11 @@ export default function EnrolmentForm({
   const [ageMonths, setAgeMonths] = useState(0);
 
   // Demographics
-  const [maritalStatus, setMaritalStatus] = useState<'Single' | 'Married' | 'Widowed' | 'Other'>('Single');
+  const [maritalStatus, setMaritalStatus] = useState<'Single' | 'Married' | 'Widowed' | 'Divorced'>('Single');
   const [husbandName, setHusbandName] = useState('');
   const [villageOfResidence, setVillageOfResidence] = useState('');
-  const [educationLevel, setEducationLevel] = useState<'Never attended school' | 'Primary' | 'Secondary' | 'University/College'>('Primary');
-  const [occupation, setOccupation] = useState<'Farmer' | 'Business woman' | 'Fisherman/ Fish monger' | 'Home maker' | 'Salaried worker' | 'Other, Specify'>('Farmer');
+  const [educationLevel, setEducationLevel] = useState<"Never Attended School" | "Primary" | "Secondary" | "University/Collage">('Primary');
+  const [occupation, setOccupation] = useState<"Farmer" | "Business woman" | "Fisherman/Fish monger" | "Home maker" | "Salaried worker" | "Other">('Farmer');
   const [occupationOther, setOccupationOther] = useState('');
 
   // Assessments (pre-filled but editable)
@@ -63,7 +63,7 @@ export default function EnrolmentForm({
     
     const candidates = screeningRecords.filter(s => {
       // Must be eligible and consented
-      const matchCriteria = s.isEligible && s.womanConsented === 'Yes';
+      const matchCriteria = s.eligibility.meetsAllCriteria === 'Yes' && s.eligibility.consentedToParticipate === 'Yes';
       if (!matchCriteria) return false;
 
       // If in editing mode, the current screening ID is allowed even if present in active enrolled list
@@ -83,18 +83,18 @@ export default function EnrolmentForm({
     setScreeningId(id);
     const origin = screeningRecords.find(s => s.screeningId === id);
     if (origin) {
-      setFacility(origin.facility);
-      setDateOfBirth(origin.dateOfBirth);
-      setAgeYears(origin.ageYears);
-      setAgeMonths(origin.ageMonths);
-      setHeightCm(origin.heightCm);
-      setWeightKg(origin.weightKg);
-      setTemperatureC(origin.temperatureC);
-      setTempMethod(origin.tempMethod);
-      setRespiratoryRate(origin.respiratoryRate);
-      setPulseRate(origin.pulseRate);
-      setBloodPressureSys(origin.bloodPressureSys);
-      setBloodPressureDia(origin.bloodPressureDia);
+      setFacility(origin.healthFacility);
+      setDateOfBirth(origin.DoB);
+      setAgeYears(origin.Age.years);
+      setAgeMonths(origin.Age.months);
+      setHeightCm(origin.height);
+      setWeightKg(origin.weight);
+      setTemperatureC(origin.vitalSigns.temperature.value);
+      setTempMethod(origin.vitalSigns.temperature.location);
+      setRespiratoryRate(origin.vitalSigns.respiratoryRate);
+      setPulseRate(origin.vitalSigns.pulseRate);
+      setBloodPressureSys(origin.vitalSigns.bloodPressure.systolic);
+      setBloodPressureDia(origin.vitalSigns.bloodPressure.diastolic);
     }
   };
 
@@ -102,25 +102,25 @@ export default function EnrolmentForm({
   useEffect(() => {
     if (existingRecord) {
       setScreeningId(existingRecord.screeningId);
-      setFacility(existingRecord.facility);
-      setDateOfBirth(existingRecord.dateOfBirth);
-      setAgeYears(existingRecord.ageYears);
-      setAgeMonths(existingRecord.ageMonths);
+      setFacility(existingRecord.healthFacility);
+      setDateOfBirth(existingRecord.DoB);
+      setAgeYears(existingRecord.Age.years);
+      setAgeMonths(existingRecord.Age.months);
       setMaritalStatus(existingRecord.maritalStatus);
-      setHusbandName(existingRecord.husbandName || '');
+      setHusbandName(existingRecord.HusbandName || '');
       setVillageOfResidence(existingRecord.villageOfResidence);
       setEducationLevel(existingRecord.educationLevel);
-      setOccupation(existingRecord.occupation);
-      setOccupationOther(existingRecord.occupationOther || '');
-      setHeightCm(existingRecord.heightCm);
-      setWeightKg(existingRecord.weightKg);
-      setTemperatureC(existingRecord.temperatureC);
-      setTempMethod(existingRecord.tempMethod);
-      setRespiratoryRate(existingRecord.respiratoryRate);
-      setPulseRate(existingRecord.pulseRate);
-      setBloodPressureSys(existingRecord.bloodPressureSys);
-      setBloodPressureDia(existingRecord.bloodPressureDia);
-      setEstimatedGestationUltrasoundWeeks(existingRecord.estimatedGestationUltrasoundWeeks);
+      setOccupation(existingRecord.subjectOccupation);
+      setOccupationOther(existingRecord.otherOccupation || '');
+      setHeightCm(existingRecord.height);
+      setWeightKg(existingRecord.weight);
+      setTemperatureC(existingRecord.vitalSigns.temperature.value);
+      setTempMethod(existingRecord.vitalSigns.temperature.location);
+      setRespiratoryRate(existingRecord.vitalSigns.respiratoryRate);
+      setPulseRate(existingRecord.vitalSigns.pulseRate);
+      setBloodPressureSys(existingRecord.vitalSigns.bloodPressure.systolic);
+      setBloodPressureDia(existingRecord.vitalSigns.bloodPressure.diastolic);
+      setEstimatedGestationUltrasoundWeeks(existingRecord.estGestAge);
     }
   }, [existingRecord]);
 
@@ -140,25 +140,33 @@ export default function EnrolmentForm({
 
     const record: EnrolmentRecord = {
       screeningId,
-      facility,
-      dateOfBirth,
-      ageYears,
-      ageMonths,
+      healthFacility: facility,
+      DoB: dateOfBirth,
+      Age: {
+        years: ageYears,
+        months: ageMonths,
+      },
       maritalStatus,
-      husbandName: maritalStatus === 'Married' ? husbandName : '',
+      HusbandName: maritalStatus === 'Married' ? husbandName : '',
       villageOfResidence,
       educationLevel,
-      occupation,
-      occupationOther: occupation === 'Other, Specify' ? occupationOther : '',
-      heightCm: Number(heightCm) || 0,
-      weightKg: Number(weightKg) || 0,
-      temperatureC: Number(temperatureC) || 0,
-      tempMethod,
-      respiratoryRate: Number(respiratoryRate) || 0,
-      pulseRate: Number(pulseRate) || 0,
-      bloodPressureSys: Number(bloodPressureSys) || 0,
-      bloodPressureDia: Number(bloodPressureDia) || 0,
-      estimatedGestationUltrasoundWeeks: Number(estimatedGestationUltrasoundWeeks) || 0,
+      subjectOccupation: occupation,
+      otherOccupation: occupation === 'Other' ? occupationOther : '',
+      height: Number(heightCm) || 0,
+      weight: Number(weightKg) || 0,
+      vitalSigns: {
+        temperature: {
+          value: Number(temperatureC) || 0,
+          location: tempMethod,
+        },
+        respiratoryRate: Number(respiratoryRate) || 0,
+        pulseRate: Number(pulseRate) || 0,
+        bloodPressure: {
+          systolic: Number(bloodPressureSys) || 0,
+          diastolic: Number(bloodPressureDia) || 0,
+        },
+      },
+      estGestAge: Number(estimatedGestationUltrasoundWeeks) || 0,
       submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
       submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
       updatedBy: existingRecord ? userInitials : undefined,
@@ -167,6 +175,7 @@ export default function EnrolmentForm({
 
     onSave(record);
   };
+
 
   return (
     <div className="bg-white border border-slate-150 rounded-2xl shadow-xs p-6 md:p-8 space-y-8 max-w-5xl mx-auto shadow-violet-100/30">
@@ -220,11 +229,12 @@ export default function EnrolmentForm({
                   id="f2-screening-id-select"
                 >
                   <option value="">-- Search / Select Eligible Screening ID --</option>
-                  {eligibleList.map((cand) => (
+                  {eligibleList.map(cand => (
                     <option key={cand.screeningId} value={cand.screeningId}>
-                      {cand.screeningId} - {cand.facility} (DOB: {cand.dateOfBirth})
+                      {cand.screeningId} - {cand.healthFacility} (DOB: {cand.DoB})
                     </option>
                   ))}
+
                 </select>
                 {eligibleList.length === 0 && (
                   <p className="mt-1.5 text-[11px] text-amber-600 font-medium">
@@ -336,10 +346,10 @@ export default function EnrolmentForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f2-education"
               >
-                <option value="Never attended school">Never attended school</option>
+                <option value="Never Attended School">Never Attended School</option>
                 <option value="Primary">Primary</option>
                 <option value="Secondary">Secondary</option>
-                <option value="University/College">University/College</option>
+                <option value="University/Collage">University/Collage</option>
               </select>
             </div>
 
@@ -356,14 +366,14 @@ export default function EnrolmentForm({
               >
                 <option value="Farmer">Farmer</option>
                 <option value="Business woman">Business woman</option>
-                <option value="Fisherman/ Fish monger">Fisherman / Fish monger</option>
+                <option value="Fisherman/Fish monger">Fisherman/Fish monger</option>
                 <option value="Home maker">Home maker</option>
                 <option value="Salaried worker">Salaried worker</option>
-                <option value="Other, Specify">Other, Specify</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
-            {occupation === 'Other, Specify' && (
+            {occupation === 'Other' && (
               <div>
                 <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
                   Specify Occupation <span className="text-red-500">*</span>

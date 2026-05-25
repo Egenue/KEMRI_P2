@@ -55,9 +55,9 @@ const createDeliveryForm = async (req, res) => {
         const exists = await deliveryForm.findOne({deliveryScreeningId});
 
         if (!deliveryScreeningId || !interviewDate || !bodyMassIndex){
-            return res.status(500).json({"message":"Please fill in all fields"});
+            return res.status(400).json({"message":"Please fill in all fields"});
         }else if(exists){
-            res.status(404).json({"message":"Form already exists !!"});
+            return res.status(409).json({"message":"Form already exists !!"});
         }else{
             await newDeliveryForm.save();
             return res.status(200).json({"message":"Data saved successfully", data: newDeliveryForm});
@@ -73,7 +73,7 @@ const getdeliveryForms = async (req, res) => {
         const deliveryFormData = await deliveryForm.find({});
         return res.status(200).json({data:deliveryFormData});
     }catch (error){
-        return ("ERROR!! Could not get delivery form: ", error);
+        return res.status(500).json({"message":"ERROR!! Could not get delivery form: ", error: error.message});
     }
 }
 
@@ -85,27 +85,27 @@ const getOneDeliveryForm = async (req, res) => {
         });
 
         if(!delFormData){
-            res.status(200).json("Form not found !!");
+            return res.status(404).json("Form not found !!");
         }else{
-            res.status(200).json({data:delFormData});
+            return res.status(200).json({data:delFormData});
         }
     }catch (error){
-        return ("Operation failed: ", error);
+        return res.status(500).json({"message":"Operation failed: ", error: error.message});
     }
 }
 
 const deleteOneDeliveryForm = async (req, res) => {
     try{
         const id = req.body.deliveryScreeningId;
-        const oneDelveryForm = await deliveryForm.findOne({id});
+        const oneDelveryForm = await deliveryForm.findOne({deliveryScreeningId: id});
         if(!oneDelveryForm){
-            return res.status(401).json({"message":"Form not found"});
+            return res.status(404).json({"message":"Form not found"});
         }else{
-            await oneDelveryForm.findByIdAndDelete(id);
-            res.status(200).json({ success: true, message: 'Deleted successfully' });
+            await deliveryForm.findOneAndDelete({deliveryScreeningId: id});
+            return res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
     }catch(error){
-        return res.status(500).json({ message: "Error, could not delete enrollment form", error: error.message });
+        return res.status(500).json({ message: "Error, could not delete delivery form", error: error.message });
     }
 }
 

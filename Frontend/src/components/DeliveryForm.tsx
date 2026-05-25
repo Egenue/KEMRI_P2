@@ -48,13 +48,13 @@ export default function DeliveryForm({
   // C. Delivery History
   const [dateOfDelivery, setDateOfDelivery] = useState('');
   const [timeOfDelivery, setTimeOfDelivery] = useState('');
-  const [deliveryLocation, setDeliveryLocation] = useState<'Bondo' | 'Lumumba' | 'Siaya' | 'Other hospital/clinic' | 'Home' | 'Other location'>('Bondo');
+  const [deliveryLocation, setDeliveryLocation] = useState<'Bondo' | 'Lumumba' | 'Siaya' | 'Other hospital/clinic' | 'Home' | 'Other Location'>('Bondo');
   const [deliveryLocationSpecify, setDeliveryLocationSpecify] = useState('');
   const [deliveredBy, setDeliveredBy] = useState<'Doctor' | 'Clinical Officer' | 'Nurse' | 'Midwife' | 'Traditional Birth Attendant' | 'Village Health Worker' | 'Other' | 'Don\'t know'>('Nurse');
   const [deliveredBySpecify, setDeliveredBySpecify] = useState('');
-  const [modeOfDelivery, setModeOfDelivery] = useState<'Spontaneous vaginal delivery (Normal)' | 'Episiotomy' | 'Vacuum' | 'Forceps' | 'C-section' | 'Other'>('Spontaneous vaginal delivery (Normal)');
+  const [modeOfDelivery, setModeOfDelivery] = useState<'Spontaneous vaginal delivery (Normal' | 'Episiotomy' | 'Vacuum' | 'Forceps' | 'C-section' | 'Other'>('Spontaneous vaginal delivery (Normal');
   const [modeOfDeliverySpecify, setModeOfDeliverySpecify] = useState('');
-  const [cSectionIndication, setCSectionIndication] = useState<'Prolonged labor' | 'Fetal distress' | 'Meconium-stained amniotic fluid' | 'Antepartum hemorrhage' | 'Pre-eclamptic toxemia' | 'Cephalopelvic disproportion' | 'Malpresentation' | 'Elective C-section' | 'Pregnancy-induced hypertension' | 'Other' | 'Don\'t know' | ''>('');
+  const [cSectionIndication, setCSectionIndication] = useState<'Prolonged labour' | 'Fetal distress' | 'Meconium-stained amniotic fluid' | 'Antepartum hemorrhage' | 'Pre-eclempic toxemia' | 'cephalopelvic disproportion' | 'Malpresentation' | 'Elective C-section' | 'Pregnancy-induced hypertension' | 'Other' | 'Don\'t know' | ''>('');
   const [cSectionIndicationOther, setCSectionIndicationOther] = useState('');
 
   // Dropdown list computation
@@ -63,10 +63,10 @@ export default function DeliveryForm({
 
   // Compute enrolled list candidates: currently enrolled and not delivered yet (or is current editing record)
   useEffect(() => {
-    const activeDeliveredIds = deliveryRecords.map(d => d.screeningId);
+    const activeDeliveredIds = deliveryRecords.map(d => d.deliveryScreeningId);
     
     const candidates = enrolledRecords.filter(e => {
-      if (existingRecord && e.screeningId === existingRecord.screeningId) {
+      if (existingRecord && e.screeningId === existingRecord.deliveryScreeningId) {
         return true;
       }
       return !activeDeliveredIds.includes(e.screeningId);
@@ -75,12 +75,13 @@ export default function DeliveryForm({
     setCandidateEnrolledList(candidates);
   }, [enrolledRecords, deliveryRecords, existingRecord]);
 
+
   // Track height of selected enrolled candidate to display/calculate BMI
   useEffect(() => {
     if (screeningId) {
       const match = enrolledRecords.find(e => e.screeningId === screeningId);
       if (match) {
-        setMatchedHeight(match.heightCm);
+        setMatchedHeight(match.height);
       }
     } else {
       setMatchedHeight(null);
@@ -90,30 +91,30 @@ export default function DeliveryForm({
   // Auto-fill today's date for new records
   useEffect(() => {
     if (existingRecord) {
-      setScreeningId(existingRecord.screeningId);
-      setDateOfInterview(existingRecord.dateOfInterview);
-      setMotherWeightKg(existingRecord.motherWeightKg);
-      setTemperatureC(existingRecord.temperatureC);
-      setTempMethod(existingRecord.tempMethod);
-      setRespiratoryRate(existingRecord.respiratoryRate);
-      setPulseRate(existingRecord.pulseRate);
-      setBloodPressureSys(existingRecord.bloodPressureSys);
-      setBloodPressureDia(existingRecord.bloodPressureDia);
-      setOxygenSaturation(existingRecord.oxygenSaturation);
-      setOxygenSource(existingRecord.oxygenSource);
-      setBmiUnknown(!!existingRecord.bmiUnknown);
-      setMotherExamAbnormal(existingRecord.motherExamAbnormal);
-      setMotherExamAbnormalSpecify(existingRecord.motherExamAbnormalSpecify || '');
-      setDateOfDelivery(existingRecord.dateOfDelivery);
-      setTimeOfDelivery(existingRecord.timeOfDelivery);
-      setDeliveryLocation(existingRecord.deliveryLocation);
-      setDeliveryLocationSpecify(existingRecord.deliveryLocationSpecify || '');
-      setDeliveredBy(existingRecord.deliveredBy);
-      setDeliveredBySpecify(existingRecord.deliveredBySpecify || '');
-      setModeOfDelivery(existingRecord.modeOfDelivery);
-      setModeOfDeliverySpecify(existingRecord.modeOfDeliverySpecify || '');
-      setCSectionIndication(existingRecord.cSectionIndication || '');
-      setCSectionIndicationOther(existingRecord.cSectionIndicationOther || '');
+      setScreeningId(existingRecord.deliveryScreeningId);
+      setDateOfInterview(existingRecord.interviewDate);
+      setMotherWeightKg(existingRecord.physicalExam.motherWeight);
+      setTemperatureC(existingRecord.physicalExam.vitalSigns.temperature.tempValue);
+      setTempMethod(existingRecord.physicalExam.vitalSigns.temperature.location);
+      setRespiratoryRate(existingRecord.physicalExam.vitalSigns.respiratoryRate);
+      setPulseRate(existingRecord.physicalExam.vitalSigns.pulseRate);
+      setBloodPressureSys(existingRecord.physicalExam.vitalSigns.bloodPressure.systolic);
+      setBloodPressureDia(existingRecord.physicalExam.vitalSigns.bloodPressure.diastolic);
+      setOxygenSaturation(existingRecord.physicalExam.vitalSigns.oxygenSaturation.oxygenValue);
+      setOxygenSource(existingRecord.physicalExam.vitalSigns.oxygenSaturation.oxygenOptions);
+      setBmiUnknown(!!existingRecord.bodyMassIndex.unknown);
+      setMotherExamAbnormal(existingRecord.motherAbnormality.motherAbnomValue);
+      setMotherExamAbnormalSpecify(existingRecord.motherAbnormality.specifics || '');
+      setDateOfDelivery(existingRecord.deliveryHistory.deliveryDate);
+      setTimeOfDelivery(existingRecord.deliveryHistory.deliveryTime);
+      setDeliveryLocation(existingRecord.deliveryHistory.deliveryPlace.deliveryChoices);
+      setDeliveryLocationSpecify(existingRecord.deliveryHistory.deliveryPlace.otherLocation || existingRecord.deliveryHistory.deliveryPlace.otherFacility || '');
+      setDeliveredBy(existingRecord.deliveryHistory.deliveryPersonnel.deliveryPersValue);
+      setDeliveredBySpecify(existingRecord.deliveryHistory.deliveryPersonnel.otherPersonnel || '');
+      setModeOfDelivery(existingRecord.deliveryHistory.deliveryMode.choices);
+      setModeOfDeliverySpecify(existingRecord.deliveryHistory.deliveryMode.otherMode || '');
+      setCSectionIndication(existingRecord.deliveryHistory.deliveryMode.csectionIndication?.csectOptions || '');
+      setCSectionIndicationOther(existingRecord.deliveryHistory.deliveryMode.csectionIndication?.otherOption || '');
     } else {
       const todayISO = new Date().toISOString().split('T')[0];
       setDateOfInterview(todayISO);
@@ -154,30 +155,56 @@ export default function DeliveryForm({
     }
 
     const record: DeliveryRecord = {
-      screeningId,
-      dateOfInterview,
-      motherWeightKg: Number(motherWeightKg) || 0,
-      temperatureC: Number(temperatureC) || 0,
-      tempMethod,
-      respiratoryRate: Number(respiratoryRate) || 0,
-      pulseRate: Number(pulseRate) || 0,
-      bloodPressureSys: Number(bloodPressureSys) || 0,
-      bloodPressureDia: Number(bloodPressureDia) || 0,
-      oxygenSaturation: Number(oxygenSaturation) || 0,
-      oxygenSource,
-      bmiUnknown,
-      motherExamAbnormal,
-      motherExamAbnormalSpecify: motherExamAbnormal === 'Yes' ? motherExamAbnormalSpecify : '',
-      dateOfDelivery,
-      timeOfDelivery,
-      deliveryLocation,
-      deliveryLocationSpecify: (deliveryLocation === 'Other hospital/clinic' || deliveryLocation === 'Other location') ? deliveryLocationSpecify : '',
-      deliveredBy,
-      deliveredBySpecify: (deliveredBy === 'Other') ? deliveredBySpecify : '',
-      modeOfDelivery,
-      modeOfDeliverySpecify: (modeOfDelivery === 'Other') ? modeOfDeliverySpecify : '',
-      cSectionIndication: modeOfDelivery === 'C-section' ? cSectionIndication : '',
-      cSectionIndicationOther: (modeOfDelivery === 'C-section' && cSectionIndication === 'Other') ? cSectionIndicationOther : '',
+      deliveryScreeningId: screeningId,
+      interviewDate: dateOfInterview,
+      physicalExam: {
+        motherWeight: Number(motherWeightKg) || 0,
+        vitalSigns: {
+          temperature: {
+            tempValue: Number(temperatureC) || 0,
+            location: tempMethod,
+          },
+          respiratoryRate: Number(respiratoryRate) || 0,
+          pulseRate: Number(pulseRate) || 0,
+          bloodPressure: {
+            systolic: Number(bloodPressureSys) || 0,
+            diastolic: Number(bloodPressureDia) || 0,
+          },
+          oxygenSaturation: {
+            oxygenValue: Number(oxygenSaturation) || 0,
+            oxygenOptions: oxygenSource,
+          },
+        },
+      },
+      bodyMassIndex: {
+        value: bmiUnknown ? null : Number(getBmiString()),
+        unknown: bmiUnknown,
+      },
+      motherAbnormality: {
+        motherAbnomValue: motherExamAbnormal,
+        specifics: motherExamAbnormal === 'Yes' ? motherExamAbnormalSpecify : '',
+      },
+      deliveryHistory: {
+        deliveryDate: dateOfDelivery,
+        deliveryTime: timeOfDelivery,
+        deliveryPlace: {
+          deliveryChoices: deliveryLocation as any,
+          otherLocation: deliveryLocation === 'Other location' ? deliveryLocationSpecify : '',
+          otherFacility: deliveryLocation === 'Other hospital/clinic' ? deliveryLocationSpecify : '',
+        },
+        deliveryPersonnel: {
+          deliveryPersValue: deliveredBy as any,
+          otherPersonnel: deliveredBy === 'Other' ? deliveredBySpecify : '',
+        },
+        deliveryMode: {
+          choices: modeOfDelivery as any,
+          otherMode: modeOfDelivery === 'Other' ? modeOfDeliverySpecify : '',
+          csectionIndication: modeOfDelivery === 'C-section' ? {
+            csectOptions: cSectionIndication as any,
+            otherOption: cSectionIndication === 'Other' ? cSectionIndicationOther : '',
+          } : undefined,
+        },
+      },
       submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
       submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
       updatedBy: existingRecord ? userInitials : undefined,
@@ -186,6 +213,7 @@ export default function DeliveryForm({
 
     onSave(record);
   };
+
 
   return (
     <div className="bg-white border border-slate-150 rounded-2xl shadow-xs p-6 md:p-8 space-y-8 max-w-5xl mx-auto shadow-teal-100/30">
@@ -241,7 +269,7 @@ export default function DeliveryForm({
                   <option value="">-- Dropdown Enrolled patient IDs --</option>
                   {candidateEnrolledList.map((cand) => (
                     <option key={cand.screeningId} value={cand.screeningId}>
-                      {cand.screeningId} - {cand.facility} (Active Enrolment)
+                      {cand.screeningId} - {cand.healthFacility} (Active Enrollment)
                     </option>
                   ))}
                 </select>
@@ -584,11 +612,11 @@ export default function DeliveryForm({
                 <option value="Siaya">Siaya</option>
                 <option value="Other hospital/clinic">Other hospital/clinic (specify)</option>
                 <option value="Home">Home</option>
-                <option value="Other location">Other location (specify)</option>
+                <option value="Other Location">Other location (specify)</option>
               </select>
             </div>
 
-            {(deliveryLocation === 'Other hospital/clinic' || deliveryLocation === 'Other location') && (
+            {(deliveryLocation === 'Other hospital/clinic' || deliveryLocation === 'Other Location') && (
               <div className="col-span-1 md:col-span-3">
                 <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
                   Specify Location Details <span className="text-red-500">*</span>
@@ -657,7 +685,7 @@ export default function DeliveryForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f3-delivery-mode"
               >
-                <option value="Spontaneous vaginal delivery (Normal)">Spontaneous vaginal delivery (Normal)</option>
+                <option value="Spontaneous vaginal delivery (Normal">Spontaneous vaginal delivery (Normal)</option>
                 <option value="Episiotomy">Episiotomy</option>
                 <option value="Vacuum">Vacuum</option>
                 <option value="Forceps">Forceps</option>
@@ -697,14 +725,14 @@ export default function DeliveryForm({
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
                 {[
-                  { value: 'Prolonged labor', label: 'Prolonged Labor' },
+                  { value: 'Prolonged labour', label: 'Prolonged Labor' },
                   { value: 'Fetal distress', label: 'Fetal Distress' },
                   { value: 'Meconium-stained amniotic fluid', label: 'Meconium Fluid Spill' },
                   { value: 'Antepartum hemorrhage', label: 'Antepartum Hemorrhage' },
-                  { value: 'Pre-eclamptic toxemia', label: 'Pre-eclamptic Toxemia' },
-                  { value: 'Cephalopelvic disproportion', label: 'Cephalopelvic Disproportion' },
+                  { value: 'Pre-eclempic toxemia', label: 'Pre-eclamptic Toxemia' },
+                  { value: 'cephalopelvic disproportion', label: 'Cephalopelvic Disproportion' },
                   { value: 'Malpresentation', label: 'Malpresentation (Breech)' },
-                  { value: 'Election C-section', label: 'Elective C-section' },
+                  { value: 'Elective C-section', label: 'Elective C-section' },
                   { value: 'Pregnancy-induced hypertension', label: 'Pregnancy-induced Hypertension' },
                   { value: 'Other', label: 'Other (specify)' },
                   { value: 'Don\'t know', label: 'Don\'t know' }
@@ -726,6 +754,7 @@ export default function DeliveryForm({
                   </button>
                 ))}
               </div>
+
 
               {cSectionIndication === 'Other' && (
                 <div className="pt-2">
