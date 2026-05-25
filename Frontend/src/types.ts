@@ -86,6 +86,19 @@ export interface EnrolmentRecord extends AuditFields {
   weight: number;
   vitalSigns: VitalSigns;
   estGestAge: number;
+  gaParameters?: {
+    ultrasoundDate: string;
+    usWeeks: number;
+    usDays: number;
+    lmpDate?: string;
+    lmpCertainty?: 'certain' | 'uncertain' | '';
+    calculatedTrimester: string;
+    finalPregnancyStartDate: string;
+    gaAtEnrolmentDays: number;
+    edd: string;
+    source: string;
+    loc: string;
+  };
 }
 
 export interface DeliveryRecord extends AuditFields {

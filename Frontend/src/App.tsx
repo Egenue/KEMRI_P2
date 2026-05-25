@@ -17,7 +17,8 @@ import {
   Sparkles,
   Search,
   Check,
-  AlertCircle
+  AlertCircle,
+  Calculator
 } from 'lucide-react';
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from './types';
 import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI } from './lib/apiClient';
@@ -29,8 +30,9 @@ import DeliveryForm from './components/DeliveryForm';
 import CloseoutForm from './components/CloseoutForm';
 import RecordsList from './components/RecordsList';
 import RecordDetailModal from './components/RecordDetailModal';
+import GestationTracker from './components/GestationTracker';
 
-type ActiveTab = 'dashboard' | 'records' | 'screening' | 'enrolment' | 'delivery' | 'closeout';
+type ActiveTab = 'dashboard' | 'records' | 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'gestation';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -439,6 +441,7 @@ export default function App() {
                 { id: 'records', label: 'Audit Log Tables', icon: FileText },
                 { id: 'screening', label: '1. Screening', icon: Users },
                 { id: 'enrolment', label: '2. Enrolment', icon: UserCheck },
+                { id: 'gestation', label: 'GA Tracking', icon: Calculator },
                 { id: 'delivery', label: '3. postpartum Delivery', icon: Baby },
                 { id: 'closeout', label: '4. Closeout', icon: UserX },
               ].map((item) => {
@@ -533,6 +536,7 @@ export default function App() {
               { id: 'records', label: 'Audit List', icon: FileText },
               { id: 'screening', label: '1. Screening', icon: Users },
               { id: 'enrolment', label: '2. Enrolment', icon: UserCheck },
+              { id: 'gestation', label: 'GA Tracking', icon: Calculator },
               { id: 'delivery', label: '3. Delivery', icon: Baby },
               { id: 'closeout', label: '4. Closeout', icon: UserX },
             ].map((item) => {
@@ -629,6 +633,10 @@ export default function App() {
             userInitials={currentUser.initials}
             readOnly={currentUser.role === 'technician'}
           />
+        )}
+
+        {activeTab === 'gestation' && (
+          <GestationTracker enrolledRecords={db.enrolment} />
         )}
 
         {activeTab === 'delivery' && (

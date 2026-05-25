@@ -5,9 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Search, Sparkles, Check, Lock, ShieldCheck, HeartPulse } from 'lucide-react';
+import { Search, Sparkles, Check, Lock, ShieldCheck, HeartPulse, Calculator, CalendarDays } from 'lucide-react';
 import { EnrolmentRecord, ScreeningRecord, HealthFacility } from '../types';
-import { calculateAge, isValidDob } from '../lib/dateUtils';
+import { calculateAge, isValidDob, calculateGAIA, GAIAResult, formatToDdmMmyyyy } from '../lib/dateUtils';
 
 interface EnrolmentFormProps {
   onSave: (record: EnrolmentRecord) => void;
@@ -54,6 +54,14 @@ export default function EnrolmentForm({
   const [bloodPressureDia, setBloodPressureDia] = useState<number | ''>('');
   const [estimatedGestationUltrasoundWeeks, setEstimatedGestationUltrasoundWeeks] = useState<number | ''>('');
 
+  // GAIA GA Parameters
+  const [ultrasoundDate, setUltrasoundDate] = useState('');
+  const [usWeeks, setUsWeeks] = useState<number | ''>('');
+  const [usDays, setUsDays] = useState<number | ''>('');
+  const [lmpDate, setLmpDate] = useState('');
+  const [lmpCertainty, setLmpCertainty] = useState<'certain' | 'uncertain' | ''>('');
+  const [gaiaResult, setGaiaResult] = useState<GAIAResult | null>(null);
+
   // Dropdown list computation
   const [eligibleList, setEligibleList] = useState<ScreeningRecord[]>([]);
 
@@ -95,6 +103,11 @@ export default function EnrolmentForm({
       setPulseRate(origin.vitalSigns.pulseRate);
       setBloodPressureSys(origin.vitalSigns.bloodPressure.systolic);
       setBloodPressureDia(origin.vitalSigns.bloodPressure.diastolic);
+      
+      // Auto-prefill LMP from screening if available
+      if (origin.lastMenstrualPeriod && !origin.lastMenstrualPeriod.unknown) {
+        setLmpDate(origin.lastMenstrualPeriod.date.split('T')[0]);
+      }
     }
   };
 
@@ -121,8 +134,39 @@ export default function EnrolmentForm({
       setBloodPressureSys(existingRecord.vitalSigns.bloodPressure.systolic);
       setBloodPressureDia(existingRecord.vitalSigns.bloodPressure.diastolic);
       setEstimatedGestationUltrasoundWeeks(existingRecord.estGestAge);
+      
+      if (existingRecord.gaParameters) {
+        setUltrasoundDate(existingRecord.gaParameters.ultrasoundDate);
+        setUsWeeks(existingRecord.gaParameters.usWeeks);
+        setUsDays(existingRecord.gaParameters.usDays);
+        setLmpDate(existingRecord.gaParameters.lmpDate || '');
+        setLmpCertainty(existingRecord.gaParameters.lmpCertainty || '');
+      }
+    } else {
+      // Set default ultrasound date to today for new records
+      setUltrasoundDate(new Date().toISOString().split('T')[0]);
     }
   }, [existingRecord]);
+
+  // Automatic GAIA Calculation Trigger
+  useEffect(() => {
+    if (ultrasoundDate && usWeeks !== '' && usDays !== '') {
+      const result = calculateGAIA({
+        ultrasoundDate,
+        usWeeks: Number(usWeeks),
+        usDays: Number(usDays),
+        lmpDate: lmpDate || undefined,
+        lmpCertainty: lmpCertainty || undefined,
+        enrolmentDate: new Date().toISOString().split('T')[0]
+      });
+      setGaiaResult(result);
+      
+      // Update the main Gestational Age field automatically
+      setEstimatedGestationUltrasoundWeeks(Math.floor(result.gaAtEnrolmentDays / 7));
+    } else {
+      setGaiaResult(null);
+    }
+  }, [ultrasoundDate, usWeeks, usDays, lmpDate, lmpCertainty]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,6 +179,11 @@ export default function EnrolmentForm({
 
     if (!villageOfResidence.trim()) {
       alert('Village of residence is required.');
+      return;
+    }
+
+    if (!gaiaResult) {
+      alert('Please complete ultrasound GA parameters to calculate gestational age.');
       return;
     }
 
@@ -167,6 +216,19 @@ export default function EnrolmentForm({
         },
       },
       estGestAge: Number(estimatedGestationUltrasoundWeeks) || 0,
+      gaParameters: {
+        ultrasoundDate,
+        usWeeks: Number(usWeeks),
+        usDays: Number(usDays),
+        lmpDate: lmpDate || undefined,
+        lmpCertainty: lmpCertainty || undefined,
+        calculatedTrimester: gaiaResult.trimester,
+        finalPregnancyStartDate: gaiaResult.finalPregnancyStartDate.toISOString().split('T')[0],
+        gaAtEnrolmentDays: gaiaResult.gaAtEnrolmentDays,
+        edd: gaiaResult.edd.toISOString().split('T')[0],
+        source: gaiaResult.source,
+        loc: gaiaResult.loc
+      },
       submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
       submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
       updatedBy: existingRecord ? userInitials : undefined,
@@ -284,7 +346,7 @@ export default function EnrolmentForm({
                 Marital Status <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-4 gap-2">
-                {['Single', 'Married', 'Widowed', 'Other'].map(status => (
+                {['Single', 'Married', 'Widowed', 'Divorced'].map(status => (
                   <button
                     key={status}
                     type="button"
@@ -313,7 +375,7 @@ export default function EnrolmentForm({
                 disabled={maritalStatus !== 'Married' || readOnly}
                 value={husbandName}
                 onChange={(e) => setHusbandName(e.target.value)}
-                placeholder={maritalStatus === 'Married' ? "Enter full name of husband" : "N/A - Single/Widowed/Other"}
+                placeholder={maritalStatus === 'Married' ? "Enter full name of husband" : "N/A - Single/Widowed/Divorced"}
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm disabled:bg-slate-50 disabled:text-slate-400"
                 id="f2-husband"
               />
@@ -390,29 +452,191 @@ export default function EnrolmentForm({
                 />
               </div>
             )}
-            
-            <div>
+          </div>
+        </div>
+
+        {/* Gestation Assessment Area */}
+        <div className="space-y-4">
+          <h3 className="text-md font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+            <Calculator className="w-5 h-5 text-indigo-600" />
+            Gestation Assessment (GAIA Calculator)
+          </h3>
+          
+          <div className="bg-indigo-50/30 p-5 rounded-xl border border-indigo-100/50 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                  Date of Ultrasound <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    required
+                    disabled={readOnly}
+                    value={ultrasoundDate}
+                    onChange={(e) => setUltrasoundDate(e.target.value)}
+                    className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
+                    id="f2-us-date"
+                  />
+                  <CalendarDays className="absolute right-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                  Ultrasound GA — Weeks <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="42"
+                  required
+                  disabled={readOnly}
+                  value={usWeeks}
+                  onChange={(e) => setUsWeeks(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="e.g. 22"
+                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
+                  id="f2-us-weeks"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                  Ultrasound GA — Days <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="6"
+                  required
+                  disabled={readOnly}
+                  value={usDays}
+                  onChange={(e) => setUsDays(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="0-6"
+                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
+                  id="f2-us-days"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-indigo-100 pt-4">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                  Last Menstrual Period (LMP)
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    disabled={readOnly}
+                    value={lmpDate}
+                    onChange={(e) => setLmpDate(e.target.value)}
+                    className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
+                    id="f2-lmp-date"
+                  />
+                  <CalendarDays className="absolute right-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                  LMP Certainty
+                </label>
+                <select
+                  value={lmpCertainty}
+                  onChange={(e) => setLmpCertainty(e.target.value as any)}
+                  disabled={readOnly || !lmpDate}
+                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
+                  id="f2-lmp-certainty"
+                >
+                  <option value="">-- Select Certainty --</option>
+                  <option value="certain">Certain</option>
+                  <option value="uncertain">Uncertain</option>
+                </select>
+              </div>
+            </div>
+
+            {gaiaResult && !gaiaResult.error && (
+              <motion.div 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border-l-4 border-indigo-500 p-4 rounded-r-xl shadow-sm space-y-3"
+              >
+                <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs uppercase tracking-tight">
+                  <Sparkles className="w-4 h-4" />
+                  GAIA Automated Calculation Result
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-6">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">GA at Enrolment</span>
+                    <strong className="text-slate-900 text-sm">
+                      {Math.floor(gaiaResult.gaAtEnrolmentDays / 7)} weeks {gaiaResult.gaAtEnrolmentDays % 7} days
+                    </strong>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Estimated Due Date</span>
+                    <strong className="text-slate-900 text-sm">
+                      {formatToDdmMmyyyy(gaiaResult.edd)}
+                    </strong>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Trimester</span>
+                    <strong className="text-slate-900 text-sm">{gaiaResult.trimester}</strong>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Calculation Source</span>
+                    <strong className="text-indigo-600 text-sm font-extrabold">{gaiaResult.source}</strong>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Level of Certainty (LOC)</span>
+                    <strong className={`text-sm font-extrabold ${gaiaResult.loc.includes('NOT') ? 'text-rose-600' : 'text-emerald-600'}`}>
+                      {gaiaResult.loc}
+                    </strong>
+                  </div>
+                </div>
+
+                {gaiaResult.loc.includes('NOT') && (
+                  <div className="bg-rose-50 border border-rose-100 p-2.5 rounded-lg text-[11px] text-rose-700 font-medium flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 rotate-45" />
+                    <span>Protocol Warning: Participant does not meet Level of Certainty (LOC 1-2b) standards. Screen but do not enrol.</span>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {gaiaResult && gaiaResult.error && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-rose-50 border border-rose-200 p-4 rounded-xl flex items-start gap-3 text-rose-800"
+              >
+                <Lock className="w-5 h-5 mt-0.5 shrink-0" />
+                <div>
+                  <span className="text-xs font-bold uppercase block mb-1">Illogical Calculation Parameters</span>
+                  <p className="text-sm font-medium leading-snug">{gaiaResult.error}</p>
+                </div>
+              </motion.div>
+            )}
+
+            <div className="border-t border-indigo-100 pt-4">
               <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
                 Estimated gestational age by ultrasound (weeks) <span className="text-red-500">*</span>
               </label>
-              <input
-                type="number"
-                min="4"
-                max="42"
-                required
-                disabled={readOnly}
-                placeholder="weeks"
-                value={estimatedGestationUltrasoundWeeks}
-                onChange={(e) => setEstimatedGestationUltrasoundWeeks(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f2-gestation"
-              />
-              {typeof estimatedGestationUltrasoundWeeks === 'number' && estimatedGestationUltrasoundWeeks >= 31 && (
-                <p className="text-xs text-orange-600 mt-1 font-semibold">Note: Should be "&lt; 31" weeks for baseline</p>
-              )}
-              {typeof estimatedGestationUltrasoundWeeks === 'number' && (estimatedGestationUltrasoundWeeks < 4 || estimatedGestationUltrasoundWeeks > 42) && (
-                <p className="text-xs text-red-500 mt-1">Gestation: 4-42 weeks</p>
-              )}
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="4"
+                  max="42"
+                  required
+                  readOnly
+                  className="block w-32 px-3 py-2.5 bg-slate-50 border border-indigo-200 rounded-lg text-indigo-700 font-bold text-sm shadow-inner"
+                  value={estimatedGestationUltrasoundWeeks}
+                  id="f2-gestation"
+                />
+                <span className="text-xs text-slate-400 font-medium italic">
+                  &larr; Derived automatically from GAIA metrics
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -486,12 +710,6 @@ export default function EnrolmentForm({
                   className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-l-lg text-slate-900 text-sm"
                   id="f2-temp"
                 />
-                {typeof temperatureC === 'number' && temperatureC < 36.0 && (
-                  <p className="text-xs text-red-600 mt-1 font-semibold">Hypothermia</p>
-                )}
-                {typeof temperatureC === 'number' && temperatureC > 38.5 && (
-                  <p className="text-xs text-red-600 mt-1 font-semibold">High Fever</p>
-                )}
                 <select
                   value={tempMethod}
                   disabled={readOnly}
@@ -504,6 +722,12 @@ export default function EnrolmentForm({
                   <option value="Tympanic">Tympanic</option>
                 </select>
               </div>
+              {typeof temperatureC === 'number' && temperatureC < 36.0 && (
+                <p className="text-xs text-red-600 mt-1 font-semibold">Hypothermia</p>
+              )}
+              {typeof temperatureC === 'number' && temperatureC > 38.5 && (
+                <p className="text-xs text-red-600 mt-1 font-semibold">High Fever</p>
+              )}
             </div>
 
             <div>
