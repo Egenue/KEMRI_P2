@@ -41,7 +41,7 @@ export function isValidDob(dobString: string): boolean {
 }
 
 
-export function formatToDdmMmyyyy(dateInput: string | Date | undefined): string {
+export function formatToDdmMmyyyy(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return '';
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   if (isNaN(date.getTime())) return String(dateInput);

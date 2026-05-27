@@ -105,7 +105,7 @@ export default function EnrolmentForm({
       setBloodPressureDia(origin.vitalSigns.bloodPressure.diastolic);
       
       // Auto-prefill LMP from screening if available
-      if (origin.lastMenstrualPeriod && !origin.lastMenstrualPeriod.unknown) {
+      if (origin.lastMenstrualPeriod && !origin.lastMenstrualPeriod.unknown && origin.lastMenstrualPeriod.date) {
         setLmpDate(origin.lastMenstrualPeriod.date.split('T')[0]);
       }
     }

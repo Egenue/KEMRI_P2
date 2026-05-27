@@ -34,7 +34,6 @@ const createScreeningForm = async (req, res) => {
             return res.status(409).json({ "message": "This form already exists" });
         }
 
-        // Ensure all enum fields have valid string values
         const sanitizeExclusionCriteria = {
             multiplePregancy: exclusionCriteria.multiplePregancy || 'No',
             fisturaRepairOrSpinalDeformity: exclusionCriteria.fisturaRepairOrSpinalDeformity || 'No',

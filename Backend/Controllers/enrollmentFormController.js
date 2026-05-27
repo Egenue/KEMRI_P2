@@ -105,7 +105,7 @@ const deleteEnrollmentForm = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
-            res.status(200).json({ success: true, message: 'Deleted successfully' });
+            return res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
     } catch (error) {
         return res.status(500).json({ message: "Error, could not delete enrollment form", error: error.message });

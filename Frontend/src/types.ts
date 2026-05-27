@@ -45,7 +45,7 @@ export interface ScreeningRecord extends AuditFields {
   weight: number;
   vitalSigns: VitalSigns;
   lastMenstrualPeriod: {
-    date: string;
+    date: string | null;
     unknown: boolean;
   };
   fundalHeight: number;

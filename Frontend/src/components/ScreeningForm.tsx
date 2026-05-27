@@ -91,7 +91,7 @@ export default function ScreeningForm({
         setLmpDate('');
       } else {
         setLmpUnknown(false);
-        setLmpDate(existingRecord.lastMenstrualPeriod.date);
+        setLmpDate(existingRecord.lastMenstrualPeriod.date || '');
       }
       setFundalHeightCm(existingRecord.fundalHeight);
       setIncVillage15km(existingRecord.inclusionCriteria.residentWithin15km === 'Yes');
@@ -113,11 +113,11 @@ export default function ScreeningForm({
       
       // Auto-generate Screening ID
       const activeIds = records.map(r => r.screeningId);
-      let nextNum = 1007;
-      let checkId = `SCR-${nextNum}`;
+      let nextNum = 123;
+      let checkId = `08-000${nextNum}-01`;
       while (activeIds.includes(checkId)) {
         nextNum++;
-        checkId = `SCR-${nextNum}`;
+        checkId = `08-000${nextNum}-01`;
       }
       setScreeningId(checkId);
     }
