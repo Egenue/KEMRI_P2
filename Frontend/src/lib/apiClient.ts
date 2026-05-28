@@ -219,6 +219,13 @@ export const gestationAgeAPI = {
   async deleteGestAge(screeningId: string) {
     return apiRequest(`/deleteGestAge/${screeningId}`, { method: 'DELETE' });
   },
+
+  async updateGestAge(screeningId: string, formData: any) {
+    return apiRequest(`/updateGestAge/${screeningId}`, {
+      method: 'PUT',
+      body: JSON.stringify(formData),
+    });
+  },
 };
 
 export const apiClient = {

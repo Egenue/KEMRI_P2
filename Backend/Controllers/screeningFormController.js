@@ -1,4 +1,8 @@
 import screeningForm  from "../Models/screeningForm.js";
+import EnrollmentForm from "../Models/enrollmentForm.js";
+import deliveryForm from "../Models/deliveryForm.js";
+import closeoutForm from "../Models/closeoutForm.js";
+import gestationAge from "../Models/gestationAge.js";
 
 const createScreeningForm = async (req, res) => {
     try {
@@ -125,7 +129,15 @@ const deleteScreeningForm = async (req, res) => {
         if (!deleted) {
             return res.status(404).json({ "message": "Screening form does not exist" });
         } else {
-            return res.status(200).json({ "message": "Deleted successfully", success: true });
+            // Cascade delete ALL associated records across all study modules
+            await Promise.all([
+                EnrollmentForm.deleteMany({ screeningId: id }),
+                deliveryForm.deleteMany({ deliveryScreeningId: id }),
+                closeoutForm.deleteMany({ sreeningId: id }),
+                gestationAge.deleteMany({ screeningId: id })
+            ]);
+
+            return res.status(200).json({ "message": "Deleted successfully and cascaded to all modules", success: true });
         }
     } catch (error) {
         return res.status(500).json({ "message": "Could not delete form", error: error.message });

@@ -7,7 +7,7 @@ const getOneGestAge = async (req, res) =>{
         const exists = await gestationAge.findOne({screeningId});
 
         if(!exists){
-            res.status(401).json({"message":"Not Found"});
+            res.status(404).json({"message":"Not Found"});
         }else{
             res.status(200).json({
                 "message":"Success", data:exists
@@ -21,8 +21,6 @@ const getOneGestAge = async (req, res) =>{
 
 const getAllGestAge = async (req, res) => {
     try{
-        const {screeningId} = req.params ;
-
         const datas = await gestationAge.find() ;
         if(!datas){
             return res.status(404).json({"message":"Not Found, Does Not exist"});
@@ -45,10 +43,6 @@ const createGestAge = async (req, res) => {
             estDueDate,
             currentGestAge = {}
         } = req.body;
-
-        const {gestweeks,gestdays} = currentGestAge;
-
-        const {usWeeks,usDays} = ultrasoundDate;
 
         const existing = await gestationAge.findOne({screeningId: screeningId})
         if(existing){
@@ -74,6 +68,27 @@ const createGestAge = async (req, res) => {
     }
 }
 
+const updateGestAge = async (req, res) => {
+    try {
+        const { screeningId } = req.params;
+        const updateData = req.body;
+
+        const updated = await gestationAge.findOneAndUpdate(
+            { screeningId },
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updated) {
+            return res.status(404).json({ "message": "Record not found" });
+        }
+
+        return res.status(200).json({ "message": "Update Success!!!", data: updated });
+    } catch (error) {
+        return res.status(500).json({ "message": error.message });
+    }
+}
+
 const deleteGestAge = async (req, res) => {
     try{
         const {screeningId} = req.params;
@@ -91,4 +106,4 @@ const deleteGestAge = async (req, res) => {
 }
 
 
-export {createGestAge, getAllGestAge, getOneGestAge, deleteGestAge};
+export {createGestAge, getAllGestAge, getOneGestAge, updateGestAge, deleteGestAge};

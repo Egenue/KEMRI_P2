@@ -1,4 +1,5 @@
 import EnrollmentForm from "../Models/enrollmentForm.js";
+import screeningForm from "../Models/screeningForm.js";
  
 const getAllEnrollmentForms = async (req, res) => {
     try {
@@ -38,6 +39,12 @@ const newEnrollmentForm = async (req, res) => {
         const exists = await EnrollmentForm.findOne({ screeningId });
         if (exists) {
             return res.status(409).json({ "message": "This enrollment form already exists !" });
+        }
+
+        // Validate that the screening record exists
+        const parentScreening = await screeningForm.findOne({ screeningId });
+        if (!parentScreening) {
+            return res.status(400).json({ "message": "Invalid Screening ID: No screening record found for this participant." });
         }
 
         const newForm = new EnrollmentForm({
