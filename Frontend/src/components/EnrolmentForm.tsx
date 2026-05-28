@@ -360,6 +360,7 @@ export default function EnrolmentForm({
                 <input
                   type="text"
                   required
+                  maxLength={100}
                   disabled={readOnly}
                   value={occupationOther}
                   onChange={(e) => setOccupationOther(e.target.value)}

@@ -341,11 +341,17 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">US GA (Weeks)</label>
-                  <input type="number" value={usWeeks} onChange={(e) => setUsWeeks(e.target.value)} placeholder="e.g. 22" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                  <input type="number" value={usWeeks} onChange={(e) => setUsWeeks(e.target.value)} placeholder="e.g. 22"
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" 
+                   min={0}
+                   max={52} />
                 </div>
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">US GA (Days)</label>
-                  <input type="number" value={usDays} onChange={(e) => setUsDays(e.target.value)} placeholder="0-6" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                  <input type="number" value={usDays} onChange={(e) => setUsDays(e.target.value)} placeholder="0-6"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"
+                  min={0}
+                  max={6} />
                 </div>
               </div>
               <div>
@@ -353,7 +359,6 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
                 <div className="grid grid-cols-2 gap-4">
                   <input type="date" value={lmpDate} onChange={(e) => setLmpDate(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
                   <select value={lmpCertainty} onChange={(e) => setLmpCertainty(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold">
-                    <option value="">Certainty?</option>
                     <option value="certain">Certain</option>
                     <option value="uncertain">Uncertain</option>
                   </select>

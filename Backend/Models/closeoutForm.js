@@ -25,7 +25,7 @@ const closeoutFormSchema = new mongoose.Schema({
         incompleteReason: {
             incompletionOptions: {
                 type: String,
-                enum: ["Adverse event", "Death", "Lost to follow-up", "Physician decision", "Protocol deviation", "Screen failure", "Study terminated by sponsor", "Withrawal by participant", "Other"],
+                enum: ["Adverse event", "Death", "Lost to follow-up", "Physician decision", "Protocol deviation", "Screen failure", "Study terminated by sponsor", "Withdrawal by participant", "Other"],
                 required: false
             },
             adverseEvent: { type: String, required: false },

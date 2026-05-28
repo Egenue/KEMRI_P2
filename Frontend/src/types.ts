@@ -163,7 +163,7 @@ export interface CloseoutRecord {
   participantStatus: {
     choicesStudy: "Completed study visits" | "Participation terminated prior to completion of study visits" | "Screen failure before enrollment";
     incompleteReason?: {
-      incompletionOptions: "Adverse event" | "Death" | "Lost to follow-up" | "Physician decision" | "Protocol deviation" | "Screen failure" | "Study terminated by sponsor" | "Withrawal by participant" | "Other";
+      incompletionOptions: "Adverse event" | "Death" | "Lost to follow-up" | "Physician decision" | "Protocol deviation" | "Screen failure" | "Study terminated by sponsor" | "Withdrawal by participant" | "Other";
       adverseEvent?: string;
       deathOption?: string;
       protocalDeviation?: string;

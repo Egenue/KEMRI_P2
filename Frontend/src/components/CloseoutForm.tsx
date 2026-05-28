@@ -27,7 +27,7 @@ export default function CloseoutForm({
   const [dateOfInterview, setDateOfInterview] = useState('');
   const [dateOfStudyTermination, setDateOfStudyTermination] = useState('');
   const [participantStatus, setParticipantStatus] = useState<"Completed study visits" | "Participation terminated prior to completion of study visits" | "Screen failure before enrollment">('Completed study visits');
-  const [discontinuationReason, setDiscontinuationReason] = useState<"" | "Other" | "Adverse event" | "Death" | "Lost to follow-up" | "Physician decision" | "Protocol deviation" | "Screen failure" | "Study terminated by sponsor" | "Withrawal by participant">('');
+  const [discontinuationReason, setDiscontinuationReason] = useState<"" | "Other" | "Adverse event" | "Death" | "Lost to follow-up" | "Physician decision" | "Protocol deviation" | "Screen failure" | "Study terminated by sponsor" | "Withdrawal by participant">('');
   const [discontinuationReasonDetail, setDiscontinuationReasonDetail] = useState('');
   const [deathDate, setDeathDate] = useState('');
 
@@ -86,7 +86,7 @@ export default function CloseoutForm({
           adverseEvent: discontinuationReason === 'Adverse event' ? discontinuationReasonDetail : undefined,
           deathOption: discontinuationReason === 'Death' ? deathDate : undefined,
           protocalDeviation: discontinuationReason === 'Protocol deviation' ? discontinuationReasonDetail : undefined,
-          withdrawalReason: discontinuationReason === 'Withdrawal by participant' ? discontinuationReasonDetail : undefined,
+          withdrawalReason: discontinuationReason === "Withdrawal by participant" ? discontinuationReasonDetail : undefined,
           otherReason: discontinuationReason === 'Other' ? discontinuationReasonDetail : undefined,
         } : undefined,
       },
@@ -256,7 +256,7 @@ export default function CloseoutForm({
                 { val: 'Protocol deviation', lbl: 'Protocol Deviation' },
                 { val: 'Screen failure', lbl: 'Screen Failure' },
                 { val: 'Study terminated by sponsor', lbl: 'Terminated by Sponsor' },
-                { val: 'Withrawal by participant', lbl: 'Withdrawal by Participant' },
+                { val: 'Withdrawal by participant', lbl: 'Withdrawal by Participant' },
                 { val: 'Other', lbl: 'Other (specify)' }
               ].map(reason => (
                 <button
@@ -296,6 +296,7 @@ export default function CloseoutForm({
                     type="date"
                     required
                     disabled={readOnly}
+                    max={new Date().toISOString().split('T')[0]}
                     value={deathDate}
                     onChange={(e) => setDeathDate(e.target.value)}
                     className="block px-3 py-2 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-white rounded-lg text-xs"
@@ -306,7 +307,7 @@ export default function CloseoutForm({
             )}
 
             {/* Custom specification Text Detail */}
-            {['Adverse event', 'Protocol deviation', 'Withrawal by participant', 'Other'].includes(discontinuationReason) && (
+            {['Adverse event', 'Protocol deviation', 'Withdrawal by participant', 'Other'].includes(discontinuationReason) && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.99 }}
                 animate={{ opacity: 1, scale: 1 }}

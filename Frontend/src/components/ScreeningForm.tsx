@@ -335,6 +335,7 @@ export default function ScreeningForm({
               type="date"
               required
               disabled={readOnly}
+              max={new Date().toISOString().split('T')[0]}
               value={dateOfInterview}
               onChange={(e) => setDateOfInterview(e.target.value)}
               className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"

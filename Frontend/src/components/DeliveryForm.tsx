@@ -290,6 +290,7 @@ export default function DeliveryForm({
               type="date"
               required
               disabled={readOnly}
+              max={new Date().toISOString().split('T')[0]}
               value={dateOfInterview}
               onChange={(e) => setDateOfInterview(e.target.value)}
               className="block px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm shadow-xs focus:ring-2 focus:ring-teal-500 focus:outline-hidden"

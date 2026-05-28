@@ -190,7 +190,7 @@ const deliveryFormSchema = new mongoose.Schema(
                 incompletionOptions:{
                     type: String,
                     enum:["Adverse event","Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
-                    "Study terminated by sponsor", "Withrawal by participant", "Other"],
+                    "Study terminated by sponsor", "Withdrawal by participant", "Other"],
                     required: false
                 },
                 adverseEvent:{
