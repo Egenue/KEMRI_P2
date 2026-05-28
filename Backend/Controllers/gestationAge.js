@@ -15,7 +15,7 @@ const getOneGestAge = async (req, res) =>{
         }
 
     }catch(error){
-        res.status(500).json({"message":"Error!!!", error: error.message});
+        res.status(500).json({"message": error.message});
     }
 }
 
@@ -30,7 +30,7 @@ const getAllGestAge = async (req, res) => {
             return res.status(200).json({"message":"Success!!", data: datas});
         }
     }catch (error){
-        return res.status(500).json({"message":"Error!!!", error: error.message});
+        return res.status(500).json({"message": error.message});
     }
 }
 
@@ -64,7 +64,7 @@ const createGestAge = async (req, res) => {
         }
 
     }catch(error){
-        return res.status(500).json({"message":"Error!!!", error: error.message});
+        return res.status(500).json({"message": error.message});
     }
 }
 
@@ -80,7 +80,7 @@ const deleteGestAge = async (req, res) => {
             return res.status(200).json({"message":"Success!!!"})
         }
     }catch(error){
-        return res.status(500).json({"message":"Error!!!", error:error.message});
+        return res.status(500).json({"message": error.message});
     }
 }
 

@@ -23,6 +23,7 @@ export const saveDatabase = (db: DatabaseState): void => {
   localStorage.setItem(DB_KEY, JSON.stringify(db));
 };
 
-export const resetDatabase = (): void => {
+export const resetDatabase = (): DatabaseState => {
   localStorage.removeItem(DB_KEY);
+  return getDatabase();
 };

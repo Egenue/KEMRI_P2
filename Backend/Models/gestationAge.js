@@ -6,7 +6,7 @@ const gestAge = new mongoose.Schema({
     },
     lmp:{
         type: Date,
-        required: true,
+        required: false,
         default: null
     },
     ultrasoundDate:{
@@ -20,7 +20,7 @@ const gestAge = new mongoose.Schema({
         }
     },
     lmpCertainty:{
-        type: Boolean,
+        type: String,
         required: true
     },
     enrolmentDate:{

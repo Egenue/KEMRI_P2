@@ -21,7 +21,7 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
   const [usWeeks, setUsWeeks] = useState<string>('');
   const [usDays, setUsDays] = useState<string>('');
   const [lmpDate, setLmpDate] = useState<string>('');
-  const [lmpCertainty, setLmpCertainty] = useState<string>('');
+  const [lmpCertainty, setLmpCertainty] = useState<string>('certain');
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -58,7 +58,7 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
           setUsWeeks(String(p.gaParameters.usWeeks || ''));
           setUsDays(String(p.gaParameters.usDays || ''));
           setLmpDate(p.gaParameters.lmpDate?.split('T')[0] || '');
-          setLmpCertainty(p.gaParameters.lmpCertainty || '');
+          setLmpCertainty(p.gaParameters.lmpCertainty || 'certain');
         }
         setEnrolmentDate(p.submittedAt?.split('T')[0] || new Date().toISOString().split('T')[0]);
       }
@@ -76,11 +76,11 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
   const calculate = () => {
     try {
       setSaveStatus(null);
-      const usWeeksNum = parseInt(usWeeks);
-      const usDaysNum = parseInt(usDays);
+      const usWeeksNum = parseInt(usWeeks) || 0;
+      const usDaysNum = parseInt(usDays) || 0;
       
-      if (isNaN(usWeeksNum) || isNaN(usDaysNum)) {
-        alert("Please enter valid Ultrasound GA (Weeks and Days).");
+      if (!usWeeks) {
+        alert("Please enter valid Ultrasound GA (Weeks).");
         return;
       }
 
@@ -207,6 +207,11 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
       return;
     }
 
+    if (!result) {
+      alert("Please calculate the GAIA parameters before saving.");
+      return;
+    }
+
     try {
       setIsSaving(true);
       setSaveStatus(null);
@@ -215,8 +220,8 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
         screeningId: selectedParticipantId,
         lmp: lmpDate || null,
         ultrasoundDate: {
-          usWeeks: parseInt(usWeeks),
-          usDays: parseInt(usDays)
+          usWeeks: parseInt(usWeeks) || 0,
+          usDays: parseInt(usDays) || 0
         },
         lmpCertainty,
         enrolmentDate
