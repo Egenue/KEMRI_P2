@@ -200,12 +200,34 @@ export const closeoutAPI = {
   },
 };
 
+export const gestationAgeAPI = {
+  async createGestAge(formData: any) {
+    return apiRequest('/createGestAge', {
+      method: 'POST',
+      body: JSON.stringify(formData),
+    });
+  },
+
+  async getAllGestAge() {
+    return apiRequest('/getGestAge', { method: 'GET' });
+  },
+
+  async getGestAgeByScreeningId(screeningId: string) {
+    return apiRequest(`/getOneGestAge/${screeningId}`, { method: 'GET' });
+  },
+
+  async deleteGestAge(screeningId: string) {
+    return apiRequest(`/deleteGestAge/${screeningId}`, { method: 'DELETE' });
+  },
+};
+
 export const apiClient = {
   login: loginAPI,
   screening: screeningAPI,
   enrollment: enrollmentAPI,
   delivery: deliveryAPI,
   closeout: closeoutAPI,
+  gestation: gestationAgeAPI,
 };
 
 export default apiClient;

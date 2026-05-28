@@ -11,11 +11,11 @@ const gestAge = new mongoose.Schema({
     },
     ultrasoundDate:{
         usWeeks:{
-            type: Date,
+            type: Number,
             required: true
         },
         usDays:{
-            type: Date,
+            type: Number,
             required: true
         }
     },

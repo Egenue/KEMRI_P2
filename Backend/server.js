@@ -6,8 +6,8 @@ import router from './Routes/formRoutes.js';
 
 dotenv.config();
 
-const app = express({ path: './.env' });
-const PORT = process.env.PORT;
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 //      CORS configuration      //
 const defaultOrigins = [

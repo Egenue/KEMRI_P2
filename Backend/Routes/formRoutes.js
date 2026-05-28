@@ -4,6 +4,7 @@ import { newEnrollmentForm, getAllEnrollmentForms, getOneEnrollmentForm, updateE
 import { createDeliveryForm, getdeliveryForms, getOneDeliveryForm, updateDeliveryForm, deleteOneDeliveryForm } from '../Controllers/deliveryFormController.js';
 import { createScreeningForm, getAllSreeningForms, getOneScreeningForm, updateScreeningForm, deleteScreeningForm } from '../Controllers/screeningFormController.js';
 import { createCloseoutForm, getAllCloseoutForms, getOneCloseoutForm, updateCloseoutForm, deleteCloseoutForm } from '../Controllers/closeoutFormController.js';
+import { createGestAge, getAllGestAge, getOneGestAge, deleteGestAge } from '../Controllers/gestationAge.js';
 
 const router = express.Router();
 
@@ -41,5 +42,11 @@ router.get('/getCloseout', getAllCloseoutForms);
 router.get('/getOneCloseout/:id', getOneCloseoutForm);
 router.put('/updateCloseout/:id', updateCloseoutForm);
 router.delete('/deleteCloseout/:id', deleteCloseoutForm);
+
+// Gestation Age Routes
+router.post('/createGestAge', createGestAge);
+router.get('/getGestAge', getAllGestAge);
+router.get('/getOneGestAge/:screeningId', getOneGestAge);
+router.delete('/deleteGestAge/:screeningId', deleteGestAge);
 
 export default router;
