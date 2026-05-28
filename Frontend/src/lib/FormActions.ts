@@ -60,6 +60,7 @@ export const createFormActions = (context: FormActionsContext) => {
         enrolment: enrollmentData,
         delivery: deliveryData,
         closeout: [],
+        gestation: [],
       });
     } catch (error: any) {
       console.error('Error fetching data from backend:', error);

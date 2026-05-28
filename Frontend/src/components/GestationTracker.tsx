@@ -1,32 +1,58 @@
 import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
-import { Calculator, Calendar, Clock, Baby, ChevronRight, AlertTriangle } from 'lucide-react';
-import { EnrolmentRecord } from '../types';
+import { Calculator, Calendar, Clock, Baby, ChevronRight, AlertTriangle, PlusCircle } from 'lucide-react';
+import { EnrolmentRecord, DatabaseState, GestationAgeRecord } from '../types';
 import { calculateGAIA, formatToDdmMmyyyy } from '../lib/dateUtils';
+import { Link } from 'react-router-dom';
 
 interface GestationTrackerProps {
-  enrolledRecords: EnrolmentRecord[];
+  db: DatabaseState;
 }
 
-export default function GestationTracker({ enrolledRecords }: GestationTrackerProps) {
+export default function GestationTracker({ db }: GestationTrackerProps) {
   const calculations = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     
-    return enrolledRecords.map(record => {
-      if (!record.gaParameters) return { record, gaia: null };
+    return db.enrolment.map(record => {
+      // Find matching gestation record from backend
+      const gestRecord = db.gestation.find(g => g.screeningId === record.screeningId);
       
-      const gaia = calculateGAIA({
-        ultrasoundDate: record.gaParameters.ultrasoundDate,
-        usWeeks: record.gaParameters.usWeeks,
-        usDays: record.gaParameters.usDays,
-        lmpDate: record.gaParameters.lmpDate,
-        lmpCertainty: record.gaParameters.lmpCertainty,
-        enrolmentDate: today // Calculate current GA as of today
-      });
+      if (gestRecord) {
+        // Calculate live GA based on the pregnancy start date derived from the saved record
+        // First, calculate the original pregnancy start date from the saved enrollment GA
+        const enrDate = new Date(gestRecord.enrolmentDate);
+        const enrDays = gestRecord.currentGestAge.gestweeks * 7 + gestRecord.currentGestAge.gestdays;
+        const pregStartDate = new Date(enrDate.getTime() - enrDays * 86400000);
+        
+        // Calculate current GA (days since pregnancy start)
+        const currentDays = Math.round((new Date().getTime() - pregStartDate.getTime()) / 86400000);
+        
+        return {
+          record,
+          gaia: {
+            gaAtEnrolmentDays: currentDays,
+            edd: new Date(gestRecord.estDueDate),
+            trimester: currentDays <= 97 ? 'First' : (currentDays <= 195 ? 'Second' : 'Third')
+          }
+        };
+      }
+
+      // Fallback to gaParameters if present in enrolment record
+      if (record.gaParameters) {
+        const gaia = calculateGAIA({
+          ultrasoundDate: record.gaParameters.ultrasoundDate,
+          usWeeks: record.gaParameters.usWeeks,
+          usDays: record.gaParameters.usDays,
+          lmpDate: record.gaParameters.lmpDate,
+          lmpCertainty: record.gaParameters.lmpCertainty,
+          enrolmentDate: today // Calculate current GA as of today
+        });
+        return { record, gaia };
+      }
       
-      return { record, gaia };
+      return { record, gaia: null };
     });
-  }, [enrolledRecords]);
+  }, [db.enrolment, db.gestation]);
 
   return (
     <div className="space-y-6">
@@ -35,10 +61,17 @@ export default function GestationTracker({ enrolledRecords }: GestationTrackerPr
           <div className="p-2.5 bg-indigo-50 rounded-xl">
             <Calculator className="w-6 h-6 text-indigo-600" />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-bold text-slate-900">Automatic Gestational Age Tracking</h2>
             <p className="text-xs text-slate-500">Live monitoring of participant pregnancy progression based on GAIA standards</p>
           </div>
+          <Link 
+            to="/gestCalculator"
+            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-100"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Launch GAIA Calculator
+          </Link>
         </div>
 
         <div className="overflow-x-auto">
@@ -81,7 +114,12 @@ export default function GestationTracker({ enrolledRecords }: GestationTrackerPr
                           </span>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400 italic">No GAIA Data</span>
+                        <Link 
+                          to="/gestCalculator"
+                          className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                        >
+                          <PlusCircle className="w-3 h-3" /> Calculate
+                        </Link>
                       )}
                     </td>
                     <td className="px-4 py-4 text-xs font-semibold text-slate-700">

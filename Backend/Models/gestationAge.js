@@ -26,6 +26,20 @@ const gestAge = new mongoose.Schema({
     enrolmentDate:{
         type: Date,
         required:true
+    },
+    estDueDate:{
+        type: Date,
+        required: true
+    },
+    currentGestAge:{
+        gestweeks:{
+            type: Number,
+            required: true
+        },
+        gestdays:{
+            type: Number,
+            required: true
+        }
     }
 
 });

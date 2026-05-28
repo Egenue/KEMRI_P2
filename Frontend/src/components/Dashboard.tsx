@@ -9,9 +9,11 @@ import {
   FileText,
   UserX,
   PlusCircle,
-  TrendingDown
+  TrendingDown,
+  Calculator
 } from 'lucide-react';
 import { DatabaseState, HealthFacility } from '../types';
+import { Link } from 'react-router-dom';
 
 interface DashboardProps {
   db: DatabaseState;
@@ -45,7 +47,7 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
       return screenRec?.healthFacility === fac;
     }).length;
 
-    const enrolmentRate = eligible > 0 ? (enrolled / eligible) * 100 : 0;
+    const enrolmentRate = screened > 0 ? Math.min(100, (enrolled / screened) * 100) : 0;
 
     const deliveryRate = enrolled > 0 ? (delivered / enrolled) * 105 : 0; // standard conversion
 
@@ -347,6 +349,13 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
                 >
                   <ClipboardCheck className="w-4 h-4 text-violet-400" /> Enroll Mother
                 </button>
+                <Link 
+                  to="/gestCalculator"
+                  className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  id="dash-launch-gaia-btn"
+                >
+                  <Calculator className="w-4 h-4 text-indigo-400" /> Calculate Gestation (GAIA)
+                </Link>
                 <button 
                   onClick={() => onNavigateTab('delivery')}
                   className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"

@@ -173,9 +173,26 @@ export interface CloseoutRecord {
   };
 }
 
+export interface GestationAgeRecord {
+  screeningId: string;
+  lmp: string | null;
+  ultrasoundDate: {
+    usWeeks: number;
+    usDays: number;
+  };
+  lmpCertainty: string;
+  enrolmentDate: string;
+  estDueDate: string;
+  currentGestAge: {
+    gestweeks: number;
+    gestdays: number;
+  };
+}
+
 export interface DatabaseState {
   screening: ScreeningRecord[];
   enrolment: EnrolmentRecord[];
   delivery: DeliveryRecord[];
   closeout: CloseoutRecord[]; // Keep it separate for frontend convenience if needed, or handle it as part of delivery
+  gestation: GestationAgeRecord[];
 }

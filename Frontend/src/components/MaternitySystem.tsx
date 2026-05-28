@@ -20,8 +20,8 @@ import {
   AlertCircle,
   Calculator
 } from 'lucide-react';
-import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from '../types';
-import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI } from '../lib/apiClient';
+import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord, GestationAgeRecord } from '../types';
+import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI, gestationAgeAPI } from '../lib/apiClient';
 import Dashboard from './Dashboard';
 import ScreeningForm from './ScreeningForm';
 import EnrolmentForm from './EnrolmentForm';
@@ -58,7 +58,13 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
 
   const activeTab = pathToTab[location.pathname] || 'dashboard';
 
-  const [db, setDb] = useState<DatabaseState>({ screening: [], enrolment: [], delivery: [], closeout: [] });
+  const [db, setDb] = useState<DatabaseState>({ 
+    screening: [], 
+    enrolment: [], 
+    delivery: [], 
+    closeout: [],
+    gestation: [] 
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -76,23 +82,26 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
       setIsLoading(true);
       setApiError(null);
 
-      const [screeningRes, enrollmentRes, deliveryRes, closeoutRes] = await Promise.all([
+      const [screeningRes, enrollmentRes, deliveryRes, closeoutRes, gestationRes] = await Promise.all([
         screeningAPI.getAllScreeningForms() as Promise<{ data: any[] }>,
         enrollmentAPI.getAllEnrollmentForms() as Promise<{ data: any[] }>,
         deliveryAPI.getAllDeliveryForms() as Promise<{ data: any[] }>,
         closeoutAPI.getAllCloseoutForms() as Promise<{ data: any[] }>,
+        gestationAgeAPI.getAllGestAge() as Promise<{ data: any[] }>,
       ]);
 
       const screeningData = screeningRes.data || [];
       const enrollmentData = enrollmentRes.data || [];
       const deliveryData = deliveryRes.data || [];
       const closeoutData = closeoutRes.data || [];
+      const gestationData = gestationRes.data || [];
 
       setDb({
         screening: screeningData,
         enrolment: enrollmentData,
         delivery: deliveryData,
-        closeout: closeoutData
+        closeout: closeoutData,
+        gestation: gestationData
       });
     } catch (error: any) {
       console.error('Error fetching data from backend:', error);
@@ -113,7 +122,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
     );
     
     if (confirmed) {
-      setDb({ screening: [], enrolment: [], delivery: [], closeout: [] });
+      setDb({ screening: [], enrolment: [], delivery: [], closeout: [], gestation: [] });
       setEditRecord(null);
       setEditTable(null);
       setViewRecord(null);
@@ -631,7 +640,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
           } />
 
           <Route path="/gestation" element={
-            <GestationTracker enrolledRecords={db.enrolment} />
+            <GestationTracker db={db} />
           } />
 
           <Route path="/delivery" element={

@@ -114,10 +114,10 @@ export default function ScreeningForm({
       // Auto-generate Screening ID
       const activeIds = records.map(r => r.screeningId);
       let nextNum = 123;
-      let checkId = `08-000${nextNum}-01`;
+      let checkId = `08-000${nextNum}-0`;
       while (activeIds.includes(checkId)) {
         nextNum++;
-        checkId = `08-000${nextNum}-01`;
+        checkId = `08-000${nextNum}-0`;
       }
       setScreeningId(checkId);
     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, User as UserIcon, Calendar, Clock, Baby, ChevronRight, AlertCircle, RefreshCw, ArrowLeft, Sparkles, Save, CheckCircle2, LogOut, ShieldCheck } from 'lucide-react';
 import { apiClient } from '../lib/apiClient';
-import { EnrolmentRecord, User } from '../types';
+import { EnrolmentRecord, ScreeningRecord, User } from '../types';
 import { Link } from 'react-router-dom';
 
 interface GaiaCalculatorProps {
@@ -12,6 +12,7 @@ interface GaiaCalculatorProps {
 export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculatorProps) {
   const [mode, setMode] = useState<'screening' | 'delivery'>('screening');
   const [enrolledParticipants, setEnrolledParticipants] = useState<EnrolmentRecord[]>([]);
+  const [screeningRecords, setScreeningRecords] = useState<ScreeningRecord[]>([]);
   const [selectedParticipantId, setSelectedParticipantId] = useState<string>('');
   
   // Form fields
@@ -36,8 +37,12 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
   const fetchParticipants = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.enrollment.getAllEnrollmentForms() as { data: EnrolmentRecord[] };
-      setEnrolledParticipants(response.data || []);
+      const [enrolResponse, screenResponse] = await Promise.all([
+        apiClient.enrollment.getAllEnrollmentForms() as Promise<{ data: EnrolmentRecord[] }>,
+        apiClient.screening.getAllScreeningForms() as Promise<{ data: ScreeningRecord[] }>
+      ]);
+      setEnrolledParticipants(enrolResponse.data || []);
+      setScreeningRecords(screenResponse.data || []);
     } catch (err: any) {
       console.error('GAIA Calc: Failed to fetch participants', err);
       setError('Failed to fetch participants: ' + err.message);
@@ -49,6 +54,8 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
   useEffect(() => {
     if (selectedParticipantId) {
       const p = enrolledParticipants.find(p => p.screeningId === selectedParticipantId);
+      const s = screeningRecords.find(s => s.screeningId === selectedParticipantId);
+
       if (p) {
         setResult(null);
         setSaveStatus(null);
@@ -59,11 +66,20 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
           setUsDays(String(p.gaParameters.usDays || ''));
           setLmpDate(p.gaParameters.lmpDate?.split('T')[0] || '');
           setLmpCertainty(p.gaParameters.lmpCertainty || 'certain');
+        } else if (s && s.lastMenstrualPeriod && !s.lastMenstrualPeriod.unknown && s.lastMenstrualPeriod.date) {
+          // Auto-fill from screening if not yet assessed in GAIA and LMP is known
+          setLmpDate(s.lastMenstrualPeriod.date.split('T')[0]);
+          setLmpCertainty('certain'); // Default to certain if coming from screening
+        } else if (s && s.lastMenstrualPeriod && s.lastMenstrualPeriod.unknown) {
+          // If LMP is unknown, ensure fields are cleared/reset
+          setLmpDate('');
+          setLmpCertainty('uncertain');
         }
+        
         setEnrolmentDate(p.submittedAt?.split('T')[0] || new Date().toISOString().split('T')[0]);
       }
     }
-  }, [selectedParticipantId, enrolledParticipants]);
+  }, [selectedParticipantId, enrolledParticipants, screeningRecords]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "N/A";
@@ -224,7 +240,12 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
           usDays: parseInt(usDays) || 0
         },
         lmpCertainty,
-        enrolmentDate
+        enrolmentDate,
+        estDueDate: result.edd_raw || result.edd, // Ensure we send a valid date string
+        currentGestAge: {
+          gestweeks: Math.floor((result.gaEnrolment || 0) / 7),
+          gestdays: (result.gaEnrolment || 0) % 7
+        }
       };
 
       const response = await apiClient.gestation.createGestAge(payload) as { message: string };

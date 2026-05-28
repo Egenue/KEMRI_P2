@@ -41,8 +41,12 @@ const createGestAge = async (req, res) => {
             lmp,
             ultrasoundDate = {},
             lmpCertainty,
-            enrolmentDate
+            enrolmentDate,
+            estDueDate,
+            currentGestAge = {}
         } = req.body;
+
+        const {gestweeks,gestdays} = currentGestAge;
 
         const {usWeeks,usDays} = ultrasoundDate;
 
@@ -55,8 +59,10 @@ const createGestAge = async (req, res) => {
             lmp,
             ultrasoundDate,
             lmpCertainty,
-            enrolmentDate
-            });
+            enrolmentDate,
+            estDueDate,
+            currentGestAge
+        });
 
             await newGest.save();
 

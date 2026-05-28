@@ -16,6 +16,7 @@ export const getDatabase = (): DatabaseState => {
     enrolment: [],
     delivery: [],
     closeout: [],
+    gestation: [],
   };
 };
 
