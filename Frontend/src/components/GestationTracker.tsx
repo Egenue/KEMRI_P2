@@ -3,13 +3,13 @@ import { motion } from 'motion/react';
 import { Calculator, Calendar, Clock, Baby, ChevronRight, AlertTriangle, PlusCircle } from 'lucide-react';
 import { EnrolmentRecord, DatabaseState, GestationAgeRecord } from '../types';
 import { calculateGAIA, formatToDdmMmyyyy } from '../lib/dateUtils';
-import { Link } from 'react-router-dom';
 
 interface GestationTrackerProps {
   db: DatabaseState;
+  onOpenCalculator?: () => void;
 }
 
-export default function GestationTracker({ db }: GestationTrackerProps) {
+export default function GestationTracker({ db, onOpenCalculator }: GestationTrackerProps) {
   const calculations = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     
@@ -17,21 +17,23 @@ export default function GestationTracker({ db }: GestationTrackerProps) {
       // Find matching gestation record from backend
       const gestRecord = db.gestation.find(g => g.screeningId === record.screeningId);
       
-      if (gestRecord) {
+      if (gestRecord && gestRecord.currentGestAge) {
         // Calculate live GA based on the pregnancy start date derived from the saved record
         // First, calculate the original pregnancy start date from the saved enrollment GA
         const enrDate = new Date(gestRecord.enrolmentDate);
-        const enrDays = gestRecord.currentGestAge.gestweeks * 7 + gestRecord.currentGestAge.gestdays;
+        const enrDays = (gestRecord.currentGestAge.gestweeks || 0) * 7 + (gestRecord.currentGestAge.gestdays || 0);
         const pregStartDate = new Date(enrDate.getTime() - enrDays * 86400000);
         
-        // Calculate current GA (days since pregnancy start)
         const currentDays = Math.round((new Date().getTime() - pregStartDate.getTime()) / 86400000);
+        
+        // Ensure we have a valid EDD
+        const eddDate = gestRecord.estDueDate ? new Date(gestRecord.estDueDate) : new Date();
         
         return {
           record,
           gaia: {
             gaAtEnrolmentDays: currentDays,
-            edd: new Date(gestRecord.estDueDate),
+            edd: isNaN(eddDate.getTime()) ? new Date() : eddDate,
             trimester: currentDays <= 97 ? 'First' : (currentDays <= 195 ? 'Second' : 'Third')
           }
         };
@@ -65,13 +67,13 @@ export default function GestationTracker({ db }: GestationTrackerProps) {
             <h2 className="text-xl font-bold text-slate-900">Automatic Gestational Age Tracking</h2>
             <p className="text-xs text-slate-500">Live monitoring of participant pregnancy progression based on GAIA standards</p>
           </div>
-          <Link 
-            to="/gestCalculator"
+          <button 
+            onClick={onOpenCalculator}
             className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-100"
           >
             <PlusCircle className="w-4 h-4" />
             Launch GAIA Calculator
-          </Link>
+          </button>
         </div>
 
         <div className="overflow-x-auto">
@@ -114,12 +116,12 @@ export default function GestationTracker({ db }: GestationTrackerProps) {
                           </span>
                         </div>
                       ) : (
-                        <Link 
-                          to="/gestCalculator"
+                        <button 
+                          onClick={onOpenCalculator}
                           className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
                         >
                           <PlusCircle className="w-3 h-3" /> Calculate
-                        </Link>
+                        </button>
                       )}
                     </td>
                     <td className="px-4 py-4 text-xs font-semibold text-slate-700">

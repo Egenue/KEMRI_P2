@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, User as UserIcon, Calendar, Clock, Baby, ChevronRight, AlertCircle, RefreshCw, ArrowLeft, Sparkles, Save, CheckCircle2, LogOut, ShieldCheck } from 'lucide-react';
+import { Calculator, User as UserIcon, Calendar, Clock, Baby, ChevronRight, AlertCircle, RefreshCw, ArrowLeft, Sparkles, Save, CheckCircle2, LogOut, ShieldCheck, X } from 'lucide-react';
 import { apiClient } from '../lib/apiClient';
 import { EnrolmentRecord, ScreeningRecord, User } from '../types';
-import { Link } from 'react-router-dom';
 
 interface GaiaCalculatorProps {
   currentUser: User;
   onLogout: () => void;
+  onClose?: () => void;
+  onSaveSuccess?: () => void;
 }
 
-export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculatorProps) {
+export default function GaiaCalculator({ currentUser, onLogout, onClose, onSaveSuccess }: GaiaCalculatorProps) {
   const [mode, setMode] = useState<'screening' | 'delivery'>('screening');
   const [enrolledParticipants, setEnrolledParticipants] = useState<EnrolmentRecord[]>([]);
   const [screeningRecords, setScreeningRecords] = useState<ScreeningRecord[]>([]);
@@ -208,6 +209,8 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
         gaEnrolment,
         gaBirth,
         edd: formatDate(eddDate.toISOString()),
+        edd_raw: eddDate.toISOString(),
+        usDate_raw: ultrasoundDate,
         decisionText,
         decisionColor
       });
@@ -252,6 +255,7 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
       
       if (response.message === "Success!!!") {
         setSaveStatus({ message: "Calculation successfully saved to clinical registry.", type: 'success' });
+        if (onSaveSuccess) onSaveSuccess();
       } else {
         setSaveStatus({ message: response.message || "Failed to save results.", type: 'error' });
       }
@@ -264,9 +268,9 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900 py-8 px-4">
-      {/* Top Bar with User Info */}
-      <div className="max-w-2xl w-full mx-auto mb-4 flex justify-between items-center bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-white/20">
+    <div className="bg-slate-50 flex flex-col font-sans text-slate-900 overflow-hidden">
+      {/* Top Bar with User Info - Hidden in modal for space */}
+      <div className="hidden max-w-2xl w-full mx-auto mb-4 flex justify-between items-center bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-white/20">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
             {currentUser.initials}
@@ -288,14 +292,17 @@ export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculator
         </button>
       </div>
 
-      <div className="max-w-2xl w-full mx-auto bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-200">
-        <header className="bg-indigo-900 px-8 py-6 text-white">
+      <div className="w-full bg-white shadow-xl overflow-hidden border border-slate-200">
+        <header className="bg-indigo-900 px-8 py-6 text-white relative">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-2xl font-black tracking-tight">GAIA GA Calculator</h1>
-            <Link to="/" className="text-xs font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 border border-white/10">
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Main System
-            </Link>
+            <button 
+              onClick={onClose}
+              className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all border border-white/10"
+              title="Close Calculator"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
           <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest opacity-80">Gestational Age & Decision Tool</p>
         </header>

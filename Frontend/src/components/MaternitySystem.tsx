@@ -30,6 +30,7 @@ import CloseoutForm from './CloseoutForm';
 import RecordsList from './RecordsList';
 import RecordDetailModal from './RecordDetailModal';
 import GestationTracker from './GestationTracker';
+import GaiaCalculator from './GaiaCalculator';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 
 type ActiveTab = 'dashboard' | 'records' | 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'gestation';
@@ -75,6 +76,9 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
   // Read-only Viewing state
   const [viewTable, setViewTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | null>(null);
   const [viewRecord, setViewRecord] = useState<any | null>(null);
+
+  // GAIA Calculator Modal state
+  const [showCalculator, setShowCalculator] = useState(false);
 
   // Fetch data from Backend API
   const fetchDataFromBackend = async () => {
@@ -593,6 +597,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
                 navigate(`/${tab === 'dashboard' ? '' : tab}`);
               }}
               userRole={currentUser.role}
+              onOpenCalculator={() => setShowCalculator(true)}
             />
           } />
 
@@ -640,7 +645,10 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
           } />
 
           <Route path="/gestation" element={
-            <GestationTracker db={db} />
+            <GestationTracker 
+              db={db} 
+              onOpenCalculator={() => setShowCalculator(true)}
+            />
           } />
 
           <Route path="/delivery" element={
@@ -689,6 +697,20 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
             setViewRecord(null);
           }}
         />
+      )}
+
+      {/* GAIA Calculator Modal Overlay */}
+      {showCalculator && (
+        <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl relative">
+            <GaiaCalculator 
+              currentUser={currentUser} 
+              onLogout={onLogout} 
+              onClose={() => setShowCalculator(false)} 
+              onSaveSuccess={fetchDataFromBackend}
+            />
+          </div>
+        </div>
       )}
 
       {/* Aesthetic humbler system footer */}

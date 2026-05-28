@@ -13,15 +13,15 @@ import {
   Calculator
 } from 'lucide-react';
 import { DatabaseState, HealthFacility } from '../types';
-import { Link } from 'react-router-dom';
 
 interface DashboardProps {
   db: DatabaseState;
   onNavigateTab: (tab: string) => void;
   userRole: string;
+  onOpenCalculator?: () => void;
 }
 
-export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProps) {
+export default function Dashboard({ db, onNavigateTab, userRole, onOpenCalculator }: DashboardProps) {
   const facilities: HealthFacility[] = ['Bondo', 'Siaya', 'Kuoyo', 'Lumumba'];
 
   const totalScreened = db.screening.length;
@@ -349,13 +349,13 @@ export default function Dashboard({ db, onNavigateTab, userRole }: DashboardProp
                 >
                   <ClipboardCheck className="w-4 h-4 text-violet-400" /> Enroll Mother
                 </button>
-                <Link 
-                  to="/gestCalculator"
+                <button 
+                  onClick={onOpenCalculator}
                   className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   id="dash-launch-gaia-btn"
                 >
                   <Calculator className="w-4 h-4 text-indigo-400" /> Calculate Gestation (GAIA)
-                </Link>
+                </button>
                 <button 
                   onClick={() => onNavigateTab('delivery')}
                   className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"

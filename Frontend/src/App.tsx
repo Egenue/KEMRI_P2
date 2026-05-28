@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import MaternitySystem from './components/MaternitySystem';
-import GaiaCalculator from './components/GaiaCalculator';
 import Login from './components/Login';
 import { User } from './types';
 import { BellRing } from 'lucide-react';
@@ -82,9 +81,6 @@ export default function App() {
       )}
 
       <Routes>
-        {/* Standalone GAIA Calculator Route */}
-        <Route path="/gestCalculator" element={<GaiaCalculator currentUser={currentUser} onLogout={handleLogout} />} />
-
         {/* Main Maternity System Routes */}
         <Route path="/*" element={<MaternitySystem currentUser={currentUser} onLogout={handleLogout} showToast={showToast} />} />
         
