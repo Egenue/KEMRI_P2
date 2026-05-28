@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord } from '../types';
 import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI } from '../lib/apiClient';
-import Login from './Login';
 import Dashboard from './Dashboard';
 import ScreeningForm from './ScreeningForm';
 import EnrolmentForm from './EnrolmentForm';
@@ -35,8 +34,13 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-
 
 type ActiveTab = 'dashboard' | 'records' | 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'gestation';
 
-export default function MaternitySystem() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+interface MaternitySystemProps {
+  currentUser: User;
+  onLogout: () => void;
+  showToast: (message: string, type?: 'success' | 'info' | 'error') => void;
+}
+
+export default function MaternitySystem({ currentUser, onLogout, showToast }: MaternitySystemProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -65,9 +69,6 @@ export default function MaternitySystem() {
   // Read-only Viewing state
   const [viewTable, setViewTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | null>(null);
   const [viewRecord, setViewRecord] = useState<any | null>(null);
-
-  // Interactive Toast Notification
-  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
 
   // Fetch data from Backend API
   const fetchDataFromBackend = async () => {
@@ -101,55 +102,10 @@ export default function MaternitySystem() {
     }
   };
 
-  // Initialize DB and authenticate from session if exists
+  // Initialize DB on component mount
   useEffect(() => {
-    // Load active session from storage if present
-    const cachedUser = sessionStorage.getItem('study_workflow_user');
-    if (cachedUser) {
-      try {
-        const user = JSON.parse(cachedUser);
-        setCurrentUser(user);
-        // Fetch data from backend after user is authenticated
-        fetchDataFromBackend();
-      } catch (e) {
-        console.error('Failed reading session cache', e);
-      }
-    }
-
-    // Security: Clear session on reload or navigating back/away
-    const handleUnload = () => {
-      sessionStorage.removeItem('study_workflow_user');
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, []);
-
-  // Display notification logs
-  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => {
-      setNotification(null);
-    }, 4000);
-  };
-
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
-    sessionStorage.setItem('study_workflow_user', JSON.stringify(user));
-    showToast(`Logged in successfully as ${user.fullName} (${user.initials})`, 'success');
-    // Fetch data after login
     fetchDataFromBackend();
-    navigate('/');
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    sessionStorage.removeItem('study_workflow_user');
-    setEditRecord(null);
-    setEditTable(null);
-    navigate('/');
-    showToast('Securely signed out of database session.', 'info');
-  };
+  }, []);
 
   const handleResetDemoData = () => {
     const confirmed = window.confirm(
@@ -413,12 +369,6 @@ export default function MaternitySystem() {
     }
   };
 
-
-  // Direct login verification check
-  if (!currentUser) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 border-t-4 border-indigo-600">
       
@@ -448,21 +398,6 @@ export default function MaternitySystem() {
           <div className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin"></div>
             <p className="text-sm font-medium text-slate-700">Processing...</p>
-          </div>
-        </div>
-      )}
-      
-      {/* Toast notifications */}
-      {notification && (
-        <div className="fixed top-5 right-5 z-50 max-w-sm w-full bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-800 p-4 shrink-0 flex items-start gap-3 animate-slide-in">
-          <div className={`p-1 rounded-lg shrink-0 ${
-            notification.type === 'success' ? 'bg-emerald-500' : notification.type === 'error' ? 'bg-rose-500' : 'bg-indigo-500'
-          }`}>
-            <BellRing className="w-4 h-4 text-white font-bold" />
-          </div>
-          <div>
-            <span className="text-xs font-semibold block uppercase">Audit system update</span>
-            <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">{notification.message}</p>
           </div>
         </div>
       )}
@@ -573,7 +508,7 @@ export default function MaternitySystem() {
 
               {/* Signout button */}
               <button
-                onClick={handleLogout}
+                onClick={onLogout}
                 className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all cursor-pointer select-none shadow-2xs"
                 id="header-logout-btn"
               >

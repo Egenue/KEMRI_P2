@@ -53,9 +53,7 @@ const newEnrollmentForm = async (req, res) => {
             otherOccupation,
             height,
             weight,
-            vitalSigns,
-            estGestAge,
-            gaParameters
+            vitalSigns
         });
 
         await newForm.save();

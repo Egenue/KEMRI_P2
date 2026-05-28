@@ -51,7 +51,6 @@ export default function EnrolmentForm({
   const [pulseRate, setPulseRate] = useState<number | ''>('');
   const [bloodPressureSys, setBloodPressureSys] = useState<number | ''>('');
   const [bloodPressureDia, setBloodPressureDia] = useState<number | ''>('');
-  const [estimatedGestationWeeks, setEstimatedGestationWeeks] = useState<number | ''>('');
 
   // Dropdown list computation
   const [eligibleList, setEligibleList] = useState<ScreeningRecord[]>([]);
@@ -112,7 +111,6 @@ export default function EnrolmentForm({
       setPulseRate(existingRecord.vitalSigns.pulseRate);
       setBloodPressureSys(existingRecord.vitalSigns.bloodPressure.systolic);
       setBloodPressureDia(existingRecord.vitalSigns.bloodPressure.diastolic);
-      setEstimatedGestationWeeks(existingRecord.estGestAge);
     }
   }, [existingRecord]);
 
@@ -158,7 +156,6 @@ export default function EnrolmentForm({
           diastolic: Number(bloodPressureDia) || 0,
         },
       },
-      estGestAge: Number(estimatedGestationWeeks) || 0,
       submittedBy: existingRecord ? existingRecord.submittedBy : userInitials,
       submittedAt: existingRecord ? existingRecord.submittedAt : new Date().toISOString(),
       updatedBy: existingRecord ? userInitials : undefined,
@@ -489,34 +486,6 @@ export default function EnrolmentForm({
                   className="block w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center font-mono"
                 />
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Gestation Manual Entry */}
-        <div className="space-y-4">
-          <h3 className="text-md font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-indigo-600" />
-            Gestation Information
-          </h3>
-          <div className="bg-indigo-50/30 p-5 rounded-xl border border-indigo-100/50">
-            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-              Estimated gestational age (weeks) <span className="text-red-500">*</span>
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                min="4"
-                max="42"
-                required
-                disabled={readOnly}
-                value={estimatedGestationWeeks}
-                onChange={(e) => setEstimatedGestationWeeks(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-32 px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-indigo-700 font-bold text-sm"
-              />
-              <p className="text-[10px] text-slate-400 font-medium italic leading-tight max-w-xs">
-                Enter the verified gestational age in weeks. Use the standalone GAIA Calculator for complex determinations.
-              </p>
             </div>
           </div>
         </div>

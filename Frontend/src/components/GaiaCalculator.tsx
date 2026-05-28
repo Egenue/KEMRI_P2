@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, User, Calendar, Clock, Baby, ChevronRight, AlertCircle, RefreshCw, ArrowLeft, Sparkles, Save, CheckCircle2 } from 'lucide-react';
+import { Calculator, User as UserIcon, Calendar, Clock, Baby, ChevronRight, AlertCircle, RefreshCw, ArrowLeft, Sparkles, Save, CheckCircle2, LogOut, ShieldCheck } from 'lucide-react';
 import { apiClient } from '../lib/apiClient';
-import { EnrolmentRecord } from '../types';
+import { EnrolmentRecord, User } from '../types';
 import { Link } from 'react-router-dom';
 
-export default function GaiaCalculator() {
+interface GaiaCalculatorProps {
+  currentUser: User;
+  onLogout: () => void;
+}
+
+export default function GaiaCalculator({ currentUser, onLogout }: GaiaCalculatorProps) {
   const [mode, setMode] = useState<'screening' | 'delivery'>('screening');
   const [enrolledParticipants, setEnrolledParticipants] = useState<EnrolmentRecord[]>([]);
   const [selectedParticipantId, setSelectedParticipantId] = useState<string>('');
@@ -45,7 +50,6 @@ export default function GaiaCalculator() {
     if (selectedParticipantId) {
       const p = enrolledParticipants.find(p => p.screeningId === selectedParticipantId);
       if (p) {
-        // Clear result first
         setResult(null);
         setSaveStatus(null);
 
@@ -189,17 +193,7 @@ export default function GaiaCalculator() {
         gaBirth,
         edd: formatDate(eddDate.toISOString()),
         decisionText,
-        decisionColor,
-        raw: {
-          screeningId: selectedParticipantId,
-          lmp: lmpDate || null,
-          ultrasoundDate: {
-            usWeeks: usWeeksNum,
-            usDays: usDaysNum
-          },
-          lmpCertainty,
-          enrolmentDate
-        }
+        decisionColor
       });
     } catch (err) {
       console.error('GAIA Calc: Error during calculation', err);
@@ -245,6 +239,29 @@ export default function GaiaCalculator() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900 py-8 px-4">
+      {/* Top Bar with User Info */}
+      <div className="max-w-2xl w-full mx-auto mb-4 flex justify-between items-center bg-white/50 backdrop-blur-md p-3 rounded-2xl border border-white/20">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[10px] font-bold">
+            {currentUser.initials}
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-slate-900 leading-tight">{currentUser.fullName}</p>
+            <div className="flex items-center gap-1 text-[8px] text-slate-500 uppercase tracking-widest font-black">
+              <ShieldCheck className="w-2.5 h-2.5 text-indigo-500" />
+              {currentUser.role}
+            </div>
+          </div>
+        </div>
+        <button 
+          onClick={onLogout}
+          className="p-2 hover:bg-rose-50 text-rose-500 rounded-xl transition-all"
+          title="Logout"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
+      </div>
+
       <div className="max-w-2xl w-full mx-auto bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-200">
         <header className="bg-indigo-900 px-8 py-6 text-white">
           <div className="flex justify-between items-center mb-2">
@@ -421,11 +438,6 @@ export default function GaiaCalculator() {
                 {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                 {isSaving ? 'PERSISTING DATA...' : 'SAVE TO CLINICAL REGISTRY'}
               </button>
-              {!selectedParticipantId && (
-                <p className="text-[10px] text-slate-400 text-center font-bold uppercase tracking-wider italic">
-                  Sync a participant ID above to enable permanent saving
-                </p>
-              )}
             </div>
           )}
         </div>

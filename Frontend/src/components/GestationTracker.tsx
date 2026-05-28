@@ -70,7 +70,7 @@ export default function GestationTracker({ enrolledRecords }: GestationTrackerPr
                       {new Date(record.submittedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-4 text-xs font-medium text-slate-700">
-                      {record.estGestAge} Weeks
+                      {record.estGestAge ? `${record.estGestAge} Weeks` : 'N/A'}
                     </td>
                     <td className="px-4 py-4 bg-indigo-50/20">
                       {gaia ? (

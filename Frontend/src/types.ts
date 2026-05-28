@@ -85,7 +85,7 @@ export interface EnrolmentRecord extends AuditFields {
   height: number;
   weight: number;
   vitalSigns: VitalSigns;
-  estGestAge: number;
+  estGestAge?: number;
   gaParameters?: {
     ultrasoundDate: string;
     usWeeks: number;

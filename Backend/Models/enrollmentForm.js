@@ -96,23 +96,6 @@ const enrollmentFormSchema = new mongoose.Schema({
                 required: true
             }
         }
-    },
-    estGestAge:{
-        type: Number,
-        required: true
-    },
-    gaParameters: {
-        ultrasoundDate: { type: Date, required: false },
-        usWeeks: { type: Number, required: false },
-        usDays: { type: Number, required: false },
-        lmpDate: { type: Date, required: false },
-        lmpCertainty: { type: String, enum: ['certain', 'uncertain', ''], required: false },
-        calculatedTrimester: { type: String, required: false },
-        finalPregnancyStartDate: { type: Date, required: false },
-        gaAtEnrolmentDays: { type: Number, required: false },
-        edd: { type: Date, required: false },
-        source: { type: String, required: false },
-        loc: { type: String, required: false }
     }
 });
 
