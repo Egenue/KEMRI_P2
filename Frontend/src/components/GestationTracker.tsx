@@ -34,7 +34,7 @@ export default function GestationTracker({ db, onOpenCalculator }: GestationTrac
           gaia: {
             gaAtEnrolmentDays: currentDays,
             edd: isNaN(eddDate.getTime()) ? new Date() : eddDate,
-            trimester: currentDays <= 97 ? 'First' : (currentDays <= 195 ? 'Second' : 'Third')
+            trimester: currentDays <= 97 ? 'First Trimester' : (currentDays <= 195 ? 'Second Trimester' : (currentDays <= 280 ? 'Third Trimester' : 'Delivered'))
           }
         };
       }
@@ -137,11 +137,13 @@ export default function GestationTracker({ db, onOpenCalculator }: GestationTrac
                       <td className="px-4 py-4">
                         {gaia ? (
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${
-                            gaia.trimester === 'First' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                            gaia.trimester === 'Second' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                            'bg-rose-50 text-rose-700 border-rose-100'
+                            gaia.trimester === 'First Trimester' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                            gaia.trimester === 'Second Trimester' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                            gaia.trimester === 'Third Trimester' ? 'bg-rose-50 text-rose-700 border-rose-100' :
+                            gaia.trimester === 'Delivered' ? 'bg-rose-50 text-rose-700 border-rose-100' :
+                            'bg-slate-50 text-slate-700 border-slate-100'
                           }`}>
-                            {gaia.trimester} Trimester
+                            {gaia.trimester}
                           </span>
                         ) : (
                           <span className="text-[10px] text-slate-400">N/A</span>
