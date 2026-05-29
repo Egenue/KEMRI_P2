@@ -325,9 +325,9 @@ export default function DeliveryForm({
               </label>
               <input
                 type="number"
-                step="0.1"
-                min="40"
-                max="240"
+                step={0.1}
+                min={40}
+                max={240}
                 required
                 disabled={readOnly}
                 placeholder="--.- kg"
@@ -348,9 +348,9 @@ export default function DeliveryForm({
               <div className="flex">
                 <input
                   type="number"
-                  step="0.1"
-                  min="35"
-                  max="42"
+                  step={0.1}
+                  min={35}
+                  max={42}
                   required
                   disabled={readOnly}
                   placeholder="--.-"
@@ -379,8 +379,8 @@ export default function DeliveryForm({
               </label>
               <input
                 type="number"
-                min="12"
-                max="30"
+                min={12}
+                max={30}
                 required
                 disabled={readOnly}
                 placeholder="RR breaths/min"
@@ -400,8 +400,8 @@ export default function DeliveryForm({
               </label>
               <input
                 type="number"
-                min="40"
-                max="120"
+                min={40}
+                max={120}
                 required
                 disabled={readOnly}
                 placeholder="PR beats/min"
@@ -422,8 +422,8 @@ export default function DeliveryForm({
               <div className="flex items-center gap-1">
                 <input
                   type="number"
-                  min="70"
-                  max="200"
+                  min={70}
+                  max={200}
                   required
                   disabled={readOnly}
                   placeholder="Sys"
@@ -435,8 +435,8 @@ export default function DeliveryForm({
                 <span className="text-slate-400 font-bold">&#47;</span>
                 <input
                   type="number"
-                  min="40"
-                  max="120"
+                  min={40}
+                  max={120}
                   required
                   disabled={readOnly}
                   placeholder="Dia"

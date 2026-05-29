@@ -399,7 +399,7 @@ export default function EnrolmentForm({
               </label>
               <input
                 type="number"
-                step="0.1"
+                step={0.1}
                 required
                 disabled={readOnly}
                 value={weightKg}
@@ -414,7 +414,7 @@ export default function EnrolmentForm({
               <div className="flex">
                 <input
                   type="number"
-                  step="0.1"
+                  step={0.1}
                   required
                   disabled={readOnly}
                   value={temperatureC}

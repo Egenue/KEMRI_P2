@@ -376,8 +376,8 @@ export default function ScreeningForm({
                 disabled={readOnly}
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
-                min="1972-01-01"
-                max="2006-01-01"
+                min={new Date('1972-01-01').toISOString().split('T')[0]}
+                max={new Date('2006-01-01').toISOString().split('T')[0]}
                 className={`block w-full px-3 py-2 bg-white border rounded-lg text-slate-900 text-sm ${
                   dobError ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
                 }`}
@@ -409,8 +409,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
-                min="100"
-                max="200"
+                min={100}
+                max={200}
                 required
                 disabled={readOnly}
                 placeholder="--- cm"
@@ -430,9 +430,9 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
-                step="0.1"
-                min="30"
-                max="150"
+                step={0.1}
+                min={30}
+                max={150}
                 required
                 disabled={readOnly}
                 placeholder="--.- kg"
@@ -453,9 +453,9 @@ export default function ScreeningForm({
               <div className="flex">
                 <input
                   type="number"
-                  step="0.1"
-                  min="35.0"
-                  max="41.0"
+                  step={0.1}
+                  min={35.0}
+                  max={41.0}
                   required
                   disabled={readOnly}
                   placeholder="--.- C"
@@ -490,8 +490,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
-                min="12"
-                max="30"
+                min={12}
+                max={30}
                 required
                 disabled={readOnly}
                 placeholder="-- breaths/min"
@@ -511,8 +511,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
-                min="40"
-                max="160"
+                min={40}
+                max={160}
                 required
                 disabled={readOnly}
                 placeholder="-- beats/min"
@@ -533,8 +533,8 @@ export default function ScreeningForm({
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"
-                  min="70"
-                  max="190"
+                  min={70}
+                  max={190}
                   required
                   disabled={readOnly}
                   placeholder="Sys"
@@ -546,8 +546,8 @@ export default function ScreeningForm({
                 <span className="text-slate-400 font-bold">&#47;</span>
                 <input
                   type="number"
-                  min="40"
-                  max="120"
+                  min={40}
+                  max={120}
                   required
                   disabled={readOnly}
                   placeholder="Dia"
@@ -597,8 +597,8 @@ export default function ScreeningForm({
               </label>
               <input
                 type="number"
-                min="10"
-                max="45"
+                min={10}
+                max={45}
                 required
                 disabled={readOnly}
                 placeholder="-- cm"
