@@ -235,6 +235,80 @@ export default function GaiaCalculator({ currentUser, onLogout, onClose, onSaveS
       setIsSaving(true);
       setSaveStatus(null);
       
+      const gestationPayload = {
+        screeningId: selectedParticipantId,
+        lmp: lmpDate || null,
+        ultrasoundDate: {
+          usWeeks: parseInt(usWeeks) || 0,
+          usDays: parseInt(usDays) || 0
+        },
+        lmpCertainty,
+        enrolmentDate,
+        estDueDate: result.edd_raw || result.edd,
+        currentGestAge: {
+          gestweeks: Math.floor((result.gaEnrolment || 0) / 7),
+          gestdays: (result.gaEnrolment || 0) % 7
+        }
+      };
+
+      // 1. Save/Update Gestation Record
+      const existingGest = enrolledParticipants.find(p => p.screeningId === selectedParticipantId);
+      const gestExists = db_gestation_exists(selectedParticipantId);
+      
+      if (gestExists) {
+        await apiClient.gestation.updateGestAge(selectedParticipantId, gestationPayload);
+      } else {
+        await apiClient.gestation.createGestAge(gestationPayload);
+      }
+
+      // 2. Sync parameters back to Enrollment Record for redundancy and list views
+      const enrollmentPayload = {
+        estGestAge: Math.floor((result.gaEnrolment || 0) / 7),
+        gaParameters: {
+          ultrasoundDate: result.usDate_raw || ultrasoundDate,
+          usWeeks: parseInt(usWeeks) || 0,
+          usDays: parseInt(usDays) || 0,
+          lmpDate: lmpDate || undefined,
+          lmpCertainty: lmpCertainty as any,
+          calculatedTrimester: result.trimester,
+          finalPregnancyStartDate: result.finalPregnancyStartDate_raw || result.finalPregnancyStartDate,
+          gaAtEnrolmentDays: result.gaEnrolment || 0,
+          edd: result.edd_raw || result.edd,
+          source: result.source,
+          loc: result.LOC
+        }
+      };
+
+      await apiClient.enrollment.updateEnrollmentForm(selectedParticipantId, enrollmentPayload);
+      
+      setSaveStatus({ message: "Calculation successfully saved and synchronized across clinical registry.", type: 'success' });
+      if (onSaveSuccess) onSaveSuccess();
+      
+    } catch (err: any) {
+      console.error('GAIA Calc: Save error', err);
+      setSaveStatus({ message: "Error: " + (err.message || "Server connection failed"), type: 'error' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Helper to check if gestation record exists locally to decide create vs update
+  const db_gestation_exists = (id: string) => {
+    // This is a bit of a hack since we don't have the full db here, 
+    // but we can check if we failed a create or just try to get it.
+    // For now, let's assume if we can find it in the enrollment data's gaParameters, it might exist,
+    // or better, let's just use the error handling of create to fallback to update if needed.
+    return false; // Will be handled by the refined try/catch below
+  };
+
+  // Refined save handler to avoid helper hacks
+  const refinedSaveHandler = async () => {
+    if (!selectedParticipantId || !result) return;
+    
+    try {
+      setIsSaving(true);
+      setSaveStatus(null);
+
       const payload = {
         screeningId: selectedParticipantId,
         lmp: lmpDate || null,
@@ -244,24 +318,49 @@ export default function GaiaCalculator({ currentUser, onLogout, onClose, onSaveS
         },
         lmpCertainty,
         enrolmentDate,
-        estDueDate: result.edd_raw || result.edd, // Ensure we send a valid date string
+        estDueDate: result.edd_raw || result.edd,
         currentGestAge: {
           gestweeks: Math.floor((result.gaEnrolment || 0) / 7),
           gestdays: (result.gaEnrolment || 0) % 7
         }
       };
 
-      const response = await apiClient.gestation.createGestAge(payload) as { message: string };
-      
-      if (response.message === "Success!!!") {
-        setSaveStatus({ message: "Calculation successfully saved to clinical registry.", type: 'success' });
-        if (onSaveSuccess) onSaveSuccess();
-      } else {
-        setSaveStatus({ message: response.message || "Failed to save results.", type: 'error' });
+      // Try creating first
+      try {
+        await apiClient.gestation.createGestAge(payload);
+      } catch (e: any) {
+        // If 409 Conflict, try updating
+        if (e.message?.includes('exists')) {
+          await apiClient.gestation.updateGestAge(selectedParticipantId, payload);
+        } else {
+          throw e;
+        }
       }
+
+      // Sync to Enrollment
+      const enrollmentUpdate = {
+        estGestAge: Math.floor((result.gaEnrolment || 0) / 7),
+        gaParameters: {
+          ultrasoundDate: result.usDate_raw || ultrasoundDate,
+          usWeeks: parseInt(usWeeks) || 0,
+          usDays: parseInt(usDays) || 0,
+          lmpDate: lmpDate || undefined,
+          lmpCertainty: lmpCertainty as any,
+          calculatedTrimester: result.trimester,
+          finalPregnancyStartDate: result.finalPregnancyStartDate_raw || result.finalPregnancyStartDate,
+          gaAtEnrolmentDays: result.gaEnrolment || 0,
+          edd: result.edd_raw || result.edd,
+          source: result.source,
+          loc: result.LOC
+        }
+      };
+      await apiClient.enrollment.updateEnrollmentForm(selectedParticipantId, enrollmentUpdate);
+
+      setSaveStatus({ message: "Clinical parameters successfully synchronized.", type: 'success' });
+      if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      console.error('GAIA Calc: Save error', err);
-      setSaveStatus({ message: "Error: " + (err.message || "Server connection failed"), type: 'error' });
+      console.error('GAIA Save Error:', err);
+      setSaveStatus({ message: err.message || "Failed to persist data", type: 'error' });
     } finally {
       setIsSaving(false);
     }
@@ -469,7 +568,7 @@ export default function GaiaCalculator({ currentUser, onLogout, onClose, onSaveS
 
               {/* Action: Save Result to Backend */}
               <button
-                onClick={handleSaveToRegistry}
+                onClick={refinedSaveHandler}
                 disabled={isSaving || !selectedParticipantId}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >

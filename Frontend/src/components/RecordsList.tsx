@@ -424,7 +424,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                           {record.submittedBy || 'PA'}
                         </span>
                         <span className="text-[10px] text-slate-400">
-                          {record.submittedAt ? record.submittedAt.substring(0, 10) : '2026-05-21'}
+                          {record.submittedAt ? record.submittedAt.substring(0, 10) : 'N/A'}
                         </span>
                       </div>
                     </td>

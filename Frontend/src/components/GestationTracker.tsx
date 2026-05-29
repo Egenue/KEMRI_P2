@@ -96,52 +96,60 @@ export default function GestationTracker({ db, onOpenCalculator }: GestationTrac
                   </td>
                 </tr>
               ) : (
-                calculations.map(({ record, gaia }) => (
-                  <tr key={record.screeningId} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-4">
-                      <span className="font-mono font-bold text-slate-900">{record.screeningId}</span>
-                    </td>
-                    <td className="px-4 py-4 text-xs text-slate-600">
-                      {new Date(record.submittedAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-4 text-xs font-medium text-slate-700">
-                      {record.estGestAge ? `${record.estGestAge} Weeks` : 'N/A'}
-                    </td>
-                    <td className="px-4 py-4 bg-indigo-50/20">
-                      {gaia ? (
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                          <span className="text-sm font-extrabold text-indigo-700">
-                            {Math.floor(gaia.gaAtEnrolmentDays / 7)}w {gaia.gaAtEnrolmentDays % 7}d
+                calculations.map(({ record, gaia }) => {
+                  const gestRecord = db.gestation.find(g => g.screeningId === record.screeningId);
+                  const displayEnrolDate = gestRecord?.enrolmentDate || record.submittedAt;
+                  const displayGAAtEnrol = (gestRecord && gestRecord.currentGestAge) ? 
+                    `${gestRecord.currentGestAge.gestweeks}w ${gestRecord.currentGestAge.gestdays}d` : 
+                    (record.estGestAge ? `${record.estGestAge} Weeks` : 'N/A');
+
+                  return (
+                    <tr key={record.screeningId} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-4">
+                        <span className="font-mono font-bold text-slate-900">{record.screeningId}</span>
+                      </td>
+                      <td className="px-4 py-4 text-xs text-slate-600">
+                        {displayEnrolDate ? formatToDdmMmyyyy(displayEnrolDate) : 'N/A'}
+                      </td>
+                      <td className="px-4 py-4 text-xs font-medium text-slate-700">
+                        {displayGAAtEnrol}
+                      </td>
+                      <td className="px-4 py-4 bg-indigo-50/20">
+                        {gaia ? (
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                            <span className="text-sm font-extrabold text-indigo-700">
+                              {Math.floor(gaia.gaAtEnrolmentDays / 7)}w {gaia.gaAtEnrolmentDays % 7}d
+                            </span>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={onOpenCalculator}
+                            className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                          >
+                            <PlusCircle className="w-3 h-3" /> Calculate
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 text-xs font-semibold text-slate-700">
+                        {gaia ? formatToDdmMmyyyy(gaia.edd) : (gestRecord?.estDueDate ? formatToDdmMmyyyy(gestRecord.estDueDate) : '--')}
+                      </td>
+                      <td className="px-4 py-4">
+                        {gaia ? (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${
+                            gaia.trimester === 'First' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                            gaia.trimester === 'Second' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                            'bg-rose-50 text-rose-700 border-rose-100'
+                          }`}>
+                            {gaia.trimester} Trimester
                           </span>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={onOpenCalculator}
-                          className="text-[10px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
-                        >
-                          <PlusCircle className="w-3 h-3" /> Calculate
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 text-xs font-semibold text-slate-700">
-                      {gaia ? formatToDdmMmyyyy(gaia.edd) : '--'}
-                    </td>
-                    <td className="px-4 py-4">
-                      {gaia ? (
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${
-                          gaia.trimester === 'First' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                          gaia.trimester === 'Second' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                          'bg-rose-50 text-rose-700 border-rose-100'
-                        }`}>
-                          {gaia.trimester} Trimester
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-slate-400">N/A</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                        ) : (
+                          <span className="text-[10px] text-slate-400">N/A</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

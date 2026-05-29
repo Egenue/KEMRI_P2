@@ -96,8 +96,28 @@ const enrollmentFormSchema = new mongoose.Schema({
                 required: true
             }
         }
+    },
+    submittedAt: {
+        type: Date,
+        default: Date.now
+    },
+    estGestAge: {
+        type: Number
+    },
+    gaParameters: {
+        ultrasoundDate: Date,
+        usWeeks: Number,
+        usDays: Number,
+        lmpDate: Date,
+        lmpCertainty: String,
+        calculatedTrimester: String,
+        finalPregnancyStartDate: Date,
+        gaAtEnrolmentDays: Number,
+        edd: Date,
+        source: String,
+        loc: String
     }
-});
+}, { timestamps: true });
 
 const EnrollmentForm = mongoose.model('EnrollmentForm', enrollmentFormSchema);
 
