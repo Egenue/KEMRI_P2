@@ -18,10 +18,11 @@ import {
   Search,
   Check,
   AlertCircle,
-  Calculator
+  Calculator,
+  AlertTriangle
 } from 'lucide-react';
 import { User, DatabaseState, ScreeningRecord, EnrolmentRecord, DeliveryRecord, CloseoutRecord, GestationAgeRecord } from '../types';
-import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI, gestationAgeAPI } from '../lib/apiClient';
+import { screeningAPI, enrollmentAPI, deliveryAPI, closeoutAPI, gestationAgeAPI, ancVisitAPI } from '../lib/apiClient';
 import Dashboard from './Dashboard';
 import ScreeningForm from './ScreeningForm';
 import EnrolmentForm from './EnrolmentForm';
@@ -65,21 +66,24 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
   const activeTab = pathToTab[location.pathname] || 'dashboard';
 
   const [db, setDb] = useState<DatabaseState>({ 
-    screening: [], 
-    enrolment: [], 
-    delivery: [], 
-    closeout: [],
-    gestation: [] 
-  });
+  screening: [], 
+  enrolment: [], 
+  delivery: [], 
+  closeout: [],
+  gestation: [],
+  anc: [] // <-- Add this line
+});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Editing state
-  const [editTable, setEditTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | null>(null);
+  // 
+  const [editTable, setEditTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc' | null>(null);
+
   const [editRecord, setEditRecord] = useState<any | null>(null);
 
   // Read-only Viewing state
-  const [viewTable, setViewTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | null>(null);
+  const [viewTable, setViewTable] = useState<'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc' | null>(null);
   const [viewRecord, setViewRecord] = useState<any | null>(null);
 
   // GAIA Calculator Modal state
@@ -128,7 +132,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
     );
     
     if (confirmed) {
-      setDb({ screening: [], enrolment: [], delivery: [], closeout: [], gestation: [] });
+      setDb({ screening: [], enrolment: [], delivery: [], closeout: [], gestation: [], anc: [] });
       setEditRecord(null);
       setEditTable(null);
       setViewRecord(null);

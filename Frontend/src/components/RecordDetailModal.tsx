@@ -4,7 +4,7 @@ import { X, Clipboard, ShieldCheck, Calendar, Activity, CheckCircle, HelpCircle,
 import { formatToDdmMmyyyy } from '../lib/dateUtils';
 
 interface RecordDetailModalProps {
-  table: 'screening' | 'enrolment' | 'delivery' | 'closeout';
+  table: 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc';
   record: any;
   onClose: () => void;
 }

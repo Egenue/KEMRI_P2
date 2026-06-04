@@ -455,5 +455,6 @@ export default function Dashboard({ db, onNavigateTab, userRole, onOpenCalculato
       </div>
 
     </div>
+    </div>
   );
 }

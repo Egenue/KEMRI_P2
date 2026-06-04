@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ancVisitSchema = new mongoose.model({
+const ancVisitSchema = new mongoose.Schema({
     visitNumber:{
         type:String,
         required: true
@@ -10,7 +10,7 @@ const ancVisitSchema = new mongoose.model({
         required: true,
         default: Date.now
     },
-    getationAge:{
+    gestationAge:{
         gestWeeks:{
             type: Number,
             required: true

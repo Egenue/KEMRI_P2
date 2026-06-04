@@ -58,8 +58,35 @@ export default function App() {
     showToast('Securely signed out of database session.', 'info');
   };
 
+  // Session Timeout logic (30 minutes)
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let timeoutId: number;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        handleLogout();
+        showToast('Session expired due to 30 minutes of inactivity.', 'error');
+      }, 30 * 60 * 1000); // 30 minutes
+    };
+
+    // Events to track activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+
+    resetTimer(); // Initial call
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [currentUser]);
+
   // Direct login verification check
   if (!currentUser) {
+
     return <Login onLogin={handleLogin} />;
   }
 

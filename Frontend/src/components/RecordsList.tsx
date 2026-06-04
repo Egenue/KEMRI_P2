@@ -20,13 +20,13 @@ import { formatToDdmMmyyyy } from '../lib/dateUtils';
 
 interface RecordsListProps {
   db: DatabaseState;
-  onEditRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', record: any) => void;
-  onViewRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', record: any) => void;
+  onEditRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc', record: any) => void;
+  onViewRecord: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc', record: any) => void;
   userRole: UserRole;
-  onDeleteRecord?: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout', id: string) => void;
+  onDeleteRecord?: (table: 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc', id: string) => void;
 }
 
-type ActiveTable = 'screening' | 'enrolment' | 'delivery' | 'closeout';
+type ActiveTable = 'screening' | 'enrolment' | 'delivery' | 'closeout' | 'anc';
 
 export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, onDeleteRecord }: RecordsListProps) {
   const [activeTable, setActiveTable] = useState<ActiveTable>('screening');
@@ -69,6 +69,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       case 'enrolment': return db.enrolment;
       case 'delivery': return db.delivery;
       case 'closeout': return db.closeout;
+      case 'anc': return db.anc;
     }
   };
 
@@ -77,16 +78,16 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
     
     return dataset
       .filter(record => {
-        const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || '';
+        const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || record.visitNumber || '';
         const matchesQuery = sId.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
           (record.submittedBy && record.submittedBy.toLowerCase().includes(searchQuery.toLowerCase().trim())) ||
           (record.villageOfResidence && record.villageOfResidence.toLowerCase().includes(searchQuery.toLowerCase().trim()));
           
         const facilityField = record.healthFacility || '';
-        // Delivery cross-reference facility if needed
+        // Delivery/ANC cross-reference facility if needed
         let recordFacility = facilityField;
-        if (activeTable === 'delivery' || activeTable === 'closeout') {
-          const correspondingScreening = db.screening.find(s => s.screeningId === sId);
+        if (activeTable === 'delivery' || activeTable === 'closeout' || activeTable === 'anc') {
+          const correspondingScreening = db.screening.find(s => s.screeningId === (record.screeningId || record.deliveryScreeningId || record.sreeningId || record.visitNumber?.split('-')[2])); // adjust if visitNumber format is known
           recordFacility = correspondingScreening?.healthFacility || '';
         }
 
@@ -96,7 +97,6 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       })
       .sort((a, b) => {
         const factor = sortDirection === 'asc' ? 1 : -1;
-        // Handle nested sort fields if necessary
         return compare(a, b, sortField) * factor;
       });
   };
@@ -241,24 +241,24 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       <div className="border-b border-slate-150">
         <nav className="flex flex-wrap gap-2 -mb-px" aria-label="Tabs">
           {[
-            { id: 'screening', label: '1. Screening Intake', count: db.screening.length, color: 'text-rose-600 bg-rose-50 border-rose-500' },
-            { id: 'enrolment', label: '2. Clinical Enrolment', count: db.enrolment.length, color: 'text-violet-600 bg-violet-50 border-violet-500' },
-            { id: 'delivery', label: '3. postpartum Delivery', count: db.delivery.length, color: 'text-teal-600 bg-teal-50 border-teal-500' },
-            { id: 'closeout', label: '4. Participant Closeout', count: db.closeout.length, color: 'text-amber-600 bg-amber-50 border-amber-500' },
+            { id: 'screening', label: '1. Screening Intake', count: db.screening.length },
+            { id: 'enrolment', label: '2. Clinical Enrolment', count: db.enrolment.length },
+            { id: 'anc', label: '3. ANC Visits', count: db.anc.length },
+            { id: 'delivery', label: '4. postpartum Delivery', count: db.delivery.length },
+            { id: 'closeout', label: '5. Participant Closeout', count: db.closeout.length },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => {
                 setActiveTable(tab.id as ActiveTable);
                 setSearchQuery('');
-                setSortField(tab.id === 'closeout' ? 'dateOfInterview' : 'submittedAt');
+                setSortField(tab.id === 'anc' ? 'visitDate' : tab.id === 'closeout' ? 'dateOfInterview' : 'submittedAt');
               }}
               className={`py-2.5 px-4 font-bold text-xs rounded-t-xl border-b-2 transition-all cursor-pointer flex items-center gap-2 select-none ${
                 activeTable === tab.id
                   ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
                   : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
-              id={`tab-btn-${tab.id}`}
             >
               {tab.label}
               <span className="ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
@@ -275,7 +275,6 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
           <div className="p-12 text-center text-slate-400">
             <UserRound className="w-8 h-8 text-slate-300 mx-auto mb-3" />
             <p className="text-sm font-semibold">No records matches filter values</p>
-            <p className="text-xs text-slate-400 mt-1">Change search query or switch tables to see items</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -322,6 +321,27 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                   </tr>
                 )}
 
+                {activeTable === 'anc' && (
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('visitNumber')}>
+                      <div className="flex items-center gap-1">Visit / ID <ArrowUpDown className="w-3 h-3" /></div>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('visitDate')}>
+                      <div className="flex items-center gap-1">Visit Date <ArrowUpDown className="w-3 h-3" /></div>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">GA (W/D)</th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Weight</th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BP</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('nextAppointment')}>
+                      <div className="flex items-center gap-1">Next Appt <ArrowUpDown className="w-3 h-3" /></div>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
+                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                )}
+
                 {activeTable === 'delivery' && (
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
@@ -360,7 +380,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
               </thead>
               <tbody className="bg-white divide-y divide-slate-100">
                 {filteredAndSortedRecords().map((record: any) => {
-                  const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || '';
+                  const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || record.visitNumber || '';
                   return (
                   <tr key={sId} className="hover:bg-slate-50/50 transition-all text-slate-800">
                     {/* Unique Screening ID Column */}
@@ -402,6 +422,18 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[120px]">{record.educationLevel}</td>
                       </>
                     )}
+
+                    {/* ANC Visit Custom Fields Row */}
+                    {activeTable === 'anc' && (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.visitDate)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.gestationAge.gestWeeks}w {record.gestationAge.gestDays}d</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.weightKilos}kg</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-semibold text-rose-700">{record.bloodPressure.systolic}/{record.bloodPressure.diastolic}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-indigo-600">{formatToDdmMmyyyy(record.nextAppointment)}</td>
+                      </>
+                    )}
+
 
                     {/* Delivery Custom Fields Row */}
                     {activeTable === 'delivery' && (
