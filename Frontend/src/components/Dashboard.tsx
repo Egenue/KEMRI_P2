@@ -10,8 +10,11 @@ import {
   UserX,
   PlusCircle,
   TrendingDown,
-  Calculator
+  Calculator,
+  BellRing,
+  AlertTriangle
 } from 'lucide-react';
+
 import { DatabaseState, HealthFacility } from '../types';
 
 interface DashboardProps {
@@ -62,9 +65,31 @@ export default function Dashboard({ db, onNavigateTab, userRole, onOpenCalculato
     };
   });
 
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
+
+  const ancReminders = db.enrolment.filter(e => {
+    const visits = db.anc.filter(v => v.visitNumber.includes(e.screeningId));
+    if (visits.length === 0) return true; // Due for first visit if enrolled
+    const lastVisit = visits.sort((a, b) => new Date(b.visitDate).getTime() - new Date(a.visitDate).getTime())[0];
+    const nextAppt = new Date(lastVisit.nextAppointment);
+    return nextAppt <= nextWeek;
+  }).slice(0, 5);
+
+  const deliveryReminders = db.enrolment.filter(e => {
+    // Check if already delivered
+    if (db.delivery.some(d => d.deliveryScreeningId === e.screeningId)) return false;
+    // Check GA > 36 weeks
+    const gest = db.gestation.find(g => g.screeningId === e.screeningId);
+    if (gest) return gest.currentGestAge.gestweeks >= 36;
+    return (e.estGestAge || 0) >= 36;
+  }).slice(0, 5);
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Top Welcome Panel */}
+      {/* ... top welcome panel ... */}
+
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-800">
         <div className="max-w-3xl">
           <motion.h1 
@@ -323,62 +348,112 @@ export default function Dashboard({ db, onNavigateTab, userRole, onOpenCalculato
           </div>
         </div>
 
+      {/* Reminders & Action Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Reminders Column */}
+        <div className="lg:col-span-2 bg-white border border-slate-150 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <BellRing className="w-4 h-4 text-indigo-600" />
+              Upcoming Clinical Reminders
+            </h3>
+          </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ANC Visits Due (Next 7 Days)</h4>
+              {ancReminders.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No ANC visits due soon.</p>
+              ) : (
+                ancReminders.map(r => (
+                  <div key={r.screeningId} className="flex items-center justify-between p-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                    <span className="text-xs font-bold text-indigo-900">{r.screeningId}</span>
+                    <button 
+                      onClick={() => onNavigateTab('anc')}
+                      className="text-[10px] font-bold text-indigo-600 hover:underline"
+                    >
+                      Enter Visit
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="space-y-3">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Delivery Reminders ({'>'}36 Weeks)</h4>
+              {deliveryReminders.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No participants near term.</p>
+              ) : (
+                deliveryReminders.map(r => (
+                  <div key={r.screeningId} className="flex items-center justify-between p-2.5 bg-teal-50/50 rounded-xl border border-teal-100/50">
+                    <span className="text-xs font-bold text-teal-900">{r.screeningId}</span>
+                    <button 
+                      onClick={() => onNavigateTab('delivery')}
+                      className="text-[10px] font-bold text-teal-600 hover:underline"
+                    >
+                      Record Delivery
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Action board */}
         <div className="flex flex-col justify-between bg-slate-900 text-slate-100 p-6 rounded-2xl border border-slate-800 shadow-xl">
           <div>
             <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Active Operations Panel</span>
             <h3 className="text-xl font-bold tracking-tight text-white mt-1 mb-3">Begin Data Entry</h3>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Launch corresponding standardized forms to input records. The system records log audits including credentials, timestamp logs, and error validations automatically.
-            </p>
           </div>
           <div className="grid grid-cols-2 gap-3.5">
             {userRole === 'admin' || userRole === 'manager' ? (
               <>
                 <button 
                   onClick={() => onNavigateTab('screening')}
-                  className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-indigo-900/40"
-                  id="dash-launch-screening-btn"
+                  className="px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-indigo-900/40"
                 >
-                  <PlusCircle className="w-4 h-4" /> Screen Mother
+                  <PlusCircle className="w-3.5 h-3.5" /> Screen Mother
                 </button>
                 <button 
                   onClick={() => onNavigateTab('enrolment')}
-                  className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                  id="dash-launch-enrolment-btn"
+                  className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-[10px] border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <ClipboardCheck className="w-4 h-4 text-violet-400" /> Enroll Mother
+                  <ClipboardCheck className="w-3.5 h-3.5 text-violet-400" /> Enroll Mother
                 </button>
                 <button 
-                  onClick={onOpenCalculator}
-                  className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                  id="dash-launch-gaia-btn"
+                  onClick={() => onNavigateTab('anc')}
+                  className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-[10px] border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Calculator className="w-4 h-4 text-indigo-400" /> Calculate Gestation (GAIA)
+                  <FileText className="w-3.5 h-3.5 text-blue-400" /> ANC Visit
                 </button>
                 <button 
                   onClick={() => onNavigateTab('delivery')}
-                  className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-xs border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                  id="dash-launch-delivery-btn"
+                  className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-[10px] border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Baby className="w-4 h-4 text-teal-400" /> post-partum Delivery
+                  <Baby className="w-3.5 h-3.5 text-teal-400" /> post-partum
+                </button>
+                <button 
+                  onClick={() => onNavigateTab('data-quality')}
+                  className="px-3 py-2.5 bg-amber-900/20 hover:bg-amber-900/40 text-amber-200 border border-amber-900/40 font-bold rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" /> Data Quality
                 </button>
                 <button 
                   onClick={() => onNavigateTab('closeout')}
-                  className="px-4 py-3 bg-red-950/40 hover:bg-red-900/30 text-rose-300 border border-red-900/40 font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                  id="dash-launch-closeout-btn"
+                  className="px-3 py-2.5 bg-red-950/40 hover:bg-red-900/30 text-rose-300 border border-red-900/40 font-bold rounded-xl text-[10px] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <TrendingDown className="w-4 h-4" /> Closeout Termination
+                  <TrendingDown className="w-3.5 h-3.5" /> Closeout
                 </button>
               </>
             ) : (
               <div className="col-span-2 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 font-medium">
-                🔒 You are logged in with Field Technician permissions. Screening, Enrolment, and Delivery records are restricted as View-Only. Please select "Audit Log Table" above to view records.
+                🔒 You are logged in with Field Technician permissions.
               </div>
             )}
           </div>
         </div>
       </div>
+
     </div>
   );
 }
