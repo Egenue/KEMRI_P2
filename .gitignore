@@ -1,7 +1,11 @@
 node_modules
 package-lock.json
-.env
+.env*
 .gitignore
 KEMRI_P1*
 KEMRI_P2*
 .vite
+.vscode
+BMICalc.txt
+.env.example
+dist

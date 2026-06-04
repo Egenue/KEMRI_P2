@@ -45,12 +45,25 @@ export default function EnrolmentForm({
   // Assessments (pre-filled but editable)
   const [heightCm, setHeightCm] = useState<number | ''>('');
   const [weightKg, setWeightKg] = useState<number | ''>('');
+  const [BMI, setBMI] = useState<number | ''>('');
   const [temperatureC, setTemperatureC] = useState<number | ''>('');
   const [tempMethod, setTempMethod] = useState<'Axillary' | 'Oral' | 'Tympanic'>('Oral');
   const [respiratoryRate, setRespiratoryRate] = useState<number | ''>('');
   const [pulseRate, setPulseRate] = useState<number | ''>('');
   const [bloodPressureSys, setBloodPressureSys] = useState<number | ''>('');
   const [bloodPressureDia, setBloodPressureDia] = useState<number | ''>('');
+
+  // Auto-calculate BMI
+  useEffect(() => {
+    const h = Number(heightCm);
+    const w = Number(weightKg);
+    if (h > 0 && w > 0) {
+      const bmiVal = w / ((h / 100) * (h / 100));
+      setBMI(Number(bmiVal.toFixed(1)));
+    } else {
+      setBMI('');
+    }
+  }, [heightCm, weightKg]);
 
   // Dropdown list computation
   const [eligibleList, setEligibleList] = useState<ScreeningRecord[]>([]);
@@ -80,6 +93,7 @@ export default function EnrolmentForm({
       setAgeMonths(origin.Age.months);
       setHeightCm(origin.height);
       setWeightKg(origin.weight);
+      setBMI(origin.BMI);
       setTemperatureC(origin.vitalSigns.temperature.value);
       setTempMethod(origin.vitalSigns.temperature.location);
       setRespiratoryRate(origin.vitalSigns.respiratoryRate);
@@ -105,6 +119,7 @@ export default function EnrolmentForm({
       setOccupationOther(existingRecord.otherOccupation || '');
       setHeightCm(existingRecord.height);
       setWeightKg(existingRecord.weight);
+      setBMI(existingRecord.BMI);
       setTemperatureC(existingRecord.vitalSigns.temperature.value);
       setTempMethod(existingRecord.vitalSigns.temperature.location);
       setRespiratoryRate(existingRecord.vitalSigns.respiratoryRate);
@@ -144,6 +159,7 @@ export default function EnrolmentForm({
       otherOccupation: occupation === 'Other' ? occupationOther : '',
       height: Number(heightCm) || 0,
       weight: Number(weightKg) || 0,
+      BMI: Number(BMI) || 0,
       vitalSigns: {
         temperature: {
           value: Number(temperatureC) || 0,
@@ -387,6 +403,8 @@ export default function EnrolmentForm({
               <input
                 type="number"
                 required
+                min={100}
+                max={250}
                 disabled={readOnly}
                 value={heightCm}
                 onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
@@ -400,6 +418,8 @@ export default function EnrolmentForm({
               <input
                 type="number"
                 step={0.1}
+                min={10}
+                max={300}
                 required
                 disabled={readOnly}
                 value={weightKg}
@@ -407,6 +427,38 @@ export default function EnrolmentForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"   
               />
             </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                BMI (Kg/m²) <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200/55">
+                  <span className="text-sm font-bold text-slate-800">{BMI}</span>
+                </div>
+              </div>
+              {Number(BMI) > 30 && (
+                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
+                  &bull; High BMI (≥30) may indicate obesity. Consider counseling on nutrition and physical activity.
+                </p>
+              )}
+              {Number(BMI) > 25 && Number(BMI) < 30 && (
+                <p className="mt-1.5 text-[11px] text-amber-600 font-medium">
+                  &bull; Elevated BMI (25-29.9) may indicate overweight status. Consider counseling on nutrition and physical activity.
+                </p>
+              )}
+              {(Number(BMI) > 0 && Number(BMI) < 18.5) && (
+                <p className="mt-1.5 text-[11px] text-blue-600 font-medium">
+                  &bull; Low BMI (&lt;18.5) may indicate malnutrition. Consider nutritional assessment and support.
+                </p>
+              )}
+              {Number(BMI) <= 0 && (
+                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
+                  &bull; Invalid BMI value. Please ensure height and weight are entered correctly.
+                </p>
+              )}
+            </div>
+
             <div>
               <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
                 Temperature (&deg;C) <span className="text-red-500">*</span>
@@ -415,6 +467,8 @@ export default function EnrolmentForm({
                 <input
                   type="number"
                   step={0.1}
+                  min={36}
+                  max={42}
                   required
                   disabled={readOnly}
                   value={temperatureC}
@@ -439,6 +493,9 @@ export default function EnrolmentForm({
               </label>
               <input
                 type="number"
+                step={0.1}
+                min={10}
+                max={30}
                 required
                 disabled={readOnly}
                 value={respiratoryRate}
@@ -455,6 +512,9 @@ export default function EnrolmentForm({
               </label>
               <input
                 type="number"
+                step={0.1}
+                min={40}
+                max={180}
                 required
                 disabled={readOnly}
                 value={pulseRate}
@@ -469,6 +529,9 @@ export default function EnrolmentForm({
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"
+                  step={0.1}
+                  min={36}
+                  max={42}
                   required
                   disabled={readOnly}
                   value={bloodPressureSys}
@@ -479,6 +542,9 @@ export default function EnrolmentForm({
                 <span className="text-slate-400 font-bold">&#47;</span>
                 <input
                   type="number"
+                  step={0.1}
+                  min={20}
+                  max={90}
                   required
                   disabled={readOnly}
                   value={bloodPressureDia}

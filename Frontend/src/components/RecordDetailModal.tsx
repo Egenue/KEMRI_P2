@@ -48,6 +48,10 @@ export default function RecordDetailModal({ table, record, onClose }: RecordDeta
             <span className="text-xs font-bold text-slate-800">{record.weight} kg</span>
           </div>
           <div>
+            <span className="text-[10px] text-slate-400 block">BMI (Calculated)</span>
+            <span className="text-xs font-bold text-slate-800">{record.BMI} Kg/m²</span>
+          </div>
+          <div>
             <span className="text-[10px] text-slate-400 block">Temperature</span>
             <span className="text-xs font-bold text-slate-800">{record.vitalSigns.temperature.value} &deg;C ({record.vitalSigns.temperature.location})</span>
           </div>
@@ -195,6 +199,10 @@ export default function RecordDetailModal({ table, record, onClose }: RecordDeta
             <span className="text-xs font-bold text-slate-800">{record.weight} kg</span>
           </div>
           <div>
+            <span className="text-[10px] text-slate-400 block">BMI (Recalculated)</span>
+            <span className="text-xs font-bold text-slate-800">{record.BMI} Kg/m²</span>
+          </div>
+          <div>
             <span className="text-[10px] text-slate-400 block">Temp</span>
             <span className="text-xs font-bold text-slate-800">{record.vitalSigns.temperature.value} &deg;C ({record.vitalSigns.temperature.location})</span>
           </div>
@@ -234,6 +242,12 @@ export default function RecordDetailModal({ table, record, onClose }: RecordDeta
           <div>
             <span className="text-[10px] text-slate-400 block">Postpartum Weight</span>
             <span className="text-xs font-bold text-slate-800">{record.physicalExam.motherWeight} kg</span>
+          </div>
+          <div>
+            <span className="text-[10px] text-slate-400 block">BMI (Calculated)</span>
+            <span className="text-xs font-bold text-slate-800">
+              {record.bodyMassIndex.unknown ? 'Unknown' : (record.bodyMassIndex.value ? `${record.bodyMassIndex.value} Kg/m²` : 'N/A')}
+            </span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block">Temp (&deg;C)</span>

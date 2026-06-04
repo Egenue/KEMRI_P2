@@ -293,6 +293,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                       <div className="flex items-center gap-1">Interview Date <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
                     <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Age</th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
                     <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Consent</th>
                     <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Eligible</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
@@ -312,6 +313,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Village</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Marital</th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Education</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
                       <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
@@ -329,6 +331,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                       <div className="flex items-center gap-1">Delivery Date <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Assistant</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Mode</th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
@@ -371,6 +374,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.interviewDate)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.Age.years}y {record.Age.months}m</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.BMI}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-semibold">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
                             record.eligibility.consentedToParticipate === 'Yes' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
@@ -394,6 +398,7 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[120px]">{record.villageOfResidence}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.maritalStatus}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.BMI}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[120px]">{record.educationLevel}</td>
                       </>
                     )}
@@ -403,6 +408,9 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                       <>
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.deliveryHistory.deliveryDate)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.deliveryHistory.deliveryPlace.deliveryChoices}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">
+                          {record.bodyMassIndex.unknown ? '?' : record.bodyMassIndex.value || '---'}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.deliveryHistory.deliveryPersonnel.deliveryPersValue}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[150px]">{record.deliveryHistory.deliveryMode.choices}</td>
                       </>

@@ -37,6 +37,7 @@ export default function ScreeningForm({
 
   // A. Assessments
   const [heightCm, setHeightCm] = useState<number | ''>('');
+  const [BMI, setBMI] = useState<number | ''>('');
   const [weightKg, setWeightKg] = useState<number | ''>('');
   const [temperatureC, setTemperatureC] = useState<number | ''>('');
   const [tempMethod, setTempMethod] = useState<'Axillary' | 'Oral' | 'Tympanic'>('Oral');
@@ -86,6 +87,7 @@ export default function ScreeningForm({
       setPulseRate(existingRecord.vitalSigns.pulseRate);
       setBloodPressureSys(existingRecord.vitalSigns.bloodPressure.systolic);
       setBloodPressureDia(existingRecord.vitalSigns.bloodPressure.diastolic);
+      setBMI(existingRecord.BMI);
       if (existingRecord.lastMenstrualPeriod.unknown) {
         setLmpUnknown(true);
         setLmpDate('');
@@ -122,6 +124,12 @@ export default function ScreeningForm({
       setScreeningId(checkId);
     }
   }, [existingRecord, records]);
+
+  // Calculate BMI
+  useEffect(() => {
+    const computedBmi = getBMI(heightCm, weightKg);
+    setBMI(computedBmi !== null ? Number(computedBmi.toFixed(1)) : '');
+  }, [heightCm, weightKg]);
 
   // Recalculate Age when DOB or Date of Interview changes
   useEffect(() => {
@@ -174,6 +182,16 @@ export default function ScreeningForm({
     }
   }, [screeningId, records, existingRecord]);
 
+  const getBMI = (heightCm: string | number, weightKg: string | number) => {
+    const heightM = Number(heightCm) / 100;
+    const weight = Number(weightKg);
+    if (heightM > 0 && weight > 0) {
+      return weight / (heightM * heightM);
+    }else{
+      return null ;
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (readOnly) return;
@@ -219,6 +237,7 @@ export default function ScreeningForm({
       },
       height: Number(heightCm) || 0,
       weight: Number(weightKg) || 0,
+      BMI: Number(BMI) || 0,
       vitalSigns: {
         temperature: {
           value: Number(temperatureC) || 0,
@@ -443,6 +462,37 @@ export default function ScreeningForm({
               />
               {typeof weightKg === 'number' && (weightKg < 30 || weightKg > 150) && (
                 <p className="text-xs text-red-500 mt-1">Weight should be 30-150 kg</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                BMI (Calculated)
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200/55">
+                  <span className="text-sm font-bold text-slate-800">{BMI}</span>
+                </div>
+              </div>
+              {Number(BMI) > 30 && (
+                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
+                  &bull; High BMI (≥30) may indicate obesity. Consider counseling on nutrition and physical activity.
+                </p>
+              )}
+              {Number(BMI) > 25 && Number(BMI) < 30 && (
+                <p className="mt-1.5 text-[11px] text-amber-600 font-medium">
+                  &bull; Elevated BMI (25-29.9) may indicate overweight status. Consider counseling on nutrition and physical activity.
+                </p>
+              )}
+              {(Number(BMI) > 0 && Number(BMI) < 18.5) && (
+                <p className="mt-1.5 text-[11px] text-blue-600 font-medium">
+                  &bull; Low BMI (&lt;18.5) may indicate malnutrition. Consider nutritional assessment and support.
+                </p>
+              )}
+              {Number(BMI) <= 0 && (
+                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
+                  &bull; Invalid BMI value. Please ensure height and weight are entered correctly.
+                </p>
               )}
             </div>
 

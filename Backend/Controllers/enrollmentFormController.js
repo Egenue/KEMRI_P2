@@ -25,6 +25,7 @@ const newEnrollmentForm = async (req, res) => {
             otherOccupation,
             height,
             weight,
+            BMI,
             vitalSigns = {},
             estGestAge,
             gaParameters
@@ -60,6 +61,7 @@ const newEnrollmentForm = async (req, res) => {
             otherOccupation,
             height,
             weight,
+            BMI,
             vitalSigns,
             estGestAge,
             gaParameters,

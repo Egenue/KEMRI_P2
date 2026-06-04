@@ -43,6 +43,7 @@ export interface ScreeningRecord extends AuditFields {
   };
   height: number;
   weight: number;
+  BMI: number;
   vitalSigns: VitalSigns;
   lastMenstrualPeriod: {
     date: string | null;
@@ -84,6 +85,7 @@ export interface EnrolmentRecord extends AuditFields {
   otherOccupation?: string;
   height: number;
   weight: number;
+  BMI: number;
   vitalSigns: VitalSigns;
   estGestAge?: number;
   gaParameters?: {

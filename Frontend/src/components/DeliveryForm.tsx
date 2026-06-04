@@ -177,7 +177,7 @@ export default function DeliveryForm({
         },
       },
       bodyMassIndex: {
-        value: bmiUnknown ? null : Number(getBmiString()),
+        value: (bmiUnknown || !motherWeightKg || !matchedHeight) ? null : Number(getBmiString()),
         unknown: bmiUnknown,
       },
       motherAbnormality: {

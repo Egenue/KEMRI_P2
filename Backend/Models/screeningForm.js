@@ -40,6 +40,10 @@ const screeningFormSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    BMI:{
+        type: Number,
+        required: true
+    },
     vitalSigns:{
         temperature:{
             value:{
