@@ -570,18 +570,21 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
         </div>
 
         {/* Mobile Navigation bar */}
-        <div className="lg:hidden border-t border-slate-100 bg-slate-50/85 px-4 py-2 sticky top-0 overflow-x-auto">
+        <div className="lg:hidden border-t border-slate-100 bg-slate-50/85 px-4 py-2 sticky top-0 overflow-x-auto text-amber-500">
           <div className="flex gap-1.5 pb-1 select-none">
             {[
               { id: 'dashboard', label: 'Overview', icon: Grid2X2, path: '/' },
               { id: 'records', label: 'Audit List', icon: FileText, path: '/records' },
-              { id: 'screening', label: '1. Screening', icon: Users, path: '/screening' },
-              { id: 'enrolment', label: '2. Enrolment', icon: UserCheck, path: '/enrolment' },
-              { id: 'gestation', label: 'GA Tracking', icon: Calculator, path: '/gestation' },
-              { id: 'delivery', label: '3. Delivery', icon: Baby, path: '/delivery' },
-              { id: 'closeout', label: '4. Closeout', icon: UserX, path: '/closeout' },
+              { id: 'screening', label: '1. Screen', icon: Users, path: '/screening' },
+              { id: 'enrolment', label: '2. Enrol', icon: UserCheck, path: '/enrolment' },
+              { id: 'anc', label: '3. ANC', icon: ClipboardCheck, path: '/anc' },
+              { id: 'gestation', label: 'GA Track', icon: Calculator, path: '/gestation' },
+              { id: 'delivery', label: '4. Delivery', icon: Baby, path: '/delivery' },
+              { id: 'closeout', label: '5. Close', icon: UserX, path: '/closeout' },
+              { id: 'data-quality', label: 'Quality', icon: AlertTriangle, path: '/data-quality' },
             ].map((item) => {
-              const IconComponent = item.icon;
+              const IconComponent = item.icon || AlertCircle;
+
               return (
                 <button
                   key={item.id}
