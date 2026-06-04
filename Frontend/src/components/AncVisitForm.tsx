@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Check, X, FileText, Calendar, Weight, Activity, AlertCircle } from 'lucide-react';
+import { Check, X, FileText, Calendar, Weight, Activity, AlertCircle, ChevronDown } from 'lucide-react';
 import { EnrolmentRecord, AncVisitRecord } from '../types';
+
 
 interface AncVisitFormProps {
   onSave: (record: any) => void;
@@ -39,7 +40,13 @@ export default function AncVisitForm({
   useEffect(() => {
     if (existingRecord) {
       setVisitNumber(existingRecord.visitNumber);
-      // screeningId logic might need clarification if visitNumber is unique or linked
+      // Extract screening ID from visit number if it follows the V[n]-[facility]-[id] format
+      // Or if there's a property in the record. For now, assume it's part of the visitNumber
+      const idParts = existingRecord.visitNumber.split('-');
+      if (idParts.length >= 3) {
+        setScreeningId(`${idParts[1]}-${idParts[2]}`);
+      }
+      
       setVisitDate(existingRecord.visitDate.split('T')[0]);
       setGestWeeks(existingRecord.gestationAge?.gestWeeks || 0);
       setGestDays(existingRecord.gestationAge?.gestDays || 0);
@@ -54,9 +61,25 @@ export default function AncVisitForm({
     }
   }, [existingRecord]);
 
+  // Handle Screening ID selection to auto-generate Visit Number
+  const handleIdSelection = (id: string) => {
+    setScreeningId(id);
+    if (!existingRecord && id) {
+      // Find how many visits this ID already has
+      const previousVisits = ancRecords.filter(v => v.visitNumber.includes(id));
+      const nextVisitNum = previousVisits.length + 1;
+      setVisitNumber(`V${nextVisitNum}-${id}`);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (readOnly) return;
+
+    if (!screeningId) {
+      alert('Please select a participant before saving.');
+      return;
+    }
 
     const record = {
       visitNumber,
@@ -83,6 +106,7 @@ export default function AncVisitForm({
     onSave(record);
   };
 
+
   return (
     <div className="bg-white border border-slate-150 rounded-2xl shadow-sm p-6 md:p-8 space-y-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center border-b border-indigo-100 pb-5">
@@ -107,16 +131,29 @@ export default function AncVisitForm({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-              Visit Number / Screening ID <span className="text-red-500">*</span>
+              Select Participant ID <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <select
               required
-              value={visitNumber}
-              onChange={(e) => setVisitNumber(e.target.value)}
+              disabled={!!existingRecord || readOnly}
+              value={screeningId}
+              onChange={(e) => handleIdSelection(e.target.value)}
               className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-              placeholder="e.g. V1-08-001"
-            />
+            >
+              <option value="">-- Select Enrolled Subject --</option>
+              {enrolledRecords.map(p => (
+                <option key={p.screeningId} value={p.screeningId}>{p.screeningId}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+              Visit Number (Auto)
+            </label>
+            <div className="px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 text-sm font-mono font-bold">
+              {visitNumber || '---'}
+            </div>
           </div>
 
           <div>
@@ -126,12 +163,15 @@ export default function AncVisitForm({
             <input
               type="date"
               required
+              disabled={readOnly}
               value={visitDate}
               onChange={(e) => setVisitDate(e.target.value)}
               className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
             />
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
               Weight (kg) <span className="text-red-500">*</span>
@@ -140,19 +180,18 @@ export default function AncVisitForm({
               type="number"
               step="0.1"
               required
+              disabled={readOnly}
               value={weightKilos}
               onChange={(e) => setWeightKilos(e.target.value === '' ? '' : Number(e.target.value))}
               className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
               placeholder="kg"
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
             <h3 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
               <Activity className="w-4 h-4 text-indigo-500" />
-              Gestation Age at Visit
+              Gestation Age
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
