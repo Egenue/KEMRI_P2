@@ -455,46 +455,44 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
 
       {/* Main Administrative Header Navigation */}
       <header className="bg-white border-b border-slate-150 sticky top-0 z-40 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16.5 items-center">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+          <div className="flex flex-wrap justify-between min-h-[4rem] items-center py-2 gap-y-2">
             
             {/* Logo area */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 shrink-0">
               <div 
                 onClick={() => {
                   setEditRecord(null);
                   setEditTable(null);
                   navigate('/');
                 }}
-                className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center cursor-pointer shadow-indigo-100 shadow-lg hover:rotate-2 transition-all"
+                className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center cursor-pointer shadow-indigo-100 shadow-lg hover:rotate-2 transition-all"
               >
-                <ClipboardCheck className="w-5 h-5 font-bold" />
+                <ClipboardCheck className="w-4.5 h-4.5 font-bold" />
               </div>
               <div className="cursor-pointer" onClick={() => { setEditRecord(null); setEditTable(null); navigate('/'); }}>
-                <h1 className="text-sm font-extrabold tracking-tight text-slate-950 font-sans">
-                  Study Workflow Manager
+                <h1 className="text-xs font-extrabold tracking-tight text-slate-950 font-sans leading-none">
+                  Study Workflow
                 </h1>
-                <p className="text-[10px] text-slate-400 font-mono tracking-wider uppercase">Digitized Clinical Portal</p>
+                <p className="text-[9px] text-slate-400 font-mono tracking-wider uppercase mt-0.5">Digitized Portal</p>
               </div>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex space-x-1.5 bg-slate-100/60 p-1 rounded-xl border border-slate-200/50">
+            <nav className="hidden xl:flex flex-wrap items-center justify-center gap-1 bg-slate-100/60 p-1 rounded-xl border border-slate-200/50">
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: Grid2X2, path: '/' },
-                { id: 'records', label: 'Audit Log Tables', icon: FileText, path: '/records' },
-                { id: 'screening', label: '1. Screening', icon: Users, path: '/screening' },
-                { id: 'enrolment', label: '2. Enrolment', icon: UserCheck, path: '/enrolment' },
-                { id: 'anc', label: '3. ANC Visit', icon: ClipboardCheck, path: '/anc' },
-                { id: 'gestation', label: 'GA Tracking', icon: Calculator, path: '/gestation' },
-                { id: 'delivery', label: '4. postpartum Delivery', icon: Baby, path: '/delivery' },
-                { id: 'closeout', label: '5. Closeout', icon: UserX, path: '/closeout' },
+                { id: 'records', label: 'Audit Log', icon: FileText, path: '/records' },
+                { id: 'screening', label: '1. Screen', icon: Users, path: '/screening' },
+                { id: 'enrolment', label: '2. Enrol', icon: UserCheck, path: '/enrolment' },
+                { id: 'anc', label: '3. ANC', icon: ClipboardCheck, path: '/anc' },
+                { id: 'gestation', label: 'GA Track', icon: Calculator, path: '/gestation' },
+                { id: 'delivery', label: '4. Delivery', icon: Baby, path: '/delivery' },
+                { id: 'closeout', label: '5. Close', icon: UserX, path: '/closeout' },
                 { id: 'data-quality', label: 'Quality', icon: AlertTriangle, path: '/data-quality' },
               ].map((item) => {
                 const IconComponent = item.icon || AlertCircle;
-
-                const isFormTab = ['screening', 'enrolment', 'delivery', 'closeout'].includes(item.id);
-                const isFormActiveInEdit = isFormTab && editTable === item.id;
+                const isFormActiveInEdit = ['screening', 'enrolment', 'delivery', 'closeout'].includes(item.id) && editTable === item.id;
                 
                 return (
                   <button
@@ -504,17 +502,16 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
                       setEditTable(null);
                       navigate(item.path);
                     }}
-                    className={`nav-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer select-none ${
+                    className={`nav-btn px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer select-none whitespace-nowrap ${
                       activeTab === item.id
                         ? 'bg-white text-indigo-700 shadow-xs border border-slate-150 font-extrabold'
                         : 'text-slate-500 hover:text-slate-800'
                     }`}
-                    id={`nav-link-${item.id}`}
                   >
-                    <IconComponent className={`w-3.5 h-3.5 ${activeTab === item.id ? 'text-indigo-600 font-bold' : 'text-slate-400'}`} />
+                    <IconComponent className={`w-3 h-3 ${activeTab === item.id ? 'text-indigo-600' : 'text-slate-400'}`} />
                     <span>{item.label}</span>
                     {isFormActiveInEdit && (
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse relative -top-1"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     )}
                   </button>
                 );
@@ -522,56 +519,46 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
             </nav>
 
             {/* User Session status & Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               
               {/* User badge */}
-              <div className="flex items-center gap-2 border-r border-slate-150 pr-3.5">
-                <div className="w-8.5 h-8.5 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-white text-xs font-mono font-bold font-extrabold shadow-sm select-none">
+              <div className="flex items-center gap-2 border-r border-slate-150 pr-2.5">
+                <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-white text-[10px] font-mono font-extrabold shadow-sm select-none">
                   {currentUser.initials}
                 </div>
                 <div className="text-right hidden sm:block">
-                  <span className="text-xs font-extrabold text-slate-850 block leading-tight">
-                    {currentUser.fullName}
+                  <span className="text-[11px] font-extrabold text-slate-850 block leading-tight">
+                    {currentUser.fullName.split(' ')[0]}
                   </span>
-                  <span className="text-[10px] text-slate-400 capitalize font-medium flex items-center gap-1 justify-end font-mono">
-                    <ShieldCheck className={`w-3 h-3 ${currentUser.role === 'admin' ? 'text-indigo-500' : currentUser.role === 'manager' ? 'text-emerald-500' : 'text-amber-500'}`} />
-                    {currentUser.role === 'admin' ? 'Administrator' : currentUser.role === 'manager' ? 'Data Manager' : 'Field Tech (View-Only)'}
+                  <span className="text-[9px] text-slate-400 capitalize flex items-center gap-1 justify-end font-mono">
+                    {currentUser.role}
                   </span>
                 </div>
               </div>
 
-              {/* Developer DB Reset buttons */}
-              <button
-                onClick={() => fetchDataFromBackend()}
-                className="p-2 border border-slate-200 rounded-xl bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
-                title="Sync data with backend"
-                id="header-sync-btn"
-                disabled={isLoading}
-              >
-                <Sparkles className="w-4 h-4" />
-              </button>
+              {/* Developer DB Actions */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => fetchDataFromBackend()}
+                  className="p-1.5 border border-slate-200 rounded-lg bg-white text-slate-400 hover:text-indigo-600 hover:bg-slate-50 transition-all cursor-pointer"
+                  title="Sync"
+                  disabled={isLoading}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                </button>
 
-              <button
-                onClick={handleResetDemoData}
-                className="p-2 border border-slate-200 rounded-xl bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs"
-                title="Reset Clinic Database"
-                id="header-reset-db-btn"
-              >
-                <ListRestart className="w-4 h-4" />
-              </button>
-
-              {/* Signout button */}
-              <button
-                onClick={onLogout}
-                className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all cursor-pointer select-none shadow-2xs"
-                id="header-logout-btn"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+                <button
+                  onClick={onLogout}
+                  className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-700 font-bold text-[11px] rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <LogOut className="w-3 h-3" />
+                  <span className="hidden md:inline">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
 
         {/* Mobile Navigation bar */}
         <div className="lg:hidden border-t border-slate-100 bg-slate-50/85 px-4 py-2 sticky top-0 overflow-x-auto text-amber-500">
@@ -614,7 +601,8 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
       </header>
 
       {/* Main Workspace Frame container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 py-6 md:py-8">
+
         
         {/* Banner notification stating write permissions of role */}
         {currentUser.role !== 'admin' && activeTab !== 'dashboard' && activeTab !== 'records' && (

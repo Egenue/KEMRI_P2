@@ -283,34 +283,30 @@ export default function ScreeningForm({
 
 
   return (
-    <div className="bg-white border border-slate-150 rounded-2xl shadow-xs p-6 md:p-8 space-y-8 max-w-5xl mx-auto shadow-indigo-100/30">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rose-100 pb-5 gap-4">
+    <div className="bg-white border border-slate-150 rounded-2xl shadow-xs p-5 md:p-6 lg:p-8 space-y-6 max-w-5xl mx-auto shadow-indigo-100/30">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-rose-100 pb-4 gap-4">
         <div>
-          <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200 uppercase tracking-widest">
+          <span className="text-[9px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 uppercase tracking-widest">
             Form 1: Trial Screening
           </span>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
-            {existingRecord ? 'Edit Screen Record' : 'New Paper Screening Digitization'}
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
+            {existingRecord ? 'Edit Screen Record' : 'New Screening Digitization'}
           </h2>
-          <p className="text-xs text-slate-500 font-sans mt-0.5">
-            Initial intake assessment protocols for the clinic mother health tracking indices
-          </p>
         </div>
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
-          id="btn-cancel"
+          className="px-3 py-1.5 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-all cursor-pointer"
         >
           Back to List
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Core Administrative Header */}
-        <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Screening ID <span className="text-red-500">*</span>
             </label>
             <input
@@ -319,25 +315,21 @@ export default function ScreeningForm({
               disabled={!!existingRecord || readOnly}
               value={screeningId}
               onChange={(e) => setScreeningId(e.target.value.toUpperCase())}
-              className={`block w-full px-3 py-2 bg-white border rounded-lg text-slate-900 font-mono text-sm font-bold ${
-                idError ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
-              } disabled:opacity-75`}
-              placeholder="e.g. SCR-1001"
-              id="f1-screening-id"
+              className={`block w-full px-2.5 py-1.5 bg-white border rounded-lg text-slate-900 font-mono text-xs font-bold ${
+                idError ? 'border-red-500' : 'border-slate-200'
+              }`}
             />
-            {idError && <p className="text-[10px] text-red-600 font-mono mt-1 font-medium">{idError}</p>}
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-              Health Facility <span className="text-red-500">*</span>
+            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+              Facility <span className="text-red-500">*</span>
             </label>
             <select
               value={facility}
               onChange={(e) => setFacility(e.target.value as HealthFacility)}
               disabled={readOnly}
-              className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-              id="f1-facility"
+              className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs"
             >
               <option value="Bondo">Bondo</option>
               <option value="Siaya">Siaya</option>
@@ -347,322 +339,73 @@ export default function ScreeningForm({
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Interview Date <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
               required
               disabled={readOnly}
-              max={new Date().toISOString().split('T')[0]}
               value={dateOfInterview}
               onChange={(e) => setDateOfInterview(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-              id="f1-interview-date"
+              className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Age (Calculated)
             </label>
             <div className="grid grid-cols-2 gap-1.5">
-              <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200/55">
-                <span className="text-sm font-bold text-slate-800">{ageYears}</span>
-                <span className="text-[10px] text-slate-500 uppercase">Yrs</span>
+              <div className="flex items-center gap-1 bg-slate-200/50 px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-bold">
+                {ageYears} <span className="text-[9px] text-slate-400">Y</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200/55">
-                <span className="text-sm font-bold text-slate-800">{ageMonths}</span>
-                <span className="text-[10px] text-slate-500 uppercase">Mths</span>
+              <div className="flex items-center gap-1 bg-slate-200/50 px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-bold">
+                {ageMonths} <span className="text-[9px] text-slate-400">M</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Section: Demographics DOB */}
+        {/* Physical Assessment */}
         <div className="space-y-4">
-          <h3 className="text-md font-bold text-slate-900 border-b border-slate-100 pb-2">
-            Patient Birth Demographics
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Date of Birth <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                required
-                disabled={readOnly}
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                min={new Date('1972-01-01').toISOString().split('T')[0]}
-                max={new Date('2006-01-01').toISOString().split('T')[0]}
-                className={`block w-full px-3 py-2 bg-white border rounded-lg text-slate-900 text-sm ${
-                  dobError ? 'border-red-500 ring-2 ring-red-100' : 'border-slate-200'
-                }`}
-                id="f1-dob"
-              />
-              <p className="text-[10px] text-slate-400 mt-1">Allowable limits: 1/1/1972 to 1/1/2006</p>
-              {dobError && <p className="text-[10px] text-red-600 font-medium mt-1">{dobError}</p>}
-            </div>
-            
-            <div className="flex items-end">
-              <div className="p-3 bg-indigo-50/50 rounded-xl border border-indigo-100 text-[11px] text-indigo-800 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-500 shrink-0" />
-                <span>The system auto-calculates mother's age in continuous months and years in accordance with protocol tables.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* A. Physical Intake Assessment */}
-        <div className="space-y-4">
-          <h3 className="text-md font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
+          <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2">
             A. Initial Assessment
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Height (cm) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={100}
-                max={200}
-                required
-                disabled={readOnly}
-                placeholder="--- cm"
-                value={heightCm}
-                onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f1-height"
-              />
-              {typeof heightCm === 'number' && (heightCm < 100 || heightCm > 200) && (
-                <p className="text-xs text-red-500 mt-1">Height should be 100-200 cm</p>
-              )}
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Height (cm)</label>
+              <input type="number" required disabled={readOnly} value={heightCm} onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
             </div>
-
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Weight (kg) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                step={0.1}
-                min={30}
-                max={150}
-                required
-                disabled={readOnly}
-                placeholder="--.- kg"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f1-weight"
-              />
-              {typeof weightKg === 'number' && (weightKg < 30 || weightKg > 150) && (
-                <p className="text-xs text-red-500 mt-1">Weight should be 30-150 kg</p>
-              )}
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Weight (kg)</label>
+              <input type="number" step={0.1} required disabled={readOnly} value={weightKg} onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
             </div>
-
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                BMI (Calculated)
-              </label>
-              <div className="grid grid-cols-2 gap-1.5">
-                <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-2 rounded-lg border border-slate-200/55">
-                  <span className="text-sm font-bold text-slate-800">{BMI}</span>
-                </div>
-              </div>
-              {Number(BMI) > 30 && (
-                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
-                  &bull; High BMI (≥30) may indicate obesity. Consider counseling on nutrition and physical activity.
-                </p>
-              )}
-              {Number(BMI) > 25 && Number(BMI) < 30 && (
-                <p className="mt-1.5 text-[11px] text-amber-600 font-medium">
-                  &bull; Elevated BMI (25-29.9) may indicate overweight status. Consider counseling on nutrition and physical activity.
-                </p>
-              )}
-              {(Number(BMI) > 0 && Number(BMI) < 18.5) && (
-                <p className="mt-1.5 text-[11px] text-blue-600 font-medium">
-                  &bull; Low BMI (&lt;18.5) may indicate malnutrition. Consider nutritional assessment and support.
-                </p>
-              )}
-              {Number(BMI) <= 0 && (
-                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
-                  &bull; Invalid BMI value. Please ensure height and weight are entered correctly.
-                </p>
-              )}
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">BMI</label>
+              <div className="bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-700">{BMI || '--.-'}</div>
             </div>
-
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Temperature (&deg;C) <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Temp (&deg;C)</label>
               <div className="flex">
-                <input
-                  type="number"
-                  step={0.1}
-                  min={35.0}
-                  max={41.0}
-                  required
-                  disabled={readOnly}
-                  placeholder="--.- C"
-                  value={temperatureC}
-                  onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-l-lg text-slate-900 text-sm focus:z-10 focus:outline-hidden"
-                  id="f1-temp"
-                />
-                {typeof temperatureC === 'number' && temperatureC < 36.0 && (
-                  <p className="text-xs text-red-600 mt-1 font-semibold">⚠ Hypothermia</p>
-                )}
-                {typeof temperatureC === 'number' && temperatureC > 38.5 && (
-                  <p className="text-xs text-red-600 mt-1 font-semibold">⚠ High Fever</p>
-                )}
-                <select
-                  value={tempMethod}
-                  disabled={readOnly}
-                  onChange={(e) => setTempMethod(e.target.value as any)}
-                  className="px-2.5 py-2 bg-slate-50 border border-slate-200 border-l-0 rounded-r-lg text-xs text-slate-600"
-                  id="f1-tempmethod"
-                >
-                  <option value="Oral">Oral</option>
-                  <option value="Axillary">Axillary</option>
-                  <option value="Tympanic">Tympanic</option>
+                <input type="number" step={0.1} required disabled={readOnly} value={temperatureC} onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2 py-1.5 bg-white border border-slate-200 rounded-l-lg text-xs" />
+                <select disabled={readOnly} value={tempMethod} onChange={(e) => setTempMethod(e.target.value as any)} className="px-1.5 bg-slate-50 border border-slate-200 border-l-0 rounded-r-lg text-[9px]">
+                  <option value="Oral">O</option>
+                  <option value="Axillary">A</option>
+                  <option value="Tympanic">T</option>
                 </select>
               </div>
             </div>
-
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Respiratory Rate <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={12}
-                max={30}
-                required
-                disabled={readOnly}
-                placeholder="-- breaths/min"
-                value={respiratoryRate}
-                onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f1-resprate"
-              />
-              {typeof respiratoryRate === 'number' && (respiratoryRate < 12 || respiratoryRate > 30) && (
-                <p className="text-xs text-red-500 mt-1">RR: 12-30 breaths/min</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Pulse Rate <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={40}
-                max={160}
-                required
-                disabled={readOnly}
-                placeholder="-- beats/min"
-                value={pulseRate}
-                onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f1-pulserate"
-              />
-              {typeof pulseRate === 'number' && (pulseRate < 40 || pulseRate > 160) && (
-                <p className="text-xs text-red-500 mt-1">PR: 40-160 beats/min</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Blood Pressure <span className="text-red-500">*</span>
-              </label>
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="number"
-                  min={70}
-                  max={190}
-                  required
-                  disabled={readOnly}
-                  placeholder="Sys"
-                  value={bloodPressureSys}
-                  onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center"
-                  id="f1-bp-sys"
-                />
-                <span className="text-slate-400 font-bold">&#47;</span>
-                <input
-                  type="number"
-                  min={40}
-                  max={120}
-                  required
-                  disabled={readOnly}
-                  placeholder="Dia"
-                  value={bloodPressureDia}
-                  onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center"
-                  id="f1-bp-dia"
-                />
-                {typeof bloodPressureSys === 'number' && typeof bloodPressureDia === 'number' && bloodPressureSys <= bloodPressureDia && (
-                  <p className="text-xs text-red-600 mt-1 font-semibold col-span-3">Systolic must be &lt; Diastolic</p>
-                )}
-                <span className="text-slate-400 text-[10px] font-mono whitespace-nowrap">mm Hg</span>
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">RR / PR</label>
+              <div className="flex gap-1">
+                <input type="number" required disabled={readOnly} value={respiratoryRate} onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="RR" />
+                <input type="number" required disabled={readOnly} value={pulseRate} onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="PR" />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                LMP Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                required={!lmpUnknown}
-                disabled={lmpUnknown || readOnly}
-                value={lmpDate}
-                onChange={(e) => setLmpDate(e.target.value)}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm disabled:bg-slate-50 disabled:text-slate-400"
-                id="f1-lmp"
-              />
-              <label className="inline-flex items-center gap-1.5 mt-1.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  disabled={readOnly}
-                  checked={lmpUnknown}
-                  onChange={(e) => {
-                    setLmpUnknown(e.target.checked);
-                    if (e.target.checked) setLmpDate('');
-                  }}
-                  className="rounded border-slate-200 text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-xs text-slate-600">LMP Unknown</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Fundal Height (cm) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={10}
-                max={45}
-                required
-                disabled={readOnly}
-                placeholder="-- cm"
-                value={fundalHeightCm}
-                onChange={(e) => setFundalHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f1-fundal"
-              />
-              {typeof fundalHeightCm === 'number' && (fundalHeightCm < 10 || fundalHeightCm > 45) && (
-                <p className="text-xs text-red-500 mt-1">Fundal height: 10-45 cm</p>
-              )}
             </div>
           </div>
         </div>
+
 
         {/* B. Inclusion Criteria */}
         <div className="space-y-4">

@@ -238,14 +238,14 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       </div>
 
       {/* Tables Switcher Tabs */}
-      <div className="border-b border-slate-150">
-        <nav className="flex flex-wrap gap-2 -mb-px" aria-label="Tabs">
+      <div className="border-b border-slate-150 overflow-hidden">
+        <nav className="flex flex-wrap gap-1 -mb-px" aria-label="Tabs">
           {[
-            { id: 'screening', label: '1. Screening Intake', count: db.screening.length },
-            { id: 'enrolment', label: '2. Clinical Enrolment', count: db.enrolment.length },
-            { id: 'anc', label: '3. ANC Visits', count: db.anc.length },
-            { id: 'delivery', label: '4. postpartum Delivery', count: db.delivery.length },
-            { id: 'closeout', label: '5. Participant Closeout', count: db.closeout.length },
+            { id: 'screening', label: '1. Screening', count: db.screening.length },
+            { id: 'enrolment', label: '2. Enrolment', count: db.enrolment.length },
+            { id: 'anc', label: '3. ANC', count: db.anc.length },
+            { id: 'delivery', label: '4. Delivery', count: db.delivery.length },
+            { id: 'closeout', label: '5. Closeout', count: db.closeout.length },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -254,14 +254,14 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                 setSearchQuery('');
                 setSortField(tab.id === 'anc' ? 'visitDate' : tab.id === 'closeout' ? 'dateOfInterview' : 'submittedAt');
               }}
-              className={`py-2.5 px-4 font-bold text-xs rounded-t-xl border-b-2 transition-all cursor-pointer flex items-center gap-2 select-none ${
+              className={`py-2 px-3 font-bold text-[10px] sm:text-xs rounded-t-xl border-b-2 transition-all cursor-pointer flex items-center gap-1.5 select-none ${
                 activeTable === tab.id
                   ? 'border-indigo-600 text-indigo-700 bg-indigo-50/50'
                   : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
             >
               {tab.label}
-              <span className="ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600">
                 {tab.count}
               </span>
             </button>
@@ -272,109 +272,79 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
       {/* Main Records Container Grid */}
       <div className="bg-white border border-slate-150 rounded-2xl shadow-xs overflow-hidden">
         {filteredAndSortedRecords().length === 0 ? (
-          <div className="p-12 text-center text-slate-400">
-            <UserRound className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-            <p className="text-sm font-semibold">No records matches filter values</p>
+          <div className="p-8 text-center text-slate-400">
+            <UserRound className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+            <p className="text-xs font-semibold">No records found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200">
+          <div className="overflow-x-auto scrollbar-thin">
+            <table className="min-w-full divide-y divide-slate-200 table-fixed sm:table-auto">
               <thead className="bg-slate-50/50">
                 {activeTable === 'screening' && (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
-                      <div className="flex items-center gap-1">Screening ID <ArrowUpDown className="w-3 h-3" /></div>
+                    <th scope="col" className="w-28 px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
+                      <div className="flex items-center gap-1">ID <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('facility')}>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('facility')}>
                       <div className="flex items-center gap-1">Facility <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('dateOfInterview')}>
-                      <div className="flex items-center gap-1">Interview Date <ArrowUpDown className="w-3 h-3" /></div>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('dateOfInterview')}>
+                      <div className="flex items-center gap-1">Date <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Age</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Consent</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Eligible</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
-                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Age</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">BMI</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Elig</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">By</th>
+                    <th scope="col" className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 )}
 
                 {activeTable === 'enrolment' && (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
-                      <div className="flex items-center gap-1">Screening ID <ArrowUpDown className="w-3 h-3" /></div>
+                    <th scope="col" className="w-28 px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
+                      <div className="flex items-center gap-1">ID <ArrowUpDown className="w-3 h-3" /></div>
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('facility')}>
-                      <div className="flex items-center gap-1">Facility <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Village</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Marital</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Education</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
-                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Facility</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Village</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">BMI</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Education</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">By</th>
+                    <th scope="col" className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 )}
 
                 {activeTable === 'anc' && (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('visitNumber')}>
-                      <div className="flex items-center gap-1">Visit / ID <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('visitDate')}>
-                      <div className="flex items-center gap-1">Visit Date <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">GA (W/D)</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Weight</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BP</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('nextAppointment')}>
-                      <div className="flex items-center gap-1">Next Appt <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
-                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="w-28 px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Visit/ID</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">GA</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Wt</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">BP</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Next</th>
+                    <th scope="col" className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 )}
 
                 {activeTable === 'delivery' && (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
-                      <div className="flex items-center gap-1">Screening ID <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('dateOfDelivery')}>
-                      <div className="flex items-center gap-1">Delivery Date <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">BMI</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Assistant</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Mode</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
-                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="w-28 px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Del Date</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Loc</th>
+                    <th scope="col" className="px-4 py-2.5 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">BMI</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mode</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">By</th>
+                    <th scope="col" className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 )}
 
                 {activeTable === 'closeout' && (
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('screeningId')}>
-                      <div className="flex items-center gap-1">Screening ID <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('dateOfStudyTermination')}>
-                      <div className="flex items-center gap-1">Termination Date <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Participant Status</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Termination Reason</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer" onClick={() => requestSort('submittedBy')}>
-                      <div className="flex items-center gap-1">submitted By <ArrowUpDown className="w-3 h-3" /></div>
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" className="w-28 px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Term Date</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reason</th>
+                    <th scope="col" className="px-4 py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">By</th>
+                    <th scope="col" className="px-4 py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 )}
               </thead>
@@ -383,138 +353,80 @@ export default function RecordsList({ db, onEditRecord, onViewRecord, userRole, 
                   const sId = record.screeningId || record.deliveryScreeningId || record.sreeningId || record.visitNumber || '';
                   return (
                   <tr key={sId} className="hover:bg-slate-50/50 transition-all text-slate-800">
-                    {/* Unique Screening ID Column */}
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-bold font-mono text-indigo-900 border-l-4 border-l-indigo-600/30">
+                    <td className="px-4 py-3 whitespace-nowrap text-[10px] font-bold font-mono text-indigo-900 border-l-2 border-l-indigo-600/30 truncate max-w-[110px]">
                       {sId}
                     </td>
 
-                    {/* Screening Custom Fields Row */}
                     {activeTable === 'screening' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.interviewDate)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.Age.years}y {record.Age.months}m</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.BMI}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-semibold">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            record.eligibility.consentedToParticipate === 'Yes' ? 'bg-indigo-50 text-indigo-700' : 'bg-rose-50 text-rose-700'
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-semibold">{record.healthFacility}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-medium text-slate-500">{formatToDdmMmyyyy(record.interviewDate)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-mono">{record.Age.years}y</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-bold text-slate-600">{record.BMI}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-xs text-center">
+                          <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-extrabold ${
+                            record.eligibility.meetsAllCriteria === 'Yes' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-rose-700'
                           }`}>
-                            {record.eligibility.consentedToParticipate}
+                            {record.eligibility.meetsAllCriteria === 'Yes' ? 'OK' : 'Fail'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold ${
-                            record.eligibility.meetsAllCriteria === 'Yes' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-rose-700'
-                          }`}>
-                            {record.eligibility.meetsAllCriteria === 'Yes' ? 'Passed' : 'Fail'}
-                          </span>
-                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-mono text-slate-400">{record.submittedBy || 'PA'}</td>
                       </>
                     )}
 
-                    {/* Enrolment Custom Fields Row */}
                     {activeTable === 'enrolment' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.healthFacility}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[120px]">{record.villageOfResidence}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.maritalStatus}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.BMI}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[120px]">{record.educationLevel}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-semibold">{record.healthFacility}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-semibold text-slate-600 truncate max-w-[80px]">{record.villageOfResidence}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-bold text-slate-600">{record.BMI}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-slate-500 truncate max-w-[80px]">{record.educationLevel}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-mono text-slate-400">{record.submittedBy || 'PA'}</td>
                       </>
                     )}
 
-                    {/* ANC Visit Custom Fields Row */}
                     {activeTable === 'anc' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.visitDate)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-mono">{record.gestationAge.gestWeeks}w {record.gestationAge.gestDays}d</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">{record.weightKilos}kg</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-semibold text-rose-700">{record.bloodPressure.systolic}/{record.bloodPressure.diastolic}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-indigo-600">{formatToDdmMmyyyy(record.nextAppointment)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-medium text-slate-500">{formatToDdmMmyyyy(record.visitDate)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-mono">{record.gestationAge.gestWeeks}w</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-bold text-slate-600">{record.weightKilos}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-semibold text-rose-700">{record.bloodPressure.systolic}/{record.bloodPressure.diastolic}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-bold text-indigo-600">{formatToDdmMmyyyy(record.nextAppointment)}</td>
                       </>
                     )}
 
-
-                    {/* Delivery Custom Fields Row */}
                     {activeTable === 'delivery' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.deliveryHistory.deliveryDate)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold">{record.deliveryHistory.deliveryPlace.deliveryChoices}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-center font-bold text-slate-600">
-                          {record.bodyMassIndex.unknown ? '?' : record.bodyMassIndex.value || '---'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500">{record.deliveryHistory.deliveryPersonnel.deliveryPersValue}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-slate-500 truncate max-w-[150px]">{record.deliveryHistory.deliveryMode.choices}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-medium text-slate-500">{formatToDdmMmyyyy(record.deliveryHistory.deliveryDate)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-semibold">{record.deliveryHistory.deliveryPlace.deliveryChoices}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-center font-bold text-slate-600">{record.bodyMassIndex.value || '-'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-slate-500 truncate max-w-[100px]">{record.deliveryHistory.deliveryMode.choices}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-mono text-slate-400">{record.submittedBy || 'PA'}</td>
                       </>
                     )}
 
-                    {/* Closeout Custom Fields Row */}
                     {activeTable === 'closeout' && (
                       <>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfTermination)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 truncate max-w-[180px]">{record.participantStatus.choicesStudy}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-rose-700 font-bold">{record.participantStatus.incompleteReason?.incompletionOptions || 'Graduated (Visits OK)'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-medium text-slate-500">{formatToDdmMmyyyy(record.dateOfTermination)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-semibold text-slate-600 truncate max-w-[120px]">{record.participantStatus.choicesStudy}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] text-rose-700 font-bold truncate max-w-[100px]">{record.participantStatus.incompleteReason?.incompletionOptions || 'Graduated'}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] font-mono text-slate-400">{record.submittedBy || 'PA'}</td>
                       </>
                     )}
 
-                    {/* Common submittedBy Column with time string */}
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-sans">
-                      <div className="flex items-center gap-1.5 font-mono">
-                        <span className="w-5 h-5 bg-slate-800 text-slate-300 rounded-full flex items-center justify-center font-bold text-[9px]">
-                          {record.submittedBy || 'PA'}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {record.submittedAt ? record.submittedAt.substring(0, 10) : 'N/A'}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Action buttons */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-xs font-medium space-x-1">
-                      <button
-                        onClick={() => onViewRecord(activeTable, record)}
-                        type="button"
-                        className="p-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-md transition-all inline-flex items-center gap-1 cursor-pointer"
-                        id={`btn-view-${sId}`}
-                      >
-                        <Eye className="w-3.5 h-3.5" /> View
-                      </button>
-                      
-                      {userRole === 'admin' && (
-                        <button
-                          onClick={() => onEditRecord(activeTable, record)}
-                          type="button"
-                          className="p-1 px-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-md transition-all inline-flex items-center gap-1 cursor-pointer"
-                          id={`btn-edit-${sId}`}
-                        >
-                          <Edit3 className="w-3.5 h-3.5" /> Edit
-                        </button>
-                      )}
-
-                      {userRole === 'admin' && onDeleteRecord && (
-                        <button
-                          onClick={() => {
-                            if (confirm(`Are you sure you want to delete record ${sId}?`)) {
-                              onDeleteRecord(activeTable, sId);
-                            }
-                          }}
-                          type="button"
-                          className="p-1 hover:bg-red-50 text-red-500 rounded-md transition-all cursor-pointer"
-                          id={`btn-delete-${sId}`}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                    <td className="px-4 py-3 whitespace-nowrap text-right text-[10px] font-medium space-x-1">
+                      <button onClick={() => onViewRecord(activeTable, record)} className="p-1 text-slate-500 hover:text-indigo-600"><Eye className="w-3.5 h-3.5" /></button>
+                      {userRole === 'admin' && <button onClick={() => onEditRecord(activeTable, record)} className="p-1 text-slate-500 hover:text-indigo-600"><Edit3 className="w-3.5 h-3.5" /></button>}
+                      {userRole === 'admin' && onDeleteRecord && <button onClick={() => confirm(`Delete ${sId}?`) && onDeleteRecord(activeTable, sId)} className="p-1 text-slate-400 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>}
                     </td>
                   </tr>
                 );
                 })}
               </tbody>
-
             </table>
           </div>
         )}
       </div>
+
     </div>
   );
 }
