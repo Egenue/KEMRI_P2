@@ -71,11 +71,7 @@ const getOneAnc = async(req, res) =>{
 const getAllAnc = async (req, res) => {
     try{
         const allAnc = await ancVisit.find();
-        if (!allAnc || allAnc.length === 0){
-            return res.status(404).json({"message":"ANC Forms Not Found, Database Possibly Empty"});
-        }else{
-            return res.status(200).json({"message":"Anc Forms Found !!!", data: allAnc});
-        }
+        return res.status(200).json({"message":"ANC Forms Found !!!", data: allAnc || []});
     }catch(error){
         return res.status(500).json({"message":"Error Getting ANC Forms", error: error.message});
     }

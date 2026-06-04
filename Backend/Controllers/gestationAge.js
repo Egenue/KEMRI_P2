@@ -23,11 +23,7 @@ const getOneGestAge = async (req, res) =>{
 const getAllGestAge = async (req, res) => {
     try{
         const datas = await gestationAge.find() ;
-        if(!datas){
-            return res.status(404).json({"message":"Not Found, Does Not exist"});
-        }else{
-            return res.status(200).json({"message":"Success!!", data: datas});
-        }
+        return res.status(200).json({"message":"Success!!", data: datas || []});
     }catch (error){
         return res.status(500).json({"message": error.message});
     }
