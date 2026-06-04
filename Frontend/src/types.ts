@@ -191,10 +191,31 @@ export interface GestationAgeRecord {
   };
 }
 
+export interface AncVisitRecord extends AuditFields {
+  visitNumber: string;
+  visitDate: string;
+  gestationAge: {
+    gestWeeks: number;
+    gestDays: number;
+  };
+  weightKilos: number;
+  bloodPressure: {
+    systolic: number;
+    diastolic: number;
+  };
+  fundalHeight: number;
+  muac: number;
+  complaints: string;
+  medicationGiven: string;
+  nextAppointment: string;
+}
+
 export interface DatabaseState {
   screening: ScreeningRecord[];
   enrolment: EnrolmentRecord[];
   delivery: DeliveryRecord[];
   closeout: CloseoutRecord[]; // Keep it separate for frontend convenience if needed, or handle it as part of delivery
   gestation: GestationAgeRecord[];
+  anc: AncVisitRecord[];
 }
+

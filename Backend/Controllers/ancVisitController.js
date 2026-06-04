@@ -1,4 +1,5 @@
 import ancVisit from '../Models/ancVisit.js';
+import { logAudit } from '../Utils/auditHelper.js';
 
 const createAncVisit = async (req, res) => {
     try{
@@ -12,7 +13,9 @@ const createAncVisit = async (req, res) => {
             muac,
             complaints,
             medicationGiven,
-            nextAppointment
+            nextAppointment,
+            userInitials,
+            reason
         } = req.body;
 
         const {gestationWeeks, gestDays} = gestationAge;
@@ -35,6 +38,15 @@ const createAncVisit = async (req, res) => {
             return res.status(400).json({"message":"Please fill in all the required fields"});
         }else{
             await newAncVisit.save();
+            await logAudit({
+                action: 'CREATE',
+                module: 'ANC Visit',
+                recordId: visitNumber,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue: null,
+                newValue: newAncVisit,
+                reason: reason || 'Initial Entry'
+            });
             res.status(201).json({"message":"ANC Visit Form created successfully", ancVisit: newAncVisit});
         }
     }catch(error){
@@ -55,3 +67,42 @@ const getOneAnc = async(req, res) =>{
         res.status(500).json({"message":"Error fetching ANC Visit Form", error: error.message});
     }
 }
+
+const getAllAnc = async (req, res) => {
+    try{
+        const allAnc = await ancVisit.find();
+        if (!allAnc || allAnc.length === 0){
+            return res.status(404).json({"message":"ANC Forms Not Found, Database Possibly Empty"});
+        }else{
+            return res.status(200).json({"message":"Anc Forms Found !!!", data: allAnc});
+        }
+    }catch(error){
+        return res.status(500).json({"message":"Error Getting ANC Forms", error: error.message});
+    }
+}
+
+const deleteOneAnc = async (req, res) => {
+    try{
+        const {visitNumber} = req.params;
+        const { userInitials, reason } = req.body;
+        const existing = await ancVisit.findOne({visitNumber});
+        if (!existing){
+            return res.status(404).json({"message":"ANC Form Not Found !!!"});
+        }else{
+            await ancVisit.findOneAndDelete({visitNumber});
+            await logAudit({
+                action: 'DELETE',
+                module: 'ANC Visit',
+                recordId: visitNumber,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue: existing,
+                reason: reason || 'Record deletion'
+            });
+            return res.status(200).json({"message":"ANC Form Successfully Deleted "});
+        }
+    }catch (error){
+        return res.status(500).json({"message":"Error Deleting The ANC Form", error: error.message});
+    }
+}
+
+export {createAncVisit, getOneAnc, getAllAnc, deleteOneAnc};

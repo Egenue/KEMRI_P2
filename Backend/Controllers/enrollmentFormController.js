@@ -1,5 +1,6 @@
 import EnrollmentForm from "../Models/enrollmentForm.js";
 import screeningForm from "../Models/screeningForm.js";
+import { logAudit } from '../Utils/auditHelper.js';
  
 const getAllEnrollmentForms = async (req, res) => {
     try {
@@ -28,7 +29,9 @@ const newEnrollmentForm = async (req, res) => {
             BMI,
             vitalSigns = {},
             estGestAge,
-            gaParameters
+            gaParameters,
+            userInitials,
+            reason
         } = req.body;
 
         if (!screeningId || !DoB || !healthFacility) {
@@ -69,6 +72,15 @@ const newEnrollmentForm = async (req, res) => {
         });
 
         await newForm.save();
+        await logAudit({
+            action: 'CREATE',
+            module: 'Enrollment Form',
+            recordId: screeningId,
+            userInitials: userInitials || 'SYSTEM',
+            oldValue: null,
+            newValue: newForm,
+            reason: reason || 'Initial Entry'
+        });
         return res.status(200).json({ data: newForm });
     } catch (error) {
         return res.status(500).json({ "message": "Could not create new Enrollment Form", error: error.message });
@@ -92,6 +104,9 @@ const getOneEnrollmentForm = async (req, res) => {
 const updateEnrollmentForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+
+        const oldValue = await EnrollmentForm.findOne({ screeningId: id });
         const updatedData = await EnrollmentForm.findOneAndUpdate(
             { screeningId: id },
             req.body,
@@ -101,6 +116,15 @@ const updateEnrollmentForm = async (req, res) => {
         if (!updatedData) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
+            await logAudit({
+                action: 'UPDATE',
+                module: 'Enrollment Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                newValue: updatedData,
+                reason: reason || 'Data update'
+            });
             return res.status(200).json({ "message": "Updated successfully", data: updatedData });
         }
     } catch (error) {
@@ -111,10 +135,21 @@ const updateEnrollmentForm = async (req, res) => {
 const deleteEnrollmentForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+
+        const oldValue = await EnrollmentForm.findOne({ screeningId: id });
         const deleted = await EnrollmentForm.findOneAndDelete({ screeningId: id });
         if (!deleted) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
+            await logAudit({
+                action: 'DELETE',
+                module: 'Enrollment Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                reason: reason || 'Record deletion'
+            });
             return res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
     } catch (error) {

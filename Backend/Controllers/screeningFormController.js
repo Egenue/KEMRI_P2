@@ -3,6 +3,7 @@ import EnrollmentForm from "../Models/enrollmentForm.js";
 import deliveryForm from "../Models/deliveryForm.js";
 import closeoutForm from "../Models/closeoutForm.js";
 import gestationAge from "../Models/gestationAge.js";
+import { logAudit } from '../Utils/auditHelper.js';
 
 const createScreeningForm = async (req, res) => {
     try {
@@ -22,7 +23,9 @@ const createScreeningForm = async (req, res) => {
             exclusionCriteria = {},
             eligibility = {},
             createdAt,
-            updatedAt
+            updatedAt,
+            userInitials,
+            reason
         } = req.body;
 
         // Validate required fields FIRST
@@ -71,6 +74,15 @@ const createScreeningForm = async (req, res) => {
         });
 
         await newScreeningForm.save();
+        await logAudit({
+            action: 'CREATE',
+            module: 'Screening Form',
+            recordId: screeningId,
+            userInitials: userInitials || 'SYSTEM',
+            oldValue: null,
+            newValue: newScreeningForm,
+            reason: reason || 'Initial Entry'
+        });
         return res.status(200).json({ "message": "Successful!! Form saved", data: newScreeningForm });
 
     } catch (error) {
@@ -107,6 +119,9 @@ const getAllSreeningForms = async (req, res) => {
 const updateScreeningForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+
+        const oldValue = await screeningForm.findOne({ screeningId: id });
         const updatedData = await screeningForm.findOneAndUpdate(
             { screeningId: id },
             req.body,
@@ -116,6 +131,15 @@ const updateScreeningForm = async (req, res) => {
         if (!updatedData) {
             return res.status(404).json({ "message": "Screening form not found !!" });
         } else {
+            await logAudit({
+                action: 'UPDATE',
+                module: 'Screening Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                newValue: updatedData,
+                reason: reason || 'Data update'
+            });
             return res.status(200).json({ "message": "Updated successfully", data: updatedData });
         }
     } catch (error) {
@@ -126,11 +150,22 @@ const updateScreeningForm = async (req, res) => {
 const deleteScreeningForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+
+        const oldValue = await screeningForm.findOne({ screeningId: id });
         const deleted = await screeningForm.findOneAndDelete({ screeningId: id });
 
         if (!deleted) {
             return res.status(404).json({ "message": "Screening form does not exist" });
         } else {
+            await logAudit({
+                action: 'DELETE',
+                module: 'Screening Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                reason: reason || 'Record deletion (Cascaded)'
+            });
             // Cascade delete ALL associated records across all study modules
             await Promise.all([
                 EnrollmentForm.deleteMany({ screeningId: id }),

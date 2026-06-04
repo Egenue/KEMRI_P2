@@ -5,6 +5,7 @@ import { createDeliveryForm, getdeliveryForms, getOneDeliveryForm, updateDeliver
 import { createScreeningForm, getAllSreeningForms, getOneScreeningForm, updateScreeningForm, deleteScreeningForm } from '../Controllers/screeningFormController.js';
 import { createCloseoutForm, getAllCloseoutForms, getOneCloseoutForm, updateCloseoutForm, deleteCloseoutForm } from '../Controllers/closeoutFormController.js';
 import { createGestAge, getAllGestAge, getOneGestAge, updateGestAge, deleteGestAge } from '../Controllers/gestationAge.js';
+import {createAncVisit, getOneAnc, getAllAnc, deleteOneAnc} from '../Controllers/ancVisitController.js';
 
 const router = express.Router();
 
@@ -49,5 +50,12 @@ router.get('/getGestAge', getAllGestAge);
 router.get('/getOneGestAge/:screeningId', getOneGestAge);
 router.put('/updateGestAge/:screeningId', updateGestAge);
 router.delete('/deleteGestAge/:screeningId', deleteGestAge);
+
+// ANC Visit Form Routes
+router.post('/createAncVisit', createAncVisit);
+router.get('/getAncVisit', getAllAnc);
+router.get('/getOneAnc/:visitNumber', getOneAnc);
+router.delete('/deleteAnc/:visitNumber', deleteOneAnc);
+
 
 export default router;

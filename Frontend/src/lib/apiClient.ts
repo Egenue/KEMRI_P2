@@ -76,10 +76,10 @@ export const loginAPI = {
 };
 
 export const screeningAPI = {
-  async createScreeningForm(formData: any) {
+  async createScreeningForm(formData: any, userInitials?: string) {
     return apiRequest('/createScreeningForm', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
     });
   },
 
@@ -91,28 +91,31 @@ export const screeningAPI = {
     return apiRequest(`/getOneScreeningForm/${id}`, { method: 'GET' });
   },
 
-  async deleteScreeningForm(id: string) {
-    return apiRequest(`/deleteScreeningForm/${id}`, { method: 'DELETE' });
+  async deleteScreeningForm(id: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteScreeningForm/${id}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
+    });
   },
 
-  async updateScreeningForm(id: string, formData: any) {
+  async updateScreeningForm(id: string, formData: any, userInitials?: string, reason?: string) {
     return apiRequest(`/updateScreeningForm/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason }),
     }).catch(() => {
-      // Fallback: delete and recreate if update fails (some backends might not support PUT on specific IDs)
-      return this.deleteScreeningForm(id).then(() =>
-        this.createScreeningForm(formData)
+      // Fallback: delete and recreate if update fails
+      return this.deleteScreeningForm(id, userInitials, 'Update Fallback').then(() =>
+        this.createScreeningForm(formData, userInitials)
       );
     });
   },
 };
 
 export const enrollmentAPI = {
-  async createEnrollmentForm(formData: any) {
+  async createEnrollmentForm(formData: any, userInitials?: string) {
     return apiRequest('/createEnrollment', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
     });
   },
 
@@ -124,27 +127,30 @@ export const enrollmentAPI = {
     return apiRequest(`/getOneEnrollment/${id}`, { method: 'GET' });
   },
 
-  async deleteEnrollmentForm(id: string) {
-    return apiRequest(`/deleteOne/${id}`, { method: 'DELETE' });
+  async deleteEnrollmentForm(id: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteOne/${id}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
+    });
   },
 
-  async updateEnrollmentForm(id: string, formData: any) {
+  async updateEnrollmentForm(id: string, formData: any, userInitials?: string, reason?: string) {
     return apiRequest(`/updateEnrollment/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason }),
     }).catch(() => {
-      return this.deleteEnrollmentForm(id).then(() =>
-        this.createEnrollmentForm(formData)
+      return this.deleteEnrollmentForm(id, userInitials, 'Update Fallback').then(() =>
+        this.createEnrollmentForm(formData, userInitials)
       );
     });
   },
 };
 
 export const deliveryAPI = {
-  async createDeliveryForm(formData: any) {
+  async createDeliveryForm(formData: any, userInitials?: string) {
     return apiRequest('/createDelivery', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
     });
   },
 
@@ -156,27 +162,30 @@ export const deliveryAPI = {
     return apiRequest(`/getoneDelivery/${id}`, { method: 'GET' });
   },
 
-  async deleteDeliveryForm(id: string) {
-    return apiRequest(`/deleteDelivery/${id}`, { method: 'DELETE' });
+  async deleteDeliveryForm(id: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteDelivery/${id}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
+    });
   },
 
-  async updateDeliveryForm(id: string, formData: any) {
+  async updateDeliveryForm(id: string, formData: any, userInitials?: string, reason?: string) {
     return apiRequest(`/updateDelivery/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason }),
     }).catch(() => {
-      return this.deleteDeliveryForm(id).then(() =>
-        this.createDeliveryForm(formData)
+      return this.deleteDeliveryForm(id, userInitials, 'Update Fallback').then(() =>
+        this.createDeliveryForm(formData, userInitials)
       );
     });
   },
 };
 
 export const closeoutAPI = {
-  async createCloseoutForm(formData: any) {
+  async createCloseoutForm(formData: any, userInitials?: string) {
     return apiRequest('/createCloseout', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
     });
   },
 
@@ -188,23 +197,26 @@ export const closeoutAPI = {
     return apiRequest(`/getOneCloseout/${id}`, { method: 'GET' });
   },
 
-  async deleteCloseoutForm(id: string) {
-    return apiRequest(`/deleteCloseout/${id}`, { method: 'DELETE' });
+  async deleteCloseoutForm(id: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteCloseout/${id}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
+    });
   },
 
-  async updateCloseoutForm(id: string, formData: any) {
+  async updateCloseoutForm(id: string, formData: any, userInitials?: string, reason?: string) {
     return apiRequest(`/updateCloseout/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason }),
     });
   },
 };
 
 export const gestationAgeAPI = {
-  async createGestAge(formData: any) {
+  async createGestAge(formData: any, userInitials?: string) {
     return apiRequest('/createGestAge', {
       method: 'POST',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
     });
   },
 
@@ -216,14 +228,41 @@ export const gestationAgeAPI = {
     return apiRequest(`/getOneGestAge/${screeningId}`, { method: 'GET' });
   },
 
-  async deleteGestAge(screeningId: string) {
-    return apiRequest(`/deleteGestAge/${screeningId}`, { method: 'DELETE' });
+  async deleteGestAge(screeningId: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteGestAge/${screeningId}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
+    });
   },
 
-  async updateGestAge(screeningId: string, formData: any) {
+  async updateGestAge(screeningId: string, formData: any, userInitials?: string, reason?: string) {
     return apiRequest(`/updateGestAge/${screeningId}`, {
       method: 'PUT',
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ ...formData, userInitials, reason }),
+    });
+  },
+};
+
+export const ancVisitAPI = {
+  async createAncVisit(formData: any, userInitials?: string) {
+    return apiRequest('/createAncVisit', {
+      method: 'POST',
+      body: JSON.stringify({ ...formData, userInitials, reason: 'Initial Entry' }),
+    });
+  },
+
+  async getAllAncVisits() {
+    return apiRequest('/getAncVisit', { method: 'GET' });
+  },
+
+  async getAncVisitByNumber(visitNumber: string) {
+    return apiRequest(`/getOneAnc/${visitNumber}`, { method: 'GET' });
+  },
+
+  async deleteAncVisit(visitNumber: string, userInitials?: string, reason?: string) {
+    return apiRequest(`/deleteAnc/${visitNumber}`, { 
+      method: 'DELETE',
+      body: JSON.stringify({ userInitials, reason })
     });
   },
 };
@@ -235,6 +274,7 @@ export const apiClient = {
   delivery: deliveryAPI,
   closeout: closeoutAPI,
   gestation: gestationAgeAPI,
+  anc: ancVisitAPI,
 };
 
 export default apiClient;

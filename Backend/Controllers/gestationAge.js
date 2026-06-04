@@ -1,4 +1,5 @@
 import gestationAge from '../Models/gestationAge.js'
+import { logAudit } from '../Utils/auditHelper.js';
 
 const getOneGestAge = async (req, res) =>{
     try{
@@ -41,7 +42,9 @@ const createGestAge = async (req, res) => {
             lmpCertainty,
             enrolmentDate,
             estDueDate,
-            currentGestAge = {}
+            currentGestAge = {},
+            userInitials,
+            reason
         } = req.body;
 
         const existing = await gestationAge.findOne({screeningId: screeningId})
@@ -59,6 +62,15 @@ const createGestAge = async (req, res) => {
         });
 
             await newGest.save();
+            await logAudit({
+                action: 'CREATE',
+                module: 'Gestation Age',
+                recordId: screeningId,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue: null,
+                newValue: newGest,
+                reason: reason || 'Initial Entry'
+            });
 
             return res.status(200).json({"message":"Success!!!"});
         }
@@ -71,8 +83,9 @@ const createGestAge = async (req, res) => {
 const updateGestAge = async (req, res) => {
     try {
         const { screeningId } = req.params;
-        const updateData = req.body;
+        const { userInitials, reason, ...updateData } = req.body;
 
+        const oldValue = await gestationAge.findOne({ screeningId });
         const updated = await gestationAge.findOneAndUpdate(
             { screeningId },
             updateData,
@@ -83,6 +96,16 @@ const updateGestAge = async (req, res) => {
             return res.status(404).json({ "message": "Record not found" });
         }
 
+        await logAudit({
+            action: 'UPDATE',
+            module: 'Gestation Age',
+            recordId: screeningId,
+            userInitials: userInitials || 'SYSTEM',
+            oldValue,
+            newValue: updated,
+            reason: reason || 'Data update'
+        });
+
         return res.status(200).json({ "message": "Update Success!!!", data: updated });
     } catch (error) {
         return res.status(500).json({ "message": error.message });
@@ -92,12 +115,22 @@ const updateGestAge = async (req, res) => {
 const deleteGestAge = async (req, res) => {
     try{
         const {screeningId} = req.params;
+        const { userInitials, reason } = req.body;
 
+        const oldValue = await gestationAge.findOne({ screeningId });
         const deleted = await gestationAge.findOneAndDelete({screeningId});
 
         if(!deleted){
             return res.status(404).json({"message":"Does Not exist"});
         }else{
+            await logAudit({
+                action: 'DELETE',
+                module: 'Gestation Age',
+                recordId: screeningId,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                reason: reason || 'Record deletion'
+            });
             return res.status(200).json({"message":"Success!!!"})
         }
     }catch(error){

@@ -1,4 +1,5 @@
 import closeoutForm from '../Models/closeoutForm.js';
+import { logAudit } from '../Utils/auditHelper.js';
 
 const createCloseoutForm = async (req, res) => {
     try {
@@ -7,7 +8,9 @@ const createCloseoutForm = async (req, res) => {
             closeOutInterviewDate,
             dateOfTermination,
             participantStatus,
-            submittedBy
+            submittedBy,
+            userInitials,
+            reason
         } = req.body;
 
         const exists = await closeoutForm.findOne({ sreeningId });
@@ -25,6 +28,15 @@ const createCloseoutForm = async (req, res) => {
                 submittedBy
             });
             await newCloseoutForm.save();
+            await logAudit({
+                action: 'CREATE',
+                module: 'Closeout Form',
+                recordId: sreeningId,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue: null,
+                newValue: newCloseoutForm,
+                reason: reason || 'Initial Entry'
+            });
             return res.status(200).json({ "message": "Closeout data saved successfully", data: newCloseoutForm });
         }
     } catch (error) {
@@ -59,6 +71,9 @@ const getOneCloseoutForm = async (req, res) => {
 const updateCloseoutForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+        
+        const oldValue = await closeoutForm.findOne({ sreeningId: id });
         const updatedData = await closeoutForm.findOneAndUpdate(
             { sreeningId: id },
             req.body,
@@ -68,6 +83,15 @@ const updateCloseoutForm = async (req, res) => {
         if (!updatedData) {
             return res.status(404).json({ "message": "Closeout form not found" });
         } else {
+            await logAudit({
+                action: 'UPDATE',
+                module: 'Closeout Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                newValue: updatedData,
+                reason: reason || 'Data update'
+            });
             return res.status(200).json({ "message": "Updated successfully", data: updatedData });
         }
     } catch (error) {
@@ -78,10 +102,21 @@ const updateCloseoutForm = async (req, res) => {
 const deleteCloseoutForm = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInitials, reason } = req.body;
+        
+        const oldValue = await closeoutForm.findOne({ sreeningId: id });
         const deleted = await closeoutForm.findOneAndDelete({ sreeningId: id });
         if (!deleted) {
             return res.status(404).json({ "message": "Closeout form not found" });
         } else {
+            await logAudit({
+                action: 'DELETE',
+                module: 'Closeout Form',
+                recordId: id,
+                userInitials: userInitials || 'SYSTEM',
+                oldValue,
+                reason: reason || 'Record deletion'
+            });
             return res.status(200).json({ success: true, message: 'Deleted successfully' });
         }
     } catch (error) {
