@@ -376,6 +376,12 @@ export default function Dashboard({ db, onNavigateTab, userRole, onOpenCalculato
                   <FileText className="w-3.5 h-3.5 text-blue-400" /> ANC
                 </button>
                 <button 
+                  onClick={onOpenCalculator}
+                  className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-[10px] border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Calculator className="w-3.5 h-3.5 text-indigo-400" /> GAIA Calc
+                </button>
+                <button 
                   onClick={() => onNavigateTab('delivery')}
                   className="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl text-[10px] border border-slate-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 >
