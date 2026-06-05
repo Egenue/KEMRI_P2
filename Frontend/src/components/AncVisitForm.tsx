@@ -232,31 +232,34 @@ export default function AncVisitForm({
             </div>
           </div>
 
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
-            <h3 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
-              <Activity className="w-4 h-4 text-rose-500" />
+          <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 space-y-4">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Activity className="w-3.5 h-3.5 text-rose-500" />
               Blood Pressure
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Systolic</label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
                 <input
                   type="number"
                   required
                   value={systolic}
                   onChange={(e) => setSystolic(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                  className="block w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-center font-mono"
+                  placeholder="Sys"
                 />
+                <span className="absolute right-2 top-2.5 text-[7px] font-black text-slate-300 uppercase">Sys</span>
               </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Diastolic</label>
+              <span className="text-slate-300 font-bold">/</span>
+              <div className="relative flex-1">
                 <input
                   type="number"
                   required
                   value={diastolic}
                   onChange={(e) => setDiastolic(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                  className="block w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-center font-mono"
+                  placeholder="Dia"
                 />
+                <span className="absolute right-2 top-2.5 text-[7px] font-black text-slate-300 uppercase">Dia</span>
               </div>
             </div>
           </div>

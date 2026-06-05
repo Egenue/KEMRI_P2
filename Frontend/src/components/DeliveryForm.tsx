@@ -388,85 +388,69 @@ export default function DeliveryForm({
               </div>
             </div>
 
-            <div>
+            <div className="col-span-1 md:col-span-2">
               <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Respiratory Rate <span className="text-red-500">*</span>
+                Respiratory Rate / Pulse Rate <span className="text-red-500">*</span>
               </label>
-              <input
-                type="number"
-                min={12}
-                max={30}
-                required
-                disabled={readOnly}
-                placeholder="RR breaths/min"
-                value={respiratoryRate}
-                onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f3-resprate"
-              />
-              {typeof respiratoryRate === 'number' && (respiratoryRate < 12 || respiratoryRate > 30) && (
-                <p className="text-xs text-red-500 mt-1">RR: 12-30 breaths/min</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Pulse Rate <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min={40}
-                max={120}
-                required
-                disabled={readOnly}
-                placeholder="PR beats/min"
-                value={pulseRate}
-                onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
-                id="f3-pulserate"
-              />
-              {typeof pulseRate === 'number' && (pulseRate < 40 || pulseRate > 120) && (
-                <p className="text-xs text-red-500 mt-1">PR: 40-120 beats/min</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
-                Blood Pressure <span className="text-red-500">*</span>
-              </label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  min={70}
-                  max={200}
-                  required
-                  disabled={readOnly}
-                  placeholder="Sys"
-                  value={bloodPressureSys}
-                  onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center"
-                  id="f3-bp-sys"
-                />
-                <span className="text-slate-400 font-bold">&#47;</span>
-                <input
-                  type="number"
-                  min={40}
-                  max={120}
-                  required
-                  disabled={readOnly}
-                  placeholder="Dia"
-                  value={bloodPressureDia}
-                  onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="block w-full px-2 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm text-center"
-                  id="f3-bp-dia"
-                />
-                <span className="text-slate-400 text-[10px] font-mono whitespace-nowrap">mm Hg</span>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={respiratoryRate} 
+                    onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium" 
+                    placeholder="RR" 
+                  />
+                  <span className="absolute right-3 top-2.5 text-[9px] font-black text-slate-400 uppercase">RR</span>
+                </div>
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={pulseRate} 
+                    onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium" 
+                    placeholder="PR" 
+                  />
+                  <span className="absolute right-3 top-2.5 text-[9px] font-black text-slate-400 uppercase">PR</span>
+                </div>
               </div>
-              {(typeof bloodPressureSys === 'number' || typeof bloodPressureDia === 'number') && 
-               ((typeof bloodPressureSys === 'number' && (bloodPressureSys < 70 || bloodPressureSys > 200)) ||
-                (typeof bloodPressureDia === 'number' && (bloodPressureDia < 40 || bloodPressureDia > 120))) && (
-                <p className="text-xs text-red-500 mt-1">BP: 70-200/40-120 mmHg</p>
-              )}
+            </div>
+
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
+                Blood Pressure (Sys/Dia) <span className="text-red-500">*</span>
+              </label>
+              <div className="flex items-center gap-1.5">
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={bloodPressureSys} 
+                    onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-center font-mono" 
+                    placeholder="Sys" 
+                  />
+                  <span className="absolute right-2 top-3 text-[8px] font-black text-slate-300 uppercase tracking-tighter">Sys</span>
+                </div>
+                <span className="text-slate-400 font-bold">&#47;</span>
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={bloodPressureDia} 
+                    onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-center font-mono" 
+                    placeholder="Dia" 
+                  />
+                  <span className="absolute right-2 top-3 text-[8px] font-black text-slate-300 uppercase tracking-tighter">Dia</span>
+                </div>
+              </div>
             </div>
 
             <div>

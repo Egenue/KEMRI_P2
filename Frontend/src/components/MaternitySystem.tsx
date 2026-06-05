@@ -479,7 +479,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden xl:flex flex-wrap items-center justify-center gap-1 bg-slate-100/60 p-1 rounded-xl border border-slate-200/50">
+            <nav className="hidden lg:flex flex-wrap items-center justify-center gap-1 bg-slate-100/60 p-1 rounded-xl border border-slate-200/50">
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: Grid2X2, path: '/' },
                 { id: 'records', label: 'Audit Log', icon: FileText, path: '/records' },

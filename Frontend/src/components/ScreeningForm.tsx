@@ -442,48 +442,61 @@ export default function ScreeningForm({
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-bold text-slate-500  uppercase">Respiratory Rate </label>
-              <div className="flex gap-1">
-                <input type="number" required disabled={readOnly} value={respiratoryRate} onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="RR" />
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">RR / PR</label>
+              <div className="flex gap-1.5">
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={respiratoryRate} 
+                    onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium" 
+                    placeholder="RR" 
+                  />
+                  <span className="absolute right-2 top-1.5 text-[8px] font-black text-slate-400 uppercase">RR</span>
+                </div>
+                <div className="relative flex-1">
+                  <input 
+                    type="number" 
+                    required 
+                    disabled={readOnly} 
+                    value={pulseRate} 
+                    onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium" 
+                    placeholder="PR" 
+                  />
+                  <span className="absolute right-2 top-1.5 text-[8px] font-black text-slate-400 uppercase">PR</span>
+                </div>
               </div>
             </div>
-
-            <div>
-              <label className="text-[10px] font-bold text-slate-500 uppercase">Pulse Rate</label>
-              <div className="flex gap-1">
-                <input type="number" required disabled={readOnly} value={pulseRate} onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="PR" />
-              </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                BP (Systolic / Diastolic)
-                <span className="text-red-500">*</span>
-              </label>
-              <div className="grid grid-cols-2 gap-2 max-w-[240px]">
-                <div className="relative flex items-center">
+            <div className="lg:col-span-1">
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">BP (Sys/Dia)</label>
+              <div className="flex items-center gap-1">
+                <div className="relative flex-1">
                   <input 
                     type="number" 
                     required 
                     disabled={readOnly} 
                     value={bloodPressureSys} 
                     onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="w-full pl-3 pr-10 py-2 bg-white border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg text-xs font-medium text-slate-800 disabled:bg-slate-50 disabled:text-slate-400 outline-none transition-all" 
-                    placeholder="120" 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Sys" 
                   />
-                  <span className="absolute right-3 text-[10px] font-bold text-slate-400 select-none uppercase">Sys</span>
+                  <span className="absolute right-1.5 top-2 text-[7px] font-black text-slate-300 uppercase">Sys</span>
                 </div>
-
-                <div className="relative flex items-center">
+                <span className="text-slate-300 font-bold">/</span>
+                <div className="relative flex-1">
                   <input 
                     type="number" 
                     required 
                     disabled={readOnly} 
                     value={bloodPressureDia} 
                     onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="w-full pl-3 pr-10 py-2 bg-white border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg text-xs font-medium text-slate-800 disabled:bg-slate-50 disabled:text-slate-400 outline-none transition-all" 
-                    placeholder="80" 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Dia" 
                   />
-                  <span className="absolute right-3 text-[10px] font-bold text-slate-400 select-none uppercase">Dia</span>
+                  <span className="absolute right-1.5 top-2 text-[7px] font-black text-slate-300 uppercase">Dia</span>
                 </div>
               </div>
             </div>
