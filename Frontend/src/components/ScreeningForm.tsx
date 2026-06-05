@@ -216,6 +216,11 @@ export default function ScreeningForm({
       return;
     }
 
+    if (heightStatus?.blockEntry) {
+      alert(`Height logical error: ${heightStatus.interpretation}`);
+      return;
+    }
+
     if (!isValidDob(dateOfBirth)) {
       alert('Date of Birth must be compliant with the study protocols (1972 - 2006).');
       return;
@@ -404,18 +409,16 @@ export default function ScreeningForm({
           <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2">
             A. Initial Assessment
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Height (cm)</label>
               <input 
               type="number"
               required 
-              min = {100}
-              max = {200}
               disabled={readOnly} 
               value={heightCm} 
               onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
-              className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              className={`block w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs ${heightStatus?.blockEntry ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`} />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Weight (kg)</label>
@@ -443,7 +446,17 @@ export default function ScreeningForm({
                 <input type="number" required disabled={readOnly} value={pulseRate} onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="PR" />
               </div>
             </div>
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">BP (Sys/Dia)</label>
+              <div className="flex gap-1">
+                <input type="number" required disabled={readOnly} value={bloodPressureSys} onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="Sys" />
+                <input type="number" required disabled={readOnly} value={bloodPressureDia} onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))} className="w-1/2 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" placeholder="Dia" />
+              </div>
+            </div>
           </div>
+
+          {/* Vitals Alerts Section */}
+          <VitalAlerts results={[bpStatus, tempStatus, rrStatus, prStatus, heightStatus]} />
         </div>
 
 
