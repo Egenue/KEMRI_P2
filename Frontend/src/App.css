@@ -182,3 +182,8 @@
     border-right-color: var(--border);
   }
 }
+
+.flex gap-1{
+  display: flex;
+  justify-content: space-between;
+}
