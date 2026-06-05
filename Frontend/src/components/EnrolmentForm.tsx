@@ -7,6 +7,15 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, Sparkles, Check, Lock, ShieldCheck, HeartPulse, Calculator, CalendarDays } from 'lucide-react';
 import { EnrolmentRecord, ScreeningRecord, HealthFacility } from '../types';
+import { 
+  validateBloodPressure, 
+  validateTemperature, 
+  validateRespiratoryRate, 
+  validatePulseRate, 
+  validateHeight,
+  validateBMI
+} from '../lib/vitalsValidation';
+import { VitalAlerts } from './VitalAlerts';
 
 interface EnrolmentFormProps {
   onSave: (record: EnrolmentRecord) => void;
@@ -129,6 +138,14 @@ export default function EnrolmentForm({
     }
   }, [existingRecord]);
 
+  // Vitals Validation Results
+  const bpStatus = validateBloodPressure(bloodPressureSys, bloodPressureDia);
+  const tempStatus = validateTemperature(temperatureC);
+  const rrStatus = validateRespiratoryRate(respiratoryRate);
+  const prStatus = validatePulseRate(pulseRate);
+  const heightStatus = validateHeight(heightCm);
+  const bmiStatus = validateBMI(BMI);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (readOnly) return;
@@ -140,6 +157,11 @@ export default function EnrolmentForm({
 
     if (!villageOfResidence.trim()) {
       alert('Village of residence is required.');
+      return;
+    }
+
+    if (heightStatus?.blockEntry) {
+      alert(`Height logical error: ${heightStatus.interpretation}`);
       return;
     }
 
@@ -437,26 +459,6 @@ export default function EnrolmentForm({
                   <span className="text-sm font-bold text-slate-800">{BMI}</span>
                 </div>
               </div>
-              {Number(BMI) > 30 && (
-                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
-                  &bull; High BMI (≥30) may indicate obesity. Consider counseling on nutrition and physical activity.
-                </p>
-              )}
-              {Number(BMI) > 25 && Number(BMI) < 30 && (
-                <p className="mt-1.5 text-[11px] text-amber-600 font-medium">
-                  &bull; Elevated BMI (25-29.9) may indicate overweight status. Consider counseling on nutrition and physical activity.
-                </p>
-              )}
-              {(Number(BMI) > 0 && Number(BMI) < 18.5) && (
-                <p className="mt-1.5 text-[11px] text-blue-600 font-medium">
-                  &bull; Low BMI (&lt;18.5) may indicate malnutrition. Consider nutritional assessment and support.
-                </p>
-              )}
-              {Number(BMI) <= 0 && (
-                <p className="mt-1.5 text-[11px] text-red-600 font-medium">
-                  &bull; Invalid BMI value. Please ensure height and weight are entered correctly.
-                </p>
-              )}
             </div>
 
             <div>
@@ -555,6 +557,8 @@ export default function EnrolmentForm({
               </div>
             </div>
           </div>
+
+          <VitalAlerts results={[bpStatus, tempStatus, rrStatus, prStatus, heightStatus, bmiStatus]} />
         </div>
 
         {/* Buttons Operations */}

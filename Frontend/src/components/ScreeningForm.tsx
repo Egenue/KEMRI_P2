@@ -13,7 +13,8 @@ import {
   validateTemperature, 
   validateRespiratoryRate, 
   validatePulseRate, 
-  validateHeight 
+  validateHeight,
+  validateBMI
 } from '../lib/vitalsValidation';
 import { VitalAlerts } from './VitalAlerts';
 
@@ -196,6 +197,7 @@ export default function ScreeningForm({
   const rrStatus = validateRespiratoryRate(respiratoryRate);
   const prStatus = validatePulseRate(pulseRate);
   const heightStatus = validateHeight(heightCm);
+  const bmiStatus = validateBMI(BMI);
 
   const getBMI = (heightCm: string | number, weightKg: string | number) => {
     const heightM = Number(heightCm) / 100;
@@ -456,7 +458,7 @@ export default function ScreeningForm({
           </div>
 
           {/* Vitals Alerts Section */}
-          <VitalAlerts results={[bpStatus, tempStatus, rrStatus, prStatus, heightStatus]} />
+          <VitalAlerts results={[bpStatus, tempStatus, rrStatus, prStatus, heightStatus, bmiStatus]} />
         </div>
 
 

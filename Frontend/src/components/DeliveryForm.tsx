@@ -7,6 +7,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Search, Sparkles, Check, Lock, ShieldCheck, ChevronDown, Baby } from 'lucide-react';
 import { DeliveryRecord, EnrolmentRecord, HealthFacility } from '../types';
+import { 
+  validateBloodPressure, 
+  validateTemperature, 
+  validateRespiratoryRate, 
+  validatePulseRate,
+  validateBMI
+} from '../lib/vitalsValidation';
+import { VitalAlerts } from './VitalAlerts';
 
 interface DeliveryFormProps {
   onSave: (record: DeliveryRecord) => void;
@@ -134,6 +142,13 @@ export default function DeliveryForm({
     const bmiVal = motherWeightKg / (heightInMeters * heightInMeters);
     return bmiVal.toFixed(1);
   };
+
+  // Vitals Validation Results
+  const bpStatus = validateBloodPressure(bloodPressureSys, bloodPressureDia);
+  const tempStatus = validateTemperature(temperatureC);
+  const rrStatus = validateRespiratoryRate(respiratoryRate);
+  const prStatus = validatePulseRate(pulseRate);
+  const bmiStatus = validateBMI(getBmiString() === '---' || getBmiString() === 'Unknown' ? '' : Number(getBmiString()));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -502,6 +517,8 @@ export default function DeliveryForm({
               </div>
             </div>
           </div>
+
+          <VitalAlerts results={[bpStatus, tempStatus, rrStatus, prStatus, bmiStatus]} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3">
             <div>

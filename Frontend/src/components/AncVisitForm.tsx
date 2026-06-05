@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Check, X, FileText, Calendar, Weight, Activity, AlertCircle, ChevronDown } from 'lucide-react';
 import { EnrolmentRecord, AncVisitRecord } from '../types';
-
+import { 
+  validateBloodPressure, 
+  validateBMI
+} from '../lib/vitalsValidation';
+import { VitalAlerts } from './VitalAlerts';
 
 interface AncVisitFormProps {
   onSave: (record: any) => void;
@@ -71,6 +75,17 @@ export default function AncVisitForm({
       setVisitNumber(`V${nextVisitNum}-${id}`);
     }
   };
+
+  const bpStatus = validateBloodPressure(systolic, diastolic);
+
+  // Calculate BMI for ANC visit if height is available from enrollment
+  const enrolledSubject = enrolledRecords.find(p => p.screeningId === screeningId);
+  const heightCm = enrolledSubject?.height || 0;
+  let bmiValue: number | '' = '';
+  if (heightCm > 0 && weightKilos) {
+    bmiValue = Number((Number(weightKilos) / ((heightCm / 100) * (heightCm / 100))).toFixed(1));
+  }
+  const bmiStatus = validateBMI(bmiValue);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -274,6 +289,8 @@ export default function AncVisitForm({
             />
           </div>
         </div>
+
+        <VitalAlerts results={[bpStatus, bmiStatus]} />
 
         <div className="space-y-4">
           <div>
