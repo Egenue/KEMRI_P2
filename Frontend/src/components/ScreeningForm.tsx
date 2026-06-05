@@ -8,6 +8,14 @@ import { motion } from 'motion/react';
 import { AlertCircle, FileSpreadsheet, Lock, Sparkles, Check, X, ShieldAlert } from 'lucide-react';
 import { ScreeningRecord, HealthFacility } from '../types';
 import { calculateAge, isValidDob, formatToDdmMmyyyy } from '../lib/dateUtils';
+import { 
+  validateBloodPressure, 
+  validateTemperature, 
+  validateRespiratoryRate, 
+  validatePulseRate, 
+  validateHeight 
+} from '../lib/vitalsValidation';
+import { VitalAlerts } from './VitalAlerts';
 
 interface ScreeningFormProps {
   onSave: (record: ScreeningRecord) => void;
@@ -181,6 +189,13 @@ export default function ScreeningForm({
       }
     }
   }, [screeningId, records, existingRecord]);
+
+  // Vitals Validation Results
+  const bpStatus = validateBloodPressure(bloodPressureSys, bloodPressureDia);
+  const tempStatus = validateTemperature(temperatureC);
+  const rrStatus = validateRespiratoryRate(respiratoryRate);
+  const prStatus = validatePulseRate(pulseRate);
+  const heightStatus = validateHeight(heightCm);
 
   const getBMI = (heightCm: string | number, weightKg: string | number) => {
     const heightM = Number(heightCm) / 100;
