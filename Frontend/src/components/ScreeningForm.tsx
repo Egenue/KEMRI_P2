@@ -328,7 +328,7 @@ export default function ScreeningForm({
         {/* Core Administrative Header */}
         <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Screening ID <span className="text-red-500">*</span>
             </label>
             <input
@@ -344,7 +344,7 @@ export default function ScreeningForm({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Facility <span className="text-red-500">*</span>
             </label>
             <select
@@ -361,7 +361,7 @@ export default function ScreeningForm({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Interview Date <span className="text-red-500">*</span>
             </label>
             <input
@@ -376,7 +376,7 @@ export default function ScreeningForm({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Date of Birth <span className="text-red-500">*</span>
             </label>
             <input
@@ -392,7 +392,7 @@ export default function ScreeningForm({
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+            <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
               Age (Calculated)
             </label>
             <div className="grid grid-cols-2 gap-1.5">
@@ -413,27 +413,29 @@ export default function ScreeningForm({
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Height (cm)</label>
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase">Height (cm)</label>
               <input 
               type="number"
-              required 
+              required
+              min={30}
+              max={250} 
               disabled={readOnly} 
               value={heightCm} 
               onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
               className={`block w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs ${heightStatus?.blockEntry ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-200'}`} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Weight (kg)</label>
-              <input type="number" step={0.1} required disabled={readOnly} value={weightKg} onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase">Weight (kg)</label>
+              <input type="number" step={0.1} min={0} max={500} required disabled={readOnly} value={weightKg} onChange={(e) => setWeightKg(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">BMI</label>
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase">BMI</label>
               <div className="bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-700">{BMI || '--.-'}</div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Temp (&deg;C)</label>
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase">Temp (&deg;C)</label>
               <div className="flex">
-                <input type="number" step={0.1} required disabled={readOnly} value={temperatureC} onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2 py-1.5 bg-white border border-slate-200 rounded-l-lg text-xs" />
+                <input type="number" min={20} max={50} step={0.1} required disabled={readOnly} value={temperatureC} onChange={(e) => setTemperatureC(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2 py-1.5 bg-white border border-slate-200 rounded-l-lg text-xs" />
                 <select disabled={readOnly} value={tempMethod} onChange={(e) => setTempMethod(e.target.value as any)} className="px-1.5 bg-slate-50 border border-slate-200 border-l-0 rounded-r-lg text-[9px]">
                   <option value="Oral">O</option>
                   <option value="Axillary">A</option>
@@ -442,61 +444,63 @@ export default function ScreeningForm({
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">RR / PR</label>
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase">Respiratory Rate / Pulse Rate</label>
               <div className="flex gap-1.5">
-                <div className="relative flex-1">
+                <div>
                   <input 
                     type="number" 
-                    required 
+                    required
+                    min={0}
+                    max={100}
                     disabled={readOnly} 
                     value={respiratoryRate} 
                     onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium" 
-                    placeholder="RR" 
+                    className="block w-full pl-2.5 py-1.5 pr-2 bg-white border rounded border-slate-200 rounded-lg text-xs font-small"
                   />
-                  <span className="absolute right-2 top-1.5 text-[8px] font-black text-slate-400 uppercase">RR</span>
                 </div>
-                <div className="relative flex-1">
+                <div>
                   <input 
                     type="number" 
-                    required 
+                    required
+                    min={0}
+                    max={200}
                     disabled={readOnly} 
                     value={pulseRate} 
                     onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium" 
-                    placeholder="PR" 
+                    className="block w-full pl-2.5 pr-2 py-1.5 bg-white border rounded border-slate-200 rounded-lg text-xs font-medium"
                   />
-                  <span className="absolute right-2 top-1.5 text-[8px] font-black text-slate-400 uppercase">PR</span>
                 </div>
               </div>
             </div>
             <div className="lg:col-span-1">
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">BP (Sys/Dia)</label>
+              <label className="block text-[9px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Blood Pressure</label>
               <div className="flex items-center gap-1">
-                <div className="relative flex-1">
+                <div>
                   <input 
                     type="number" 
                     required 
+                    min={0}
+                    max={250}
                     disabled={readOnly} 
                     value={bloodPressureSys} 
                     onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
-                    placeholder="Sys" 
+                    className="block w-full pl-2.5 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Systolic" 
                   />
-                  <span className="absolute right-1.5 top-2 text-[7px] font-black text-slate-300 uppercase">Sys</span>
                 </div>
                 <span className="text-slate-300 font-bold">/</span>
-                <div className="relative flex-1">
+                <div>
                   <input 
                     type="number" 
                     required 
+                    min={0}
+                    max={200}
                     disabled={readOnly} 
                     value={bloodPressureDia} 
                     onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
-                    placeholder="Dia" 
+                    className="block w-full pl-2.5 pr-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Diastolic" 
                   />
-                  <span className="absolute right-1.5 top-2 text-[7px] font-black text-slate-300 uppercase">Dia</span>
                 </div>
               </div>
             </div>

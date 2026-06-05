@@ -493,7 +493,7 @@ export default function EnrolmentForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">RR / PR</label>
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Respiratory Rate / Pulse Rate</label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <input 
@@ -502,10 +502,9 @@ export default function EnrolmentForm({
                     disabled={readOnly} 
                     value={respiratoryRate} 
                     onChange={(e) => setRespiratoryRate(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium" 
-                    placeholder="RR" 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-small" 
                   />
-                  <span className="absolute right-3 top-2.5 text-[9px] font-black text-slate-400 uppercase">RR</span>
+                  <span className="top-2.5 text-[9px] font-black text-slate-400 ">Respiratory Rate</span>
                 </div>
                 <div className="relative flex-1">
                   <input 
@@ -514,40 +513,39 @@ export default function EnrolmentForm({
                     disabled={readOnly} 
                     value={pulseRate} 
                     onChange={(e) => setPulseRate(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium" 
-                    placeholder="PR" 
+                    className="block w-full pl-2.5 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium" 
                   />
-                  <span className="absolute right-3 top-2.5 text-[9px] font-black text-slate-400 uppercase">PR</span>
+                  <span className=" top-2.5 text-[9px] font-black text-slate-400">Pulse Rate</span>
                 </div>
               </div>
             </div>
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">Blood Pressure (Sys/Dia)</label>
-              <div className="flex items-center gap-1.5">
-                <div className="relative flex-1">
+            <div className="lg:col-span-1">
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5 tracking-wider">Blood Pressure</label>
+              <div className="flex items-center gap-1">
+                <div className="width-[20px] relative">
                   <input 
                     type="number" 
                     required 
                     disabled={readOnly} 
                     value={bloodPressureSys} 
                     onChange={(e) => setBloodPressureSys(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-center font-mono" 
-                    placeholder="Sys" 
+                    className="block w-full pl-2 pr-2 py-2 bg-white border rounded border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Systolic" 
                   />
-                  <span className="absolute right-2 top-3 text-[8px] font-black text-slate-300 uppercase tracking-tighter">Sys</span>
+                  <span className="top-3 text-[8px] font-black text-slate-300 uppercase">Systolic</span>
                 </div>
-                <span className="text-slate-400 font-bold">&#47;</span>
-                <div className="relative flex-1">
+                <span className="text-slate-600 font-bold text-[21px]">&#47;</span>
+                <div>
                   <input 
                     type="number" 
                     required 
                     disabled={readOnly} 
                     value={bloodPressureDia} 
                     onChange={(e) => setBloodPressureDia(e.target.value === '' ? '' : Number(e.target.value))} 
-                    className="block w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-center font-mono" 
-                    placeholder="Dia" 
+                    className="block w-full pl-2.5 pr-2 py-2 bg-white border rounded border-slate-200 rounded-lg text-xs font-medium text-center" 
+                    placeholder="Diastolic" 
                   />
-                  <span className="absolute right-2 top-3 text-[8px] font-black text-slate-300 uppercase tracking-tighter">Dia</span>
+                  <span className="top-3 text-[8px] font-black text-slate-300 uppercase">Diastolic</span>
                 </div>
               </div>
             </div>

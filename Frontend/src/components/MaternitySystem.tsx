@@ -561,7 +561,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
 
 
         {/* Mobile Navigation bar */}
-        <div className="lg:hidden border-t border-slate-100 bg-slate-50/85 px-4 py-2 sticky top-0 overflow-x-auto text-amber-500">
+        <div className="lg:hidden border-t border-slate-100 bg-slate-50/85 px-4 py-2 overflow-x-auto text-amber-500">
           <div className="flex gap-1.5 pb-1 select-none">
             {[
               { id: 'dashboard', label: 'Overview', icon: Grid2X2, path: '/' },
