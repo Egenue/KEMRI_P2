@@ -345,9 +345,26 @@ export default function ScreeningForm({
             <input
               type="date"
               required
+              max = {Date.now()}
               disabled={readOnly}
               value={dateOfInterview}
               onChange={(e) => setDateOfInterview(e.target.value)}
+              className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">
+              Date of Birth <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              required
+              disabled={readOnly}
+              min="1972-01-01"
+              max="2006-01-01"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
               className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-900 text-xs"
             />
           </div>
@@ -375,7 +392,15 @@ export default function ScreeningForm({
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Height (cm)</label>
-              <input type="number" required disabled={readOnly} value={heightCm} onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))} className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
+              <input 
+              type="number"
+              required 
+              min = {100}
+              max = {200}
+              disabled={readOnly} 
+              value={heightCm} 
+              onChange={(e) => setHeightCm(e.target.value === '' ? '' : Number(e.target.value))}
+              className="block w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs" />
             </div>
             <div>
               <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Weight (kg)</label>
