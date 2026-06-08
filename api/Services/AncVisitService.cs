@@ -26,19 +26,19 @@ namespace KemriApi.Services
 
         public async Task<ancVisit?> CreateAncVisitAsync(AncVisitRequest request)
         {
-            await _context.AncVisits.InsertOneAsync(request);
+            await _context.ancVisit.InsertOneAsync(request);
             await _auditService.LogAuditAsync("CREATE", "ANC Visit", request.VisitNumber, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
         public async Task<List<ancVisit>> GetAllAncVisitsAsync()
         {
-            return await _context.AncVisits.Find(_ => true).ToListAsync();
+            return await _context.ancVisit.Find(_ => true).ToListAsync();
         }
 
         public async Task<ancVisit?> GetAncVisitByNumberAsync(string visitNumber)
         {
-            return await _context.AncVisits.Find(v => v.VisitNumber == visitNumber).FirstOrDefaultAsync();
+            return await _context.ancVisit.Find(v => v.VisitNumber == visitNumber).FirstOrDefaultAsync();
         }
 
         public async Task<bool> DeleteAncVisitAsync(string visitNumber, string userInitials, string reason)
@@ -46,7 +46,7 @@ namespace KemriApi.Services
             var oldValue = await GetAncVisitByNumberAsync(visitNumber);
             if (oldValue == null) return false;
 
-            var result = await _context.AncVisits.DeleteOneAsync(v => v.VisitNumber == visitNumber);
+            var result = await _context.ancVisit.DeleteOneAsync(v => v.VisitNumber == visitNumber);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "ANC Visit", visitNumber, userInitials, reason, oldValue, null);

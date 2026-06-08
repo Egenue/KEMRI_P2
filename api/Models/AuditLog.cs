@@ -19,18 +19,18 @@ namespace KemriApi.Models
         public string RecordId { get; set; } = string.Empty;
 
         [BsonElement("userInitials")]
-        public string UserInitials { get; set; } = string.Empty;
+        public string userInitials { get; set; } = string.Empty;
 
         [BsonElement("oldValue")]
-        public BsonValue? OldValue { get; set; }
+        public BsonValue? oldValue { get; set; }
 
         [BsonElement("newValue")]
-        public BsonValue? NewValue { get; set; }
+        public BsonValue? newValue { get; set; }
 
         [BsonElement("reason")]
-        public string Reason { get; set; } = string.Empty;
+        public string reason { get; set; } = string.Empty;
 
         [BsonElement("timestamp")]
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime timestamp { get; set; } = DateTime.UtcNow;
     }
 }

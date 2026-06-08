@@ -20,7 +20,7 @@ namespace KemriApi.Services
         private readonly IAuditService _auditService;
 
         // Centralized reference targeting lowercase collection mapping naming styles
-        private IMongoCollection<ScreeningForm> ScreeningCollection => _context.ScreeningForms;
+        private IMongoCollection<ScreeningForm> ScreeningCollection => _context.screeningForms;
 
         public ScreeningService(MongoDbContext context, IAuditService auditService)
         {
@@ -31,29 +31,29 @@ namespace KemriApi.Services
         public async Task<ScreeningForm?> CreateScreeningAsync(ScreeningRequest request)
         {
             // 1. Check for existing record via standard property mapping references
-            var exists = await ScreeningCollection.Find(f => f.ScreeningId == request.ScreeningId).FirstOrDefaultAsync();
+            var exists = await ScreeningCollection.Find(f => f.screeningId == request.screeningId).FirstOrDefaultAsync();
             if (exists != null) return null;
 
             // 2. Hydrate database entity structure
             var screeningForm = new ScreeningForm
             {
-                ScreeningId = request.ScreeningId,
-                UserInitials = request.UserInitials,
-                HealthFacility = request.HealthFacility,
-                InterviewDate = request.InterviewDate,
+                screeningId = request.screeningId,
+                userInitials = request.userInitials,
+                healthFacility = request.healthFacility,
+                interviewDate = request.interviewDate,
                 DoB = request.DoB,
                 Age = request.Age,
-                Height = request.Height,
-                Weight = request.Weight,
+                height = request.height,
+                weight = request.weight,
                 BMI = request.BMI,
-                VitalSigns = request.VitalSigns,
-                LastMenstrualPeriod = request.LastMenstrualPeriod,
-                FundalHeight = request.FundalHeight,
-                InclusionCriteria = request.InclusionCriteria,
-                ExclusionCriteria = request.ExclusionCriteria,
-                Eligibility = request.Eligibility,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                vitalSigns = request.vitalSigns,
+                lastMenstrualPeriod = request.lastMenstrualPeriod,
+                fundalHeight = request.fundalHeight,
+                inclusionCriteria = request.inclusionCriteria,
+                exclusionCriteria = request.exclusionCriteria,
+                eligibility = request.eligibility,
+                createdAt = DateTime.UtcNow,
+                updatedAt = DateTime.UtcNow
             };
 
             // 3. Save to MongoDB using centralized tracking references
@@ -63,7 +63,7 @@ namespace KemriApi.Services
             await _auditService.LogAuditAsync(
                 action: "CREATE", 
                 module: "Screening", 
-                recordId: screeningForm.ScreeningId, 
+                recordId: screeningForm.screeningId, 
                 userInitials: request.UserInitials,
                 reason: "Initial intake screening form submission",
                 oldValue: null, 
@@ -80,7 +80,7 @@ namespace KemriApi.Services
 
         public async Task<ScreeningForm?> GetScreeningByIdAsync(string screeningId)
         {
-            return await ScreeningCollection.Find(f => f.ScreeningId == screeningId).FirstOrDefaultAsync();
+            return await ScreeningCollection.Find(f => f.screeningId == screeningId).FirstOrDefaultAsync();
         }
 
         public async Task<ScreeningForm?> UpdateScreeningAsync(string screeningId, ScreeningRequest request)
@@ -92,27 +92,27 @@ namespace KemriApi.Services
             var updatedForm = new ScreeningForm
             {
                 Id = oldValue.Id, // Protect and pass original internal document ID token reference keys
-                ScreeningId = screeningId,
-                UserInitials = request.UserInitials ?? oldValue.UserInitials,
-                HealthFacility = request.HealthFacility,
-                InterviewDate = request.InterviewDate,
+                screeningId = screeningId,
+                userInitials = request.userInitials ?? oldValue.userInitials,
+                healthFacility = request.healthFacility,
+                interviewDate = request.interviewDate,
                 DoB = request.DoB,
                 Age = request.Age,
-                Height = request.Height,
-                Weight = request.Weight,
+                height = request.height,
+                weight = request.weight,
                 BMI = request.BMI,
-                VitalSigns = request.VitalSigns,
-                LastMenstrualPeriod = request.LastMenstrualPeriod,
-                FundalHeight = request.FundalHeight,
-                InclusionCriteria = request.InclusionCriteria,
-                ExclusionCriteria = request.ExclusionCriteria,
-                Eligibility = request.Eligibility,
-                CreatedAt = oldValue.CreatedAt, // Lock original data entry timestamps
-                UpdatedAt = DateTime.UtcNow
+                vitalSigns = request.vitalSigns,
+                lastMenstrualPeriod = request.lastMenstrualPeriod,
+                fundalHeight = request.fundalHeight,
+                inclusionCriteria = request.inclusionCriteria,
+                exclusionCriteria = request.exclusionCriteria,
+                eligibility = request.eligibility,
+                createdAt = oldValue.CreatedAt, // Lock original data entry timestamps
+                updatedAt = DateTime.UtcNow
             };
 
             // Replace document with compliant structural entity matching target definitions
-            await ScreeningCollection.ReplaceOneAsync(f => f.ScreeningId == screeningId, updatedForm);
+            await ScreeningCollection.ReplaceOneAsync(f => f.screeningId == screeningId, updatedForm);
 
             await _auditService.LogAuditAsync(
                 action: "UPDATE", 
@@ -132,16 +132,16 @@ namespace KemriApi.Services
             var oldValue = await GetScreeningByIdAsync(screeningId);
             if (oldValue == null) return false;
 
-            var result = await ScreeningCollection.DeleteOneAsync(f => f.ScreeningId == screeningId);
+            var result = await ScreeningCollection.DeleteOneAsync(f => f.screeningId == screeningId);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "Screening Form", screeningId, userInitials, reason, oldValue, null);
 
                 // Cascade delete operations executing against explicit lowercase context references
-                await _context.EnrollmentForms.DeleteManyAsync(f => f.ScreeningId == screeningId);
-                await _context.DeliveryForms.DeleteManyAsync(f => f.DeliveryScreeningId == screeningId);
-                await _context.CloseoutForms.DeleteManyAsync(f => f.ScreeningId == screeningId);
-                await _context.GestationAges.DeleteManyAsync(f => f.ScreeningId == screeningId);
+                await _context.enrollmentForm.DeleteManyAsync(f => f.screeningId == screeningId);
+                await _context.deliveryForm.DeleteManyAsync(f => f.deliveryScreeningId == screeningId);
+                await _context.closeoutForm.DeleteManyAsync(f => f.screeningId == screeningId);
+                await _context.gestationAge.DeleteManyAsync(f => f.screeningId == screeningId);
 
                 return true;
             }

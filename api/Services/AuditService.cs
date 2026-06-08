@@ -16,7 +16,7 @@ namespace KemriApi.Services
         private readonly MongoDbContext _context;
 
         // 1. Move the collection property here (Class level scope)
-        private IMongoCollection<AuditLog> _auditCollection => _context.AuditLogs;
+        private IMongoCollection<AuditLog> _auditCollection => _context.AuditLog;
 
         public AuditService(MongoDbContext context)
         {

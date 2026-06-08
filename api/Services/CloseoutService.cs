@@ -30,19 +30,19 @@ namespace KemriApi.Services
             var exists = await GetCloseoutByScreeningIdAsync(request.ScreeningId);
             if (exists != null) return null;
 
-            await _context.CloseoutForms.InsertOneAsync(request);
+            await _context.closeoutForm.InsertOneAsync(request);
             await _auditService.LogAuditAsync("CREATE", "Closeout Form", request.ScreeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
         public async Task<List<CloseoutForm>> GetAllCloseoutsAsync()
         {
-            return await _context.CloseoutForms.Find(_ => true).ToListAsync();
+            return await _context.closeoutForm.Find(_ => true).ToListAsync();
         }
 
         public async Task<CloseoutForm?> GetCloseoutByScreeningIdAsync(string screeningId)
         {
-            return await _context.CloseoutForms.Find(f => f.ScreeningId == screeningId).FirstOrDefaultAsync();
+            return await _context.closeoutForm.Find(f => f.ScreeningId == screeningId).FirstOrDefaultAsync();
         }
 
         public async Task<CloseoutForm?> UpdateCloseoutAsync(string screeningId, CloseoutRequest request)
@@ -51,7 +51,7 @@ namespace KemriApi.Services
             if (oldValue == null) return null;
 
             request.Id = oldValue.Id;
-            await _context.CloseoutForms.ReplaceOneAsync(f => f.ScreeningId == screeningId, request);
+            await _context.closeoutForm.ReplaceOneAsync(f => f.ScreeningId == screeningId, request);
             await _auditService.LogAuditAsync("UPDATE", "Closeout Form", screeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Data update", oldValue, request);
             return request;
         }
@@ -61,7 +61,7 @@ namespace KemriApi.Services
             var oldValue = await GetCloseoutByScreeningIdAsync(screeningId);
             if (oldValue == null) return false;
 
-            var result = await _context.CloseoutForms.DeleteOneAsync(f => f.ScreeningId == screeningId);
+            var result = await _context.closeoutForm.DeleteOneAsync(f => f.ScreeningId == screeningId);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "Closeout Form", screeningId, userInitials, reason, oldValue, null);

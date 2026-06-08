@@ -27,22 +27,22 @@ namespace KemriApi.Services
 
         public async Task<GestationAge?> CreateGestAgeAsync(GestationAgeRequest request)
         {
-            var exists = await GetGestAgeByScreeningIdAsync(request.ScreeningId);
+            var exists = await GetGestAgeByScreeningIdAsync(request.screeningId);
             if (exists != null) return null;
 
-            await _context.GestationAges.InsertOneAsync(request);
-            await _auditService.LogAuditAsync("CREATE", "Gestation Age", request.ScreeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
+            await _context.gestationAge.InsertOneAsync(request);
+            await _auditService.LogAuditAsync("CREATE", "Gestation Age", request.screeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
         public async Task<List<GestationAge>> GetAllGestAgesAsync()
         {
-            return await _context.GestationAges.Find(_ => true).ToListAsync();
+            return await _context.gestationAge.Find(_ => true).ToListAsync();
         }
 
         public async Task<GestationAge?> GetGestAgeByScreeningIdAsync(string screeningId)
         {
-            return await _context.GestationAges.Find(g => g.ScreeningId == screeningId).FirstOrDefaultAsync();
+            return await _context.gestationAge.Find(g => g.screeningId == screeningId).FirstOrDefaultAsync();
         }
 
         public async Task<GestationAge?> UpdateGestAgeAsync(string screeningId, GestationAgeRequest request)
@@ -51,7 +51,7 @@ namespace KemriApi.Services
             if (oldValue == null) return null;
 
             request.Id = oldValue.Id;
-            await _context.GestationAges.ReplaceOneAsync(g => g.ScreeningId == screeningId, request);
+            await _context.gestationAge.ReplaceOneAsync(g => g.screeningId == screeningId, request);
             await _auditService.LogAuditAsync("UPDATE", "Gestation Age", screeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Data update", oldValue, request);
             return request;
         }
@@ -61,7 +61,7 @@ namespace KemriApi.Services
             var oldValue = await GetGestAgeByScreeningIdAsync(screeningId);
             if (oldValue == null) return false;
 
-            var result = await _context.GestationAges.DeleteOneAsync(g => g.ScreeningId == screeningId);
+            var result = await _context.gestationAge.DeleteOneAsync(g => g.screeningId == screeningId);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "Gestation Age", screeningId, userInitials, reason, oldValue, null);

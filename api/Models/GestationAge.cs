@@ -3,49 +3,49 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
 {
-    public class GestationAge
+    public class gestationAge
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
         [BsonElement("screeningId")]
-        public string ScreeningId { get; set; } = string.Empty;
+        public string screeningId { get; set; } = string.Empty;
 
         [BsonElement("lmp")]
-        public DateTime? Lmp { get; set; }
+        public DateTime? lmp { get; set; }
 
         [BsonElement("ultrasoundDate")]
-        public UltrasoundDateInfo UltrasoundDate { get; set; } = new();
+        public UltrasoundDateInfo ultrasoundDate { get; set; } = new();
 
         [BsonElement("lmpCertainty")]
-        public string LmpCertainty { get; set; } = string.Empty;
+        public string lmpCertainty { get; set; } = string.Empty;
 
         [BsonElement("enrolmentDate")]
-        public DateTime EnrolmentDate { get; set; }
+        public DateTime enrolmentDate { get; set; }
 
         [BsonElement("estDueDate")]
-        public DateTime EstDueDate { get; set; }
+        public DateTime estDueDate { get; set; }
 
         [BsonElement("currentGestAge")]
-        public CurrentGestAgeInfo CurrentGestAge { get; set; } = new();
+        public CurrentGestAgeInfo currentGestAge { get; set; } = new();
     }
 
     public class UltrasoundDateInfo
     {
         [BsonElement("usWeeks")]
-        public int UsWeeks { get; set; }
+        public int usWeeks { get; set; }
 
         [BsonElement("usDays")]
-        public int UsDays { get; set; }
+        public int usDays { get; set; }
     }
 
     public class CurrentGestAgeInfo
     {
         [BsonElement("gestweeks")]
-        public int GestWeeks { get; set; }
+        public int gestweeks { get; set; }
 
         [BsonElement("gestdays")]
-        public int GestDays { get; set; }
+        public int gestdays { get; set; }
     }
 }

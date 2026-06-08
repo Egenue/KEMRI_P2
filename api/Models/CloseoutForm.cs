@@ -3,58 +3,58 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
 {
-    public class CloseoutForm
+    public class closeoutForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
         [BsonElement("sreeningId")]
-        public string ScreeningId { get; set; } = string.Empty;
+        public string screeningId { get; set; } = string.Empty;
 
         [BsonElement("closeOutInterviewDate")]
-        public DateTime CloseOutInterviewDate { get; set; } = DateTime.UtcNow;
+        public DateTime closeOutInterviewDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("dateOfTermination")]
-        public DateTime DateOfTermination { get; set; } = DateTime.UtcNow;
+        public DateTime dateOfTermination { get; set; } = DateTime.UtcNow;
 
         [BsonElement("participantStatus")]
-        public ParticipantStatusInfo ParticipantStatus { get; set; } = new();
+        public ParticipantStatusInfo participantStatus { get; set; } = new();
 
         [BsonElement("submittedBy")]
-        public string? SubmittedBy { get; set; }
+        public string? submittedBy { get; set; }
 
         [BsonElement("submittedAt")]
-        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+        public DateTime submittedAt { get; set; } = DateTime.UtcNow;
     }
 
     public class ParticipantStatusInfo
     {
         [BsonElement("choicesStudy")]
-        public string ChoicesStudy { get; set; } = string.Empty;
+        public string choicesStudy { get; set; } = string.Empty;
 
         [BsonElement("incompleteReason")]
-        public IncompleteReasonInfo? IncompleteReason { get; set; }
+        public IncompleteReasonInfo? incompleteReason { get; set; }
     }
 
     public class IncompleteReasonInfo
     {
         [BsonElement("incompletionOptions")]
-        public string? IncompletionOptions { get; set; }
+        public string? incompletionOptions { get; set; }
 
         [BsonElement("adverseEvent")]
-        public string? AdverseEvent { get; set; }
+        public string? adverseEvent { get; set; }
 
         [BsonElement("deathOption")]
-        public DateTime? DeathOption { get; set; }
+        public DateTime? deathOption { get; set; }
 
         [BsonElement("protocalDeviation")]
-        public string? ProtocalDeviation { get; set; }
+        public string? protocalDeviation { get; set; }
 
         [BsonElement("withdrawalReason")]
-        public string? WithdrawalReason { get; set; }
+        public string? withdrawalReason { get; set; }
 
         [BsonElement("otherReason")]
-        public string? OtherReason { get; set; }
+        public string? otherReason { get; set; }
     }
 }

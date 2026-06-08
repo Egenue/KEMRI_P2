@@ -3,17 +3,17 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
 {
-    public class EnrollmentForm
+    public class enrollmentForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
         [BsonElement("screeningId")]
-        public string ScreeningId { get; set; } = string.Empty;
+        public string screeningId { get; set; } = string.Empty;
 
         [BsonElement("healthFacility")]
-        public string HealthFacility { get; set; } = string.Empty;
+        public string healthFacility { get; set; } = string.Empty;
 
         [BsonElement("DoB")]
         public DateTime DoB { get; set; }
@@ -22,22 +22,22 @@ namespace KemriApi.Models
         public AgeInfo Age { get; set; } = new();
 
         [BsonElement("maritalStatus")]
-        public string MaritalStatus { get; set; } = string.Empty;
+        public string maritalStatus { get; set; } = string.Empty;
 
         [BsonElement("HusbandName")]
         public string? HusbandName { get; set; }
 
         [BsonElement("villageOfResidence")]
-        public string VillageOfResidence { get; set; } = string.Empty;
+        public string villageOfResidence { get; set; } = string.Empty;
 
         [BsonElement("educationLevel")]
-        public string EducationLevel { get; set; } = string.Empty;
+        public string educationLevel { get; set; } = string.Empty;
 
         [BsonElement("subjectOccupation")]
-        public string SubjectOccupation { get; set; } = string.Empty;
+        public string subjectOccupation { get; set; } = string.Empty;
 
         [BsonElement("otherOccupation")]
-        public string? OtherOccupation { get; set; }
+        public string? otherOccupation { get; set; }
 
         [BsonElement("height")]
         public double Height { get; set; }
@@ -49,90 +49,90 @@ namespace KemriApi.Models
         public double BMI { get; set; }
 
         [BsonElement("vitalSigns")]
-        public VitalSignsInfo VitalSigns { get; set; } = new();
+        public VitalSignsInfo vitalSigns { get; set; } = new();
 
         [BsonElement("submittedAt")]
-        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+        public DateTime submittedAt { get; set; } = DateTime.UtcNow;
 
         [BsonElement("estGestAge")]
         public double? EstGestAge { get; set; }
 
         [BsonElement("gaParameters")]
-        public GaParametersInfo GaParameters { get; set; } = new();
+        public GaParametersInfo gaParameters { get; set; } = new();
 
         [BsonElement("createdAt")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime createdAt { get; set; }
 
         [BsonElement("updatedAt")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime updatedAt { get; set; }
     }
 
     public class AgeInfo
     {
         [BsonElement("months")]
-        public int Months { get; set; }
+        public int months { get; set; }
 
         [BsonElement("years")]
-        public int Years { get; set; }
+        public int years { get; set; }
     }
 
     public class VitalSignsInfo
     {
         [BsonElement("temperature")]
-        public TemperatureInfo Temperature { get; set; } = new();
+        public TemperatureInfo temperature { get; set; } = new();
 
         [BsonElement("respiratoryRate")]
-        public int RespiratoryRate { get; set; }
+        public int respiratoryRate { get; set; }
 
         [BsonElement("pulseRate")]
-        public int PulseRate { get; set; }
+        public int pulseRate { get; set; }
 
         [BsonElement("bloodPressure")]
-        public BloodPressureInfo BloodPressure { get; set; } = new();
+        public BloodPressureInfo bloodPressure { get; set; } = new();
     }
 
     public class TemperatureInfo
     {
         [BsonElement("value")]
-        public double Value { get; set; }
+        public double value { get; set; }
 
         [BsonElement("location")]
-        public string Location { get; set; } = string.Empty;
+        public string location { get; set; } = string.Empty;
     }
 
     public class GaParametersInfo
     {
         [BsonElement("ultrasoundDate")]
-        public DateTime? UltrasoundDate { get; set; }
+        public DateTime? ultrasoundDate { get; set; }
 
         [BsonElement("usWeeks")]
-        public int? UsWeeks { get; set; }
+        public int? usWeeks { get; set; }
 
         [BsonElement("usDays")]
-        public int? UsDays { get; set; }
+        public int? usDays { get; set; }
 
         [BsonElement("lmpDate")]
-        public DateTime? LmpDate { get; set; }
+        public DateTime? lmpDate { get; set; }
 
         [BsonElement("lmpCertainty")]
-        public string? LmpCertainty { get; set; }
+        public string? lmpCertainty { get; set; }
 
         [BsonElement("calculatedTrimester")]
-        public string? CalculatedTrimester { get; set; }
+        public string? calculatedTrimester { get; set; }
 
         [BsonElement("finalPregnancyStartDate")]
-        public DateTime? FinalPregnancyStartDate { get; set; }
+        public DateTime? finalPregnancyStartDate { get; set; }
 
         [BsonElement("gaAtEnrolmentDays")]
-        public int? GaAtEnrolmentDays { get; set; }
+        public int? gaAtEnrolmentDays { get; set; }
 
         [BsonElement("edd")]
-        public DateTime? Edd { get; set; }
+        public DateTime? edd { get; set; }
 
         [BsonElement("source")]
-        public string? Source { get; set; }
+        public string? source { get; set; }
 
         [BsonElement("loc")]
-        public string? Loc { get; set; }
+        public string? loc { get; set; }
     }
 }

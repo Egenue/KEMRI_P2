@@ -10,51 +10,51 @@ namespace KemriApi.Models
         public string? Id { get; set; }
 
         [BsonElement("visitNumber")]
-        public string VisitNumber { get; set; } = string.Empty;
+        public string visitNumber { get; set; } = string.Empty;
 
         [BsonElement("visitDate")]
-        public DateTime VisitDate { get; set; } = DateTime.UtcNow;
+        public DateTime visitDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("gestationAge")]
-        public GestationAgeInfo GestationAge { get; set; } = new();
+        public GestationAgeInfo gestationAge { get; set; } = new();
 
         [BsonElement("weightKilos")]
-        public double WeightKilos { get; set; }
+        public double weightKilos { get; set; }
 
         [BsonElement("bloodPressure")]
-        public BloodPressureInfo BloodPressure { get; set; } = new();
+        public BloodPressureInfo bloodPressure { get; set; } = new();
 
         [BsonElement("fundalHeight")]
-        public double FundalHeight { get; set; }
+        public double fundalHeight { get; set; }
 
         [BsonElement("muac")]
-        public double Muac { get; set; }
+        public double muac { get; set; }
 
         [BsonElement("complaints")]
-        public string Complaints { get; set; } = "None";
+        public string complaints { get; set; } = "None";
 
         [BsonElement("medicationGiven")]
-        public string MedicationGiven { get; set; } = "None";
+        public string medicationGiven { get; set; } = "None";
 
         [BsonElement("nextAppointment")]
-        public DateTime NextAppointment { get; set; }
+        public DateTime nextAppointment { get; set; }
     }
 
     public class GestationAgeInfo
     {
         [BsonElement("gestWeeks")]
-        public int GestWeeks { get; set; }
+        public int gestWeeks { get; set; }
 
         [BsonElement("gestDays")]
-        public int GestDays { get; set; }
+        public int gestDays { get; set; }
     }
 
     public class BloodPressureInfo
     {
         [BsonElement("systolic")]
-        public int Systolic { get; set; }
+        public int systolic { get; set; }
 
         [BsonElement("diastolic")]
-        public int Diastolic { get; set; }
+        public int diastolic { get; set; }
     }
 }

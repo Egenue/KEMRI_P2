@@ -2,23 +2,23 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
-{    public class ScreeningForm
+{    public class screeningForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonElement("UserInitials")]
-        public string UserInitials { get; set; } = string.Empty;
+        [BsonElement("userInitials")]
+        public string userInitials { get; set; } = string.Empty;
 
         [BsonElement("screeningId")]
-        public string ScreeningId { get; set; } = string.Empty;
+        public string screeningId { get; set; } = string.Empty;
 
         [BsonElement("interviewDate")]
-        public DateTime InterviewDate { get; set; } = DateTime.UtcNow;
+        public DateTime interviewDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("healthFacility")]
-        public string HealthFacility { get; set; } = string.Empty;
+        public string healthFacility { get; set; } = string.Empty;
 
         [BsonElement("DoB")]
         public DateTime DoB { get; set; }
@@ -27,87 +27,87 @@ namespace KemriApi.Models
         public AgeInfo Age { get; set; } = new();
 
         [BsonElement("height")]
-        public double Height { get; set; }
+        public double height { get; set; }
 
         [BsonElement("weight")]
-        public double Weight { get; set; }
+        public double weight { get; set; }
 
         [BsonElement("BMI")]
         public double BMI { get; set; }
 
         [BsonElement("vitalSigns")]
-        public VitalSignsInfo VitalSigns { get; set; } = new();
+        public VitalSignsInfo vitalSigns { get; set; } = new();
 
         [BsonElement("lastMenstrualPeriod")]
-        public LmpInfo LastMenstrualPeriod { get; set; } = new();
+        public LmpInfo lastMenstrualPeriod { get; set; } = new();
 
         [BsonElement("fundalHeight")]
-        public double FundalHeight { get; set; }
+        public double fundalHeight { get; set; }
 
         [BsonElement("inclusionCriteria")]
-        public InclusionCriteriaInfo InclusionCriteria { get; set; } = new();
+        public InclusionCriteriaInfo inclusionCriteria { get; set; } = new();
 
         [BsonElement("exclusionCriteria")]
-        public ExclusionCriteriaInfo ExclusionCriteria { get; set; } = new();
+        public ExclusionCriteriaInfo exclusionCriteria { get; set; } = new();
 
         [BsonElement("eligibility")]
-        public EligibilityInfo Eligibility { get; set; } = new();
+        public EligibilityInfo eligibility { get; set; } = new();
 
         [BsonElement("createdAt")]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime createdAt { get; set; } = DateTime.UtcNow;
 
         [BsonElement("updatedAt")]
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime updatedAt { get; set; } = DateTime.UtcNow;
     }
 
     public class LmpInfo
     {
         [BsonElement("date")]
-        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public DateTime date { get; set; } = DateTime.UtcNow;
 
         [BsonElement("unknown")]
-        public bool Unknown { get; set; }
+        public bool unknown { get; set; }
     }
 
     public class InclusionCriteriaInfo
     {
         [BsonElement("residentWithin15km")]
-        public string ResidentWithin15km { get; set; } = "No";
+        public string residentWithin15km { get; set; } = "No";
 
         [BsonElement("pregnancyConfirmed")]
-        public string PregnancyConfirmed { get; set; } = "No";
+        public string pregnancyConfirmed { get; set; } = "No";
 
         [BsonElement("gestationLessThan31Weeks")]
-        public string GestationLessThan31Weeks { get; set; } = "No";
+        public string gestationLessThan31Weeks { get; set; } = "No";
 
         [BsonElement("consentsToHIVTesting")]
-        public string ConsentsToHIVTesting { get; set; } = "No";
+        public string consentsToHIVTesting { get; set; } = "No";
 
         [BsonElement("willingToDeliverAtStudyHospital")]
-        public string WillingToDeliverAtStudyHospital { get; set; } = "No";
+        public string willingToDeliverAtStudyHospital { get; set; } = "No";
     }
 
     public class ExclusionCriteriaInfo
     {
         [BsonElement("multiplePregancy")]
-        public string MultiplePregancy { get; set; } = "No";
+        public string multiplePregancy { get; set; } = "No";
 
         [BsonElement("fisturaRepairOrSpinalDeformity")]
-        public string FisturaRepairOrSpinalDeformity { get; set; } = "No";
+        public string fisturaRepairOrSpinalDeformity { get; set; } = "No";
 
         [BsonElement("unableToGiveInformedConsent")]
-        public string UnableToGiveInformedConsent { get; set; } = "No";
+        public string unableToGiveInformedConsent { get; set; } = "No";
     }
 
     public class EligibilityInfo
     {
         [BsonElement("meetsAllCriteria")]
-        public string MeetsAllCriteria { get; set; } = "No";
+        public string meetsAllCriteria { get; set; } = "No";
 
         [BsonElement("consentedToParticipate")]
-        public string ConsentedToParticipate { get; set; } = "No";
+        public string consentedToParticipate { get; set; } = "No";
 
         [BsonElement("reasonForRefusal")]
-        public string? ReasonForRefusal { get; set; }
+        public string? reasonForRefusal { get; set; }
     }
 }

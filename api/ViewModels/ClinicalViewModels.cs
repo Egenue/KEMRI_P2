@@ -2,13 +2,13 @@ using KemriApi.Models;
 
 namespace KemriApi.ViewModels
 {
-    public class AncVisitRequest : AncVisit
+    public class AncVisitRequest : ancVisit
     {
         public string? UserInitials { get; set; }
         public string? Reason { get; set; }
     }
 
-    public class GestationAgeRequest : GestationAge
+    public class GestationAgeRequest : gestationAge
     {
         public string? UserInitials { get; set; }
         public string? Reason { get; set; }

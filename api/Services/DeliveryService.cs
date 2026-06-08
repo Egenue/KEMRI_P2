@@ -30,19 +30,19 @@ namespace KemriApi.Services
             var exists = await GetDeliveryByScreeningIdAsync(request.DeliveryScreeningId);
             if (exists != null) return null;
 
-            await _context.DeliveryForms.InsertOneAsync(request);
+            await _context.deliveryForm.InsertOneAsync(request);
             await _auditService.LogAuditAsync("CREATE", "Delivery Form", request.DeliveryScreeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
         public async Task<List<DeliveryForm>> GetAllDeliveriesAsync()
         {
-            return await _context.DeliveryForms.Find(_ => true).ToListAsync();
+            return await _context.deliveryForm.Find(_ => true).ToListAsync();
         }
 
         public async Task<DeliveryForm?> GetDeliveryByScreeningIdAsync(string screeningId)
         {
-            return await _context.DeliveryForms.Find(f => f.DeliveryScreeningId == screeningId).FirstOrDefaultAsync();
+            return await _context.deliveryForm.Find(f => f.DeliveryScreeningId == screeningId).FirstOrDefaultAsync();
         }
 
         public async Task<DeliveryForm?> UpdateDeliveryAsync(string screeningId, DeliveryRequestModel request)
@@ -51,7 +51,7 @@ namespace KemriApi.Services
             if (oldValue == null) return null;
 
             request.Id = oldValue.Id;
-            await _context.DeliveryForms.ReplaceOneAsync(f => f.DeliveryScreeningId == screeningId, request);
+            await _context.deliveryForm.ReplaceOneAsync(f => f.DeliveryScreeningId == screeningId, request);
             await _auditService.LogAuditAsync("UPDATE", "Delivery Form", screeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Data update", oldValue, request);
             return request;
         }
@@ -61,7 +61,7 @@ namespace KemriApi.Services
             var oldValue = await GetDeliveryByScreeningIdAsync(screeningId);
             if (oldValue == null) return false;
 
-            var result = await _context.DeliveryForms.DeleteOneAsync(f => f.DeliveryScreeningId == screeningId);
+            var result = await _context.deliveryForm.DeleteOneAsync(f => f.DeliveryScreeningId == screeningId);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "Delivery Form", screeningId, userInitials, reason, oldValue, null);

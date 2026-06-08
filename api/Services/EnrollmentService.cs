@@ -31,22 +31,22 @@ namespace KemriApi.Services
             if (exists != null) return null;
 
             // Validate parent screening exists
-            var parent = await _context.ScreeningForms.Find(f => f.ScreeningId == request.ScreeningId).FirstOrDefaultAsync();
+            var parent = await _context.screeningForm.Find(f => f.ScreeningId == request.ScreeningId).FirstOrDefaultAsync();
             if (parent == null) return null;
 
-            await _context.EnrollmentForms.InsertOneAsync(request);
+            await _context.enrollmentForm.InsertOneAsync(request);
             await _auditService.LogAuditAsync("CREATE", "Enrollment Form", request.ScreeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
         public async Task<List<EnrollmentForm>> GetAllEnrollmentsAsync()
         {
-            return await _context.EnrollmentForms.Find(_ => true).ToListAsync();
+            return await _context.enrollmentForm.Find(_ => true).ToListAsync();
         }
 
         public async Task<EnrollmentForm?> GetEnrollmentByScreeningIdAsync(string screeningId)
         {
-            return await _context.EnrollmentForms.Find(f => f.ScreeningId == screeningId).FirstOrDefaultAsync();
+            return await _context.enrollmentForm.Find(f => f.ScreeningId == screeningId).FirstOrDefaultAsync();
         }
 
         public async Task<EnrollmentForm?> UpdateEnrollmentAsync(string screeningId, EnrollmentRequest request)
@@ -55,7 +55,7 @@ namespace KemriApi.Services
             if (oldValue == null) return null;
 
             request.Id = oldValue.Id;
-            await _context.EnrollmentForms.ReplaceOneAsync(f => f.ScreeningId == screeningId, request);
+            await _context.enrollmentForm.ReplaceOneAsync(f => f.ScreeningId == screeningId, request);
             await _auditService.LogAuditAsync("UPDATE", "Enrollment Form", screeningId, request.UserInitials ?? "SYSTEM", request.Reason ?? "Data update", oldValue, request);
             return request;
         }
@@ -65,7 +65,7 @@ namespace KemriApi.Services
             var oldValue = await GetEnrollmentByScreeningIdAsync(screeningId);
             if (oldValue == null) return false;
 
-            var result = await _context.EnrollmentForms.DeleteOneAsync(f => f.ScreeningId == screeningId);
+            var result = await _context.enrollmentForm.DeleteOneAsync(f => f.ScreeningId == screeningId);
             if (result.DeletedCount > 0)
             {
                 await _auditService.LogAuditAsync("DELETE", "Enrollment Form", screeningId, userInitials, reason, oldValue, null);

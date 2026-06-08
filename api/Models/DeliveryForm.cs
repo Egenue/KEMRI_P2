@@ -3,160 +3,160 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
 {
-    public class DeliveryForm
+    public class deliveryForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
         [BsonElement("interviewDate")]
-        public DateTime InterviewDate { get; set; } = DateTime.UtcNow;
+        public DateTime interviewDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("deliveryScreeningId")]
-        public string DeliveryScreeningId { get; set; } = string.Empty;
+        public string deliveryScreeningId { get; set; } = string.Empty;
 
         [BsonElement("physicalExam")]
-        public DeliveryPhysicalExamInfo PhysicalExam { get; set; } = new();
+        public DeliveryPhysicalExamInfo physicalExam { get; set; } = new();
 
         [BsonElement("bodyMassIndex")]
-        public BmiInfo BodyMassIndex { get; set; } = new();
+        public BmiInfo bodyMassIndex { get; set; } = new();
 
         [BsonElement("motherAbnormality")]
-        public MotherAbnormalityInfo MotherAbnormality { get; set; } = new();
+        public MotherAbnormalityInfo motherAbnormality { get; set; } = new();
 
         [BsonElement("deliveryHistory")]
-        public DeliveryHistoryInfo DeliveryHistory { get; set; } = new();
+        public DeliveryHistoryInfo deliveryHistory { get; set; } = new();
 
         [BsonElement("closeOut")]
-        public DeliveryCloseOutInfo? CloseOut { get; set; }
+        public DeliveryCloseOutInfo? closeOut { get; set; }
     }
 
     public class DeliveryPhysicalExamInfo
     {
         [BsonElement("motherWeight")]
-        public double MotherWeight { get; set; }
+        public double motherWeight { get; set; }
 
         [BsonElement("vitalSigns")]
-        public DeliveryVitalSignsInfo VitalSigns { get; set; } = new();
+        public DeliveryVitalSignsInfo vitalSigns { get; set; } = new();
     }
 
     public class DeliveryVitalSignsInfo
     {
         [BsonElement("temperature")]
-        public TemperatureInfo Temperature { get; set; } = new();
+        public TemperatureInfo temperature { get; set; } = new();
 
         [BsonElement("respiratoryRate")]
-        public int RespiratoryRate { get; set; }
+        public int respiratoryRate { get; set; }
 
         [BsonElement("pulseRate")]
-        public int PulseRate { get; set; }
+        public int pulseRate { get; set; }
 
         [BsonElement("bloodPressure")]
-        public BloodPressureInfo BloodPressure { get; set; } = new();
+        public BloodPressureInfo bloodPressure { get; set; } = new();
 
         [BsonElement("oxygenSaturation")]
-        public OxygenSaturationInfo OxygenSaturation { get; set; } = new();
+        public OxygenSaturationInfo oxygenSaturation { get; set; } = new();
     }
 
     public class OxygenSaturationInfo
     {
         [BsonElement("oxygenValue")]
-        public double OxygenValue { get; set; }
+        public double oxygenValue { get; set; }
 
         [BsonElement("oxygenOptions")]
-        public string OxygenOptions { get; set; } = string.Empty;
+        public string oxygenOptions { get; set; } = string.Empty;
     }
 
     public class BmiInfo
     {
         [BsonElement("value")]
-        public double? Value { get; set; }
+        public double? value { get; set; }
 
         [BsonElement("unknown")]
-        public bool Unknown { get; set; }
+        public bool unknown { get; set; }
     }
 
     public class MotherAbnormalityInfo
     {
         [BsonElement("motherAbnomValue")]
-        public string MotherAbnomValue { get; set; } = string.Empty;
+        public string motherAbnomValue { get; set; } = string.Empty;
 
         [BsonElement("specifics")]
-        public string? Specifics { get; set; }
+        public string? specifics { get; set; }
     }
 
     public class DeliveryHistoryInfo
     {
         [BsonElement("deliveryDate")]
-        public DateTime DeliveryDate { get; set; } = DateTime.UtcNow;
+        public DateTime deliveryDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("deliveryTime")]
-        public string DeliveryTime { get; set; } = string.Empty;
+        public string deliveryTime { get; set; } = string.Empty;
 
         [BsonElement("deliveryPlace")]
-        public DeliveryPlaceInfo DeliveryPlace { get; set; } = new();
+        public DeliveryPlaceInfo deliveryPlace { get; set; } = new();
 
         [BsonElement("deliveryPersonnel")]
-        public DeliveryPersonnelInfo DeliveryPersonnel { get; set; } = new();
+        public DeliveryPersonnelInfo deliveryPersonnel { get; set; } = new();
 
         [BsonElement("deliveryMode")]
-        public DeliveryModeInfo DeliveryMode { get; set; } = new();
+        public DeliveryModeInfo deliveryMode { get; set; } = new();
     }
 
     public class DeliveryPlaceInfo
     {
         [BsonElement("deliveryChoices")]
-        public string? DeliveryChoices { get; set; }
+        public string? deliveryChoices { get; set; }
 
         [BsonElement("otherLocation")]
-        public string? OtherLocation { get; set; }
+        public string? otherLocation { get; set; }
 
         [BsonElement("otherFacility")]
-        public string? OtherFacility { get; set; }
+        public string? otherFacility { get; set; }
     }
 
     public class DeliveryPersonnelInfo
     {
         [BsonElement("deliveryPersValue")]
-        public string? DeliveryPersValue { get; set; }
+        public string? deliveryPersValue { get; set; }
 
         [BsonElement("otherPersonnel")]
-        public string? OtherPersonnel { get; set; }
+        public string? otherPersonnel { get; set; }
     }
 
     public class DeliveryModeInfo
     {
         [BsonElement("choices")]
-        public string? Choices { get; set; }
+        public string? choices { get; set; }
 
         [BsonElement("otherMode")]
         public string? OtherMode { get; set; }
 
         [BsonElement("csectionIndication")]
-        public CSectionIndicationInfo? CSectionIndication { get; set; }
+        public CSectionIndicationInfo? csectionIndication { get; set; }
     }
 
     public class CSectionIndicationInfo
     {
         [BsonElement("csectOptions")]
-        public string? CSectOptions { get; set; }
+        public string? csectOptions { get; set; }
 
         [BsonElement("otherOption")]
-        public string? OtherOption { get; set; }
+        public string? otherOption { get; set; }
     }
 
     public class DeliveryCloseOutInfo
     {
         [BsonElement("closeOutInterviewDate")]
-        public DateTime? CloseOutInterviewDate { get; set; }
+        public DateTime? closeOutInterviewDate { get; set; }
 
         [BsonElement("sreeningId")]
-        public string? ScreeningId { get; set; }
+        public string? sreeningId { get; set; }
 
         [BsonElement("dateOfTermination")]
-        public DateTime? DateOfTermination { get; set; }
+        public DateTime? dateOfTermination { get; set; }
 
         [BsonElement("participantStatus")]
-        public ParticipantStatusInfo? ParticipantStatus { get; set; }
+        public ParticipantStatusInfo? participantStatus { get; set; }
     }
 }
