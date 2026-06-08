@@ -22,10 +22,10 @@ namespace KemriApi.Models
         public string UserInitials { get; set; } = string.Empty;
 
         [BsonElement("oldValue")]
-        public object? OldValue { get; set; }
+        public BsonValue? OldValue { get; set; }
 
         [BsonElement("newValue")]
-        public object? NewValue { get; set; }
+        public BsonValue? NewValue { get; set; }
 
         [BsonElement("reason")]
         public string Reason { get; set; } = string.Empty;

@@ -1,6 +1,10 @@
 using KemriApi.Data;
 using KemriApi.Services;
 using Scalar.AspNetCore;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using KemriApi.ViewModels;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +26,11 @@ builder.Services.AddScoped<ICloseoutService, CloseoutService>();
 builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IGestationAgeService, GestationAgeService>();
+
+// Whitelist specific mapping models for loose Object serialization
+Func<Type, bool> allowedTypes = x => x == typeof(ScreeningRequest) || x.FullName.StartsWith("KemriApi.Models");
+BsonSerializer.RegisterSerializer(new ObjectSerializer(allowedTypes));
+
 
 // Configure CORS
 var allowedOrigins = builder.Configuration.GetSection("CORS_ORIGIN").Get<string>()?.Split(',') 

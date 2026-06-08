@@ -7,9 +7,9 @@ namespace KemriApi.Services
 {
     public interface IAncVisitService
     {
-        Task<AncVisit?> CreateAncVisitAsync(AncVisitRequest request);
-        Task<List<AncVisit>> GetAllAncVisitsAsync();
-        Task<AncVisit?> GetAncVisitByNumberAsync(string visitNumber);
+        Task<ancVisit?> CreateAncVisitAsync(AncVisitRequest request);
+        Task<List<ancVisit>> GetAllAncVisitsAsync();
+        Task<ancVisit?> GetAncVisitByNumberAsync(string visitNumber);
         Task<bool> DeleteAncVisitAsync(string visitNumber, string userInitials, string reason);
     }
 
@@ -24,19 +24,19 @@ namespace KemriApi.Services
             _auditService = auditService;
         }
 
-        public async Task<AncVisit?> CreateAncVisitAsync(AncVisitRequest request)
+        public async Task<ancVisit?> CreateAncVisitAsync(AncVisitRequest request)
         {
             await _context.AncVisits.InsertOneAsync(request);
             await _auditService.LogAuditAsync("CREATE", "ANC Visit", request.VisitNumber, request.UserInitials ?? "SYSTEM", request.Reason ?? "Initial Entry", null, request);
             return request;
         }
 
-        public async Task<List<AncVisit>> GetAllAncVisitsAsync()
+        public async Task<List<ancVisit>> GetAllAncVisitsAsync()
         {
             return await _context.AncVisits.Find(_ => true).ToListAsync();
         }
 
-        public async Task<AncVisit?> GetAncVisitByNumberAsync(string visitNumber)
+        public async Task<ancVisit?> GetAncVisitByNumberAsync(string visitNumber)
         {
             return await _context.AncVisits.Find(v => v.VisitNumber == visitNumber).FirstOrDefaultAsync();
         }

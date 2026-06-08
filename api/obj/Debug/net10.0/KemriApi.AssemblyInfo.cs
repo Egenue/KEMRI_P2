@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KemriApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7dd5f963aa25c4252b1b18fa9c64e0317fa435f1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c72b6e84b937a0c10163eb667c667ca8cfe1b53")]
 [assembly: System.Reflection.AssemblyProductAttribute("KemriApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KemriApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

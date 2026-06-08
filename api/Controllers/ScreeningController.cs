@@ -26,7 +26,7 @@ namespace KemriApi.Controllers
             return Ok(new { message = "Successful!! Form saved", data = result });
         }
 
-        [HttpGet("getScreeninForms")]
+        [HttpGet("getScreeningForms")]
         public async Task<IActionResult> GetAllScreenings()
         {
             var result = await _screeningService.GetAllScreeningsAsync();

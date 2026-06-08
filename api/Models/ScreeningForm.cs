@@ -2,12 +2,14 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace KemriApi.Models
-{
-    public class ScreeningForm
+{    public class ScreeningForm
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
+
+        [BsonElement("UserInitials")]
+        public string UserInitials { get; set; } = string.Empty;
 
         [BsonElement("screeningId")]
         public string ScreeningId { get; set; } = string.Empty;
