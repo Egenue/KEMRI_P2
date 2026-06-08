@@ -9,3 +9,8 @@ KEMRI_P2*
 BMICalc.txt
 .env.example
 dist
+bin/
+obj
+Properties/
+*.log
+
