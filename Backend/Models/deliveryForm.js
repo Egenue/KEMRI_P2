@@ -130,7 +130,7 @@ const deliveryFormSchema = new mongoose.Schema(
         deliveryMode:{
             choices:{
                 type: String,
-                enum:["Spontaneous vaginal delivery (Normal", "Episiotomy",
+                enum:["Spontaneous vaginal delivery (Normal)", "Episiotomy",
                     "Vacuum", "Forceps", "C-section", "Other"]
             },
             otherMode:{
@@ -157,80 +157,6 @@ const deliveryFormSchema = new mongoose.Schema(
                         return this.deliveryHistory && this.deliveryHistory.deliveryMode && 
                                this.deliveryHistory.deliveryMode.csectionIndication && 
                                this.deliveryHistory.deliveryMode.csectionIndication.csectOptions === "Other"
-                    }
-                }
-            }
-        }
-    },
-    closeOut:{
-        closeOutInterviewDate:{
-            type: Date,
-            required: false,
-            default: Date.now
-        },
-        sreeningId:{
-            type: String,
-            unique: true,
-            sparse: true,
-            required: false
-        },
-        dateOfTermination:{
-            type: Date,
-            required: false,
-            default: Date.now
-        },
-        participantStatus:{
-            choicesStudy:{
-                type: String,
-                enum:["Completed study visits", "Participation terminated prior to completion of study visits",
-                "Screen failure before enrollment"],
-                required: false
-            },
-            incompleteReason:{
-                incompletionOptions:{
-                    type: String,
-                    enum:["Adverse event","Death", "Lost to follow-up","Physician decision", "Protocol deviation", "Screen failure",
-                    "Study terminated by sponsor", "Withdrawal by participant", "Other"],
-                    required: false
-                },
-                adverseEvent:{
-                    type: String,
-                    required: function(){
-                        return this.closeOut && this.closeOut.participantStatus && 
-                               this.closeOut.participantStatus.incompleteReason && 
-                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Adverse event"
-                    }
-                },
-                deathOption:{
-                    type: Date,
-                    required: function (){
-                        return this.closeOut && this.closeOut.participantStatus && 
-                               this.closeOut.participantStatus.incompleteReason && 
-                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Death"
-                    }
-                },
-                protocalDeviation:{
-                    type: String,
-                    required: function (){
-                        return this.closeOut && this.closeOut.participantStatus && 
-                               this.closeOut.participantStatus.incompleteReason && 
-                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Protocol deviation"
-                    }
-                },
-                withdrawalReason:{
-                    type: String,
-                    required: function (){
-                        return this.closeOut && this.closeOut.participantStatus && 
-                               this.closeOut.participantStatus.incompleteReason && 
-                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Withdrawal by participant"
-                    }
-                },
-                otherReason:{
-                    type: String,
-                    required: function (){
-                        return this.closeOut && this.closeOut.participantStatus && 
-                               this.closeOut.participantStatus.incompleteReason && 
-                               this.closeOut.participantStatus.incompleteReason.incompletionOptions === "Other"
                     }
                 }
             }

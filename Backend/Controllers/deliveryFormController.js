@@ -10,7 +10,6 @@ const createDeliveryForm = async (req, res) => {
             bodyMassIndex = {},
             motherAbnormality = {},
             deliveryHistory = {},
-            closeOut = {},
             userInitials,
             reason
         } = req.body;
@@ -30,8 +29,7 @@ const createDeliveryForm = async (req, res) => {
             physicalExam,
             bodyMassIndex,
             motherAbnormality,
-            deliveryHistory,
-            closeOut
+            deliveryHistory
         });
 
         await newDeliveryForm.save();
@@ -46,7 +44,11 @@ const createDeliveryForm = async (req, res) => {
         });
         return res.status(200).json({ "message": "Data saved successfully", data: newDeliveryForm });
     } catch (error) {
-        return res.status(500).json({ "message": "Error, Could not create new form", error: error.message });
+        return res.status(500).json({ 
+            "message": "Error, Could not create new form", 
+            error: error.message,
+            details: error.errors || error 
+        });
     }
 }
 

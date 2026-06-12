@@ -146,7 +146,7 @@ export interface DeliveryRecord extends AuditFields {
       otherPersonnel?: string;
     };
     deliveryMode: {
-      choices: "Spontaneous vaginal delivery (Normal" | "Episiotomy" | "Vacuum" | "Forceps" | "C-section" | "Other";
+      choices: "Spontaneous vaginal delivery (Normal)" | "Episiotomy" | "Vacuum" | "Forceps" | "C-section" | "Other";
       otherMode?: string;
       csectionIndication?: {
         csectOptions: "Prolonged labour" | "Fetal distress" | "Meconium-stained amniotic fluid" | "Antepartum hemorrhage" | "Pre-eclempic toxemia" | "cephalopelvic disproportion" | "Malpresentation" | "Elective C-section" | "Pregnancy-induced hypertension" | "Other" | "Don't know";

@@ -23,7 +23,9 @@ async function apiRequest<T>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const errorMessage = errorData.message || errorData.error || `HTTP ${response.status}: ${response.statusText}`;
+      const errorMessage = errorData.error 
+        ? `${errorData.message}: ${errorData.error}` 
+        : (errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       throw new Error(errorMessage);
     }
 

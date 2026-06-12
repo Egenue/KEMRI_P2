@@ -44,7 +44,7 @@ const ancVisitSchema = new mongoose.Schema({
     },
     complaints:{
         type: String,
-        requrd: true,
+        required: true,
         default: 'None'
     },
     medicationGiven:{

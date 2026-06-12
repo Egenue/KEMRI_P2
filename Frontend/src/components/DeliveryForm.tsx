@@ -60,7 +60,7 @@ export default function DeliveryForm({
   const [deliveryLocationSpecify, setDeliveryLocationSpecify] = useState('');
   const [deliveredBy, setDeliveredBy] = useState<'Doctor' | 'Clinical Officer' | 'Nurse' | 'Midwife' | 'Traditional Birth Attendant' | 'Village Health Worker' | 'Other' | 'Don\'t know'>('Nurse');
   const [deliveredBySpecify, setDeliveredBySpecify] = useState('');
-  const [modeOfDelivery, setModeOfDelivery] = useState<'Spontaneous vaginal delivery (Normal' | 'Episiotomy' | 'Vacuum' | 'Forceps' | 'C-section' | 'Other'>('Spontaneous vaginal delivery (Normal');
+  const [modeOfDelivery, setModeOfDelivery] = useState<'Spontaneous vaginal delivery (Normal)' | 'Episiotomy' | 'Vacuum' | 'Forceps' | 'C-section' | 'Other'>('Spontaneous vaginal delivery (Normal)');
   const [modeOfDeliverySpecify, setModeOfDeliverySpecify] = useState('');
   const [cSectionIndication, setCSectionIndication] = useState<'Prolonged labour' | 'Fetal distress' | 'Meconium-stained amniotic fluid' | 'Antepartum hemorrhage' | 'Pre-eclempic toxemia' | 'cephalopelvic disproportion' | 'Malpresentation' | 'Elective C-section' | 'Pregnancy-induced hypertension' | 'Other' | 'Don\'t know' | ''>('');
   const [cSectionIndicationOther, setCSectionIndicationOther] = useState('');
@@ -687,7 +687,7 @@ export default function DeliveryForm({
                 className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
                 id="f3-delivery-mode"
               >
-                <option value="Spontaneous vaginal delivery (Normal">Spontaneous vaginal delivery (Normal)</option>
+                <option value="Spontaneous vaginal delivery (Normal)">Spontaneous vaginal delivery (Normal)</option>
                 <option value="Episiotomy">Episiotomy</option>
                 <option value="Vacuum">Vacuum</option>
                 <option value="Forceps">Forceps</option>
