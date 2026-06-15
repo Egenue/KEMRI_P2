@@ -17,6 +17,7 @@ export const getDatabase = (): DatabaseState => {
     delivery: [],
     closeout: [],
     gestation: [],
+    anc: [],
   };
 };
 

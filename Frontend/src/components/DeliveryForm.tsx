@@ -62,7 +62,7 @@ export default function DeliveryForm({
   const [deliveredBySpecify, setDeliveredBySpecify] = useState('');
   const [modeOfDelivery, setModeOfDelivery] = useState<'Spontaneous vaginal delivery (Normal)' | 'Episiotomy' | 'Vacuum' | 'Forceps' | 'C-section' | 'Other'>('Spontaneous vaginal delivery (Normal)');
   const [modeOfDeliverySpecify, setModeOfDeliverySpecify] = useState('');
-  const [cSectionIndication, setCSectionIndication] = useState<'Prolonged labour' | 'Fetal distress' | 'Meconium-stained amniotic fluid' | 'Antepartum hemorrhage' | 'Pre-eclempic toxemia' | 'cephalopelvic disproportion' | 'Malpresentation' | 'Elective C-section' | 'Pregnancy-induced hypertension' | 'Other' | 'Don\'t know' | ''>('');
+  const [cSectionIndication, setCSectionIndication] = useState<'Prolonged labour' | 'Fetal distress' | 'Meconium-stained amniotic fluid' | 'Antepartum hemorrhage' | 'Pre-eclempic toxemia' | 'cephalopelvic disproportion' | 'Malpresentation' | 'Elective C-section' | 'Pregnancy-induced hypertension' | 'Other' | 'Don\'t know' >('Prolonged labour');
   const [cSectionIndicationOther, setCSectionIndicationOther] = useState('');
 
   // Dropdown list computation
@@ -121,7 +121,7 @@ export default function DeliveryForm({
       setDeliveredBySpecify(existingRecord.deliveryHistory.deliveryPersonnel.otherPersonnel || '');
       setModeOfDelivery(existingRecord.deliveryHistory.deliveryMode.choices);
       setModeOfDeliverySpecify(existingRecord.deliveryHistory.deliveryMode.otherMode || '');
-      setCSectionIndication(existingRecord.deliveryHistory.deliveryMode.csectionIndication?.csectOptions || '');
+      setCSectionIndication(existingRecord.deliveryHistory.deliveryMode.csectionIndication?.csectOptions || 'Prolonged labour');
       setCSectionIndicationOther(existingRecord.deliveryHistory.deliveryMode.csectionIndication?.otherOption || '');
     } else {
       const todayISO = new Date().toISOString().split('T')[0];

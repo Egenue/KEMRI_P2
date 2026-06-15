@@ -724,6 +724,7 @@ export default function MaternitySystem({ currentUser, onLogout, showToast }: Ma
                 navigate('/records');
               }}
               existingRecord={editTable === 'anc' ? editRecord : undefined}
+              deliveredRecords={db.delivery}
               enrolledRecords={db.enrolment}
               ancRecords={db.anc}
               userInitials={currentUser.initials}

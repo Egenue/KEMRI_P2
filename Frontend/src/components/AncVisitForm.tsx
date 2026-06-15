@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Check, X, FileText, Calendar, Weight, Activity, AlertCircle, ChevronDown } from 'lucide-react';
-import { EnrolmentRecord, AncVisitRecord } from '../types';
+import { Check, Activity } from 'lucide-react';
+import { DeliveryRecord, AncVisitRecord, ScreeningRecord, EnrolmentRecord } from '../types';
 import { 
   validateBloodPressure, 
   validateBMI
@@ -12,6 +11,7 @@ interface AncVisitFormProps {
   onSave: (record: any) => void;
   onCancel: () => void;
   existingRecord?: AncVisitRecord;
+  deliveredRecords: DeliveryRecord[];
   enrolledRecords: EnrolmentRecord[];
   ancRecords: AncVisitRecord[];
   userInitials: string;
@@ -22,6 +22,7 @@ export default function AncVisitForm({
   onSave,
   onCancel,
   existingRecord,
+  deliveredRecords,
   enrolledRecords,
   ancRecords,
   userInitials,
@@ -155,13 +156,12 @@ export default function AncVisitForm({
               onChange={(e) => handleIdSelection(e.target.value)}
               className="block w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-900 text-sm"
             >
-              <option value="">-- Select Enrolled Subject --</option>
-              {enrolledRecords.map(p => (
-                <option key={p.screeningId} value={p.screeningId}>{p.screeningId}</option>
+              <option value="">-- Select Delivered Subject --</option>
+              {deliveredRecords.map(p => (
+                <option key={p.deliveryScreeningId} value={p.deliveryScreeningId}>{p.deliveryScreeningId}</option>
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-[11px] font-bold text-slate-600 mb-1.5 uppercase tracking-wider">
               Visit Number (Auto)
