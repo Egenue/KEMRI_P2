@@ -6,7 +6,7 @@ import { createScreeningForm, getAllSreeningForms, getOneScreeningForm, updateSc
 import { createCloseoutForm, getAllCloseoutForms, getOneCloseoutForm, updateCloseoutForm, deleteCloseoutForm } from '../Controllers/closeoutFormController.js';
 import { createGestAge, getAllGestAge, getOneGestAge, updateGestAge, deleteGestAge } from '../Controllers/gestationAge.js';
 import {createAncVisit, getOneAnc, getAllAnc, deleteOneAnc} from '../Controllers/ancVisitController.js';
-
+import {logAudit, getAudit} from "../Utils/auditHelper.js";
 const router = express.Router();
 
 // Login routes
@@ -23,7 +23,7 @@ router.get("/getOneEnrollment/:id", getOneEnrollmentForm);
 router.put("/updateEnrollment/:id", updateEnrollmentForm);
 router.delete("/deleteOne/:id", deleteEnrollmentForm);
 
-// Delivery Form Routes
+// Delivery Form Routesx
 router.post('/createDelivery', createDeliveryForm);
 router.get('/getDelivery', getdeliveryForms);
 router.get('/getoneDelivery/:id', getOneDeliveryForm);
@@ -57,5 +57,8 @@ router.get('/getAncVisit', getAllAnc);
 router.get('/getOneAnc/:visitNumber', getOneAnc);
 router.delete('/deleteAnc/:visitNumber', deleteOneAnc);
 
+// AuditLog Routes
+router.post('/createAudit', logAudit);
+router.post('/getAuditLog', getAudit);
 
 export default router;
