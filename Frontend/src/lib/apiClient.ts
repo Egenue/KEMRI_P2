@@ -269,6 +269,12 @@ export const ancVisitAPI = {
   },
 };
 
+export const auditAPI = {
+  async getAllAuditLogs() {
+    return apiRequest('/getAuditLog', { method: 'GET' });
+  },
+};
+
 export const apiClient = {
   login: loginAPI,
   screening: screeningAPI,
@@ -277,6 +283,7 @@ export const apiClient = {
   closeout: closeoutAPI,
   gestation: gestationAgeAPI,
   anc: ancVisitAPI,
+  audit: auditAPI,
 };
 
 export default apiClient;

@@ -6,7 +6,8 @@ import { createScreeningForm, getAllSreeningForms, getOneScreeningForm, updateSc
 import { createCloseoutForm, getAllCloseoutForms, getOneCloseoutForm, updateCloseoutForm, deleteCloseoutForm } from '../Controllers/closeoutFormController.js';
 import { createGestAge, getAllGestAge, getOneGestAge, updateGestAge, deleteGestAge } from '../Controllers/gestationAge.js';
 import {createAncVisit, getOneAnc, getAllAnc, deleteOneAnc} from '../Controllers/ancVisitController.js';
-import {logAudit, getAudit} from "../Utils/auditHelper.js";
+import {logAudit} from "../Utils/auditHelper.js";
+import { getAudit } from '../Controllers/auditLogController.js';
 const router = express.Router();
 
 // Login routes
