@@ -99,7 +99,7 @@ const getOneScreeningForm = async (req, res) => {
         if (!existing) {
             return res.status(404).json({ "message": "The screening form was not found !!" });
         } else {
-            return res.status(200).json({ "message": "Screening form found !!", data: existing });
+            return res.status(200).json({ existing });
         }
 
     } catch (error) {
@@ -110,7 +110,7 @@ const getOneScreeningForm = async (req, res) => {
 const getAllSreeningForms = async (req, res) => {
     try {
         const screeningDocs = await screeningForm.find({});
-        return res.status(200).json({ "message": "Screening forms found !!", data: screeningDocs });
+        return res.status(200).json({screeningDocs});
     } catch (error) {
         return res.status(500).json({ "message": "Failed operation", error: error.message });
     }

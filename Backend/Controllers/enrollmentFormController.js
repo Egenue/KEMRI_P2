@@ -81,7 +81,7 @@ const newEnrollmentForm = async (req, res) => {
             newValue: newForm,
             reason: reason || 'Initial Entry'
         });
-        return res.status(200).json({ data: newForm });
+        return res.status(200).json({ newForm });
     } catch (error) {
         return res.status(500).json({ "message": "Could not create new Enrollment Form", error: error.message });
     }
@@ -94,7 +94,7 @@ const getOneEnrollmentForm = async (req, res) => {
         if (!enrolmentFormDoc) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
-            return res.status(200).json({ "message": "Enrollment form found", data: enrolmentFormDoc });
+            return res.status(200).json({enrolmentFormDoc });
         }
     } catch (error) {
         return res.status(500).json({ message: "Error, could not get enrollment form", error: error.message });

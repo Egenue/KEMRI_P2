@@ -61,7 +61,10 @@ const getLoginById = async (req, res) => {
         if (!loginData) {
             return res.status(404).json({ message: 'Login not found' });
         }
-        res.status(200).json(loginData);
+        else
+        {
+            res.status(200).json(loginData);
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
