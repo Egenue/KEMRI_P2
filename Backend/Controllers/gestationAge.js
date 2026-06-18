@@ -10,7 +10,7 @@ const getOneGestAge = async (req, res) =>{
         if(!exists){
             res.status(404).json({ });
         }else{
-            res.status(200).json({exists})
+            res.status(200).json(exists);
         }
 
     }catch(error){
@@ -21,7 +21,7 @@ const getOneGestAge = async (req, res) =>{
 const getAllGestAge = async (req, res) => {
     try{
         const datas = await gestationAge.find() ;
-        return res.status(200).json({datas});
+        return res.status(200).json(datas);
     }catch (error){
         return res.status(500).json({"message": error.message});
     }

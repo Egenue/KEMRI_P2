@@ -61,7 +61,7 @@ const getOneAnc = async(req, res) =>{
         if(!foundOne){
             return res.status(404).json({"message":"ANC Visit Form not found"});
         }else{
-            return res.status(200).json({foundOne});
+            return res.status(200).json(foundOne);
         }
     }catch(error){
         res.status(500).json({"message":"Error fetching ANC Visit Form", error: error.message});
@@ -71,7 +71,7 @@ const getOneAnc = async(req, res) =>{
 const getAllAnc = async (req, res) => {
     try{
         const allAnc = await ancVisit.find();
-        return res.status(200).json({allAnc});
+        return res.status(200).json(allAnc);
     }catch(error){
         return res.status(500).json({"message":"Error Getting ANC Forms", error: error.message});
     }

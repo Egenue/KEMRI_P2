@@ -47,7 +47,7 @@ const createCloseoutForm = async (req, res) => {
 const getAllCloseoutForms = async (req, res) => {
     try {
         const closeoutData = await closeoutForm.find({});
-        return res.status(200).json({ closeoutData });
+        return res.status(200).json(closeoutData);
     } catch (error) {
         return res.status(500).json({ "message": "ERROR!! Could not get closeout forms", error: error.message });
     }
@@ -61,7 +61,7 @@ const getOneCloseoutForm = async (req, res) => {
         if (!data) {
             return res.status(404).json({ "message": "Closeout form not found" });
         } else {
-            return res.status(200).json({ data });
+            return res.status(200).json(data);
         }
     } catch (error) {
         return res.status(500).json({ "message": "Operation failed", error: error.message });

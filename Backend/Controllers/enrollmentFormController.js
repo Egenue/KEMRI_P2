@@ -4,8 +4,8 @@ import { logAudit } from '../Utils/auditHelper.js';
  
 const getAllEnrollmentForms = async (req, res) => {
     try {
-        const enrollmentData = await EnrollmentForm.find({});
-        return res(enrollmentData);
+        const enrollmentData = await EnrollmentForm.find();
+        return res.status(200).json(enrollmentData);
     } catch (error) {
         return res.status(500).json({ "message": "Could not get all enrollment forms", error: error.message });
     }
@@ -94,7 +94,7 @@ const getOneEnrollmentForm = async (req, res) => {
         if (!enrolmentFormDoc) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
-            return res.status(200).json({enrolmentFormDoc });
+            return res.status(200).json(enrolmentFormDoc);
         }
     } catch (error) {
         return res.status(500).json({ message: "Error, could not get enrollment form", error: error.message });

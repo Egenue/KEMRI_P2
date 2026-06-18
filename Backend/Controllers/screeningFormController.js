@@ -110,7 +110,7 @@ const getOneScreeningForm = async (req, res) => {
 const getAllSreeningForms = async (req, res) => {
     try {
         const screeningDocs = await screeningForm.find({});
-        return res.status(200).json({screeningDocs});
+        return res.status(200).json(screeningDocs);
     } catch (error) {
         return res.status(500).json({ "message": "Failed operation", error: error.message });
     }

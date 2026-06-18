@@ -54,8 +54,8 @@ const createDeliveryForm = async (req, res) => {
 
 const getdeliveryForms = async (req, res) => {
     try {
-        const deliveryFormData = await deliveryForm.find({});
-        return res.status(200).json({deliveryFormData });
+        const deliveryFormData = await deliveryForm.find();
+        return res.status(200).json(deliveryFormData);
     } catch (error) {
         return res.status(500).json({ "message": "ERROR!! Could not get delivery forms", error: error.message });
     }
@@ -69,7 +69,7 @@ const getOneDeliveryForm = async (req, res) => {
         if (!delFormData) {
             return res.status(404).json({ "message": "Form not found !!" });
         } else {
-            return res.status(200).json({ delFormData });
+            return res.status(200).json(delFormData);
         }
     } catch (error) {
         return res.status(500).json({ "message": "Operation failed", error: error.message });
