@@ -41,19 +41,22 @@ const createGestAge = async (req, res) => {
             reason
         } = req.body;
 
+        const {usWeeks, usDays} = ultrasoundDate;
+        const {gestweeks, gestdays} = currentGestAge;
+
         const existing = await gestationAge.findOne({screeningId: screeningId})
         if(existing){
             return res.status(409).json({"message":"This already exists!!!"});
         }else{
             const newGest = new gestationAge({
-            screeningId,
-            lmp,
-            ultrasoundDate,
-            lmpCertainty,
-            enrolmentDate,
-            estDueDate,
-            currentGestAge
-        });
+                screeningId,
+                lmp,
+                ultrasoundDate,
+                lmpCertainty,
+                enrolmentDate,
+                estDueDate,
+                currentGestAge
+            });
 
             await newGest.save();
             await logAudit({
@@ -63,7 +66,7 @@ const createGestAge = async (req, res) => {
                 userInitials: userInitials || 'SYSTEM',
                 oldValue: null,
                 newValue: newGest,
-                reason: reason || 'Initial Entry'
+                reason: "Initial Entry"
             });
 
             return res.status(200).json({"message":"Success!!!"});
@@ -76,13 +79,11 @@ const createGestAge = async (req, res) => {
 
 const updateGestAge = async (req, res) => {
     try {
-        const { screeningId } = req.params;
-        const { userInitials, reason, ...updateData } = req.body;
-
-        const oldValue = await gestationAge.findOne({ screeningId });
+        const newForm = req.body;
+        const oldValue = await gestationAge.findOne({ screeningId: newForm.screeningId });
         const updated = await gestationAge.findOneAndUpdate(
-            { screeningId },
-            updateData,
+            { screeningId: newForm.screeningId },
+            newForm,
             { new: true, runValidators: true }
         );
 
@@ -97,7 +98,7 @@ const updateGestAge = async (req, res) => {
             userInitials: userInitials || 'SYSTEM',
             oldValue,
             newValue: updated,
-            reason: reason || 'Data update'
+            reason: 'Data update'
         });
 
         return res.status(200).json({ "message": "Update Success!!!", data: updated });
@@ -109,7 +110,7 @@ const updateGestAge = async (req, res) => {
 const deleteGestAge = async (req, res) => {
     try{
         const {screeningId} = req.params;
-        const { userInitials, reason } = req.body;
+        const { userInitials } = req.body;
 
         const oldValue = await gestationAge.findOne({ screeningId });
         const deleted = await gestationAge.findOneAndDelete({screeningId});
@@ -123,7 +124,7 @@ const deleteGestAge = async (req, res) => {
                 recordId: screeningId,
                 userInitials: userInitials || 'SYSTEM',
                 oldValue,
-                reason: reason || 'Record deletion'
+                reason:'Record deletion'
             });
             return res.status(200).json({"message":"Success!!!"})
         }

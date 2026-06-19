@@ -33,6 +33,15 @@ const newEnrollmentForm = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        const {months, years} = Age;
+        const { 
+            temperature = {},
+            respiratoryRate,
+            pulseRate,
+            bloodPressure = {}
+        } = vitalSigns;
+        const {value, location} = temperature;
+        const {systolic,diastolic} = bloodPressure;
 
         if (!screeningId || !DoB || !healthFacility) {
             return res.status(400).json({
@@ -89,8 +98,8 @@ const newEnrollmentForm = async (req, res) => {
 
 const getOneEnrollmentForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const enrolmentFormDoc = await EnrollmentForm.findOne({ screeningId: id });
+        const { screeningId } = req.params;
+        const enrolmentFormDoc = await EnrollmentForm.findOne({ screeningId: screeningId });
         if (!enrolmentFormDoc) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
@@ -103,14 +112,12 @@ const getOneEnrollmentForm = async (req, res) => {
 
 const updateEnrollmentForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-
-        const oldValue = await EnrollmentForm.findOne({ screeningId: id });
+        const newForm = req.body;
+        const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
         const updatedData = await EnrollmentForm.findOneAndUpdate(
-            { screeningId: id },
-            req.body,
-            { new: true }
+            {screeningId: newForm.screeningId},
+            newForm,
+            {new: true, runValidators: true}
         );
 
         if (!updatedData) {
@@ -119,8 +126,8 @@ const updateEnrollmentForm = async (req, res) => {
             await logAudit({
                 action: 'UPDATE',
                 module: 'Enrollment Form',
-                recordId: id,
-                userInitials: userInitials || 'SYSTEM',
+                recordId: newForm.screeningId,
+                userInitials: newForm.userInitials || 'SYSTEM',
                 oldValue,
                 newValue: updatedData,
                 reason: reason || 'Data update'
@@ -134,20 +141,19 @@ const updateEnrollmentForm = async (req, res) => {
 
 const deleteEnrollmentForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-
-        const oldValue = await EnrollmentForm.findOne({ screeningId: id });
-        const deleted = await EnrollmentForm.findOneAndDelete({ screeningId: id });
+        const delNew = req.body;
+        const oldValue = await EnrollmentForm.findOne({ screeningId: delNew.screeningId });
+        const deleted = await EnrollmentForm.findOneAndDelete({ screeningId: delNew.screeningId });
         if (!deleted) {
             return res.status(404).json({ "message": "Enrollment form not found" });
         } else {
             await logAudit({
                 action: 'DELETE',
                 module: 'Enrollment Form',
-                recordId: id,
-                userInitials: userInitials || 'SYSTEM',
-                oldValue,
+                recordId: delNew.screeningId,
+                userInitials: delNew.userInitials || 'SYSTEM',
+                oldValue: oldValue,
+                newValue: null,
                 reason: reason || 'Record deletion'
             });
             return res.status(200).json({ success: true, message: 'Deleted successfully' });

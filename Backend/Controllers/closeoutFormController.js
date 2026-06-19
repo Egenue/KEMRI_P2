@@ -5,17 +5,28 @@ const createCloseoutForm = async (req, res) => {
     try {
         const {
             sreeningId,
+            userInitials,
             closeOutInterviewDate,
             dateOfTermination,
-            participantStatus,
+            participantStatus = {},
             submittedBy,
-            userInitials,
-            reason
+            submittedAt
         } = req.body;
 
-        const exists = await closeoutForm.findOne({ sreeningId });
+        const {choicesStudy, incompleteReason = {} } = participantStatus;
+        const {
+            incompletionOptions,
+            adverseEvent,
+            deathOption,
+            protocalDeviation,
+            withdrawalReason,
+            otherReason
+        } = incompleteReason;
 
-        if (!sreeningId || !closeOutInterviewDate || !dateOfTermination || !participantStatus) {
+        const {userInitials} = req.body;
+        const exists = await closeoutForm.findOne({ sreeningId: formClose.sreeningId });
+
+        if (!formClose.sreeningId || !formClose.closeOutInterviewDate || !formClose.dateOfTermination || !participantStatus) {
             return res.status(400).json({ "message": "Please fill in all required fields" });
         } else if (exists) {
             return res.status(409).json({ "message": "Closeout record already exists for this Screening ID" });
@@ -35,7 +46,7 @@ const createCloseoutForm = async (req, res) => {
                 userInitials: userInitials || 'SYSTEM',
                 oldValue: null,
                 newValue: newCloseoutForm,
-                reason: reason || 'Initial Entry'
+                reason: 'Initial Entry'
             });
             return res.status(200).json({ "message": "Closeout data saved successfully", data: newCloseoutForm });
         }
@@ -70,14 +81,14 @@ const getOneCloseoutForm = async (req, res) => {
 
 const updateCloseoutForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
+        const formBody = req.body;
+        const { userInitials } = req.body;
         
-        const oldValue = await closeoutForm.findOne({ sreeningId: id });
+        const oldValue = await closeoutForm.findOne({ sreeningId: formBody.sreeningId });
         const updatedData = await closeoutForm.findOneAndUpdate(
-            { sreeningId: id },
-            req.body,
-            { new: true }
+            { sreeningId: formBody.sreeningId },
+            formBody,
+            { new: true, runValidators:true }
         );
 
         if (!updatedData) {
@@ -101,20 +112,19 @@ const updateCloseoutForm = async (req, res) => {
 
 const deleteCloseoutForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-        
-        const oldValue = await closeoutForm.findOne({ sreeningId: id });
-        const deleted = await closeoutForm.findOneAndDelete({ sreeningId: id });
+        const newClose = req.body;
+        const oldValue = await closeoutForm.findOne({ sreeningId: newClose.screeningId });
+        const deleted = await closeoutForm.findOneAndDelete({ sreeningId: newClose.screeningId });
         if (!deleted) {
             return res.status(404).json({ "message": "Closeout form not found" });
         } else {
             await logAudit({
                 action: 'DELETE',
                 module: 'Closeout Form',
-                recordId: id,
+                recordId: newClose.screeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue,
+                oldValue: oldValue,
+                newvalue: null,
                 reason: reason || 'Record deletion'
             });
             return res.status(200).json({ success: true, message: 'Deleted successfully' });

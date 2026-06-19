@@ -13,6 +13,30 @@ const createDeliveryForm = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        const {motherWeight, vitalSigns = {} } = physicalExam;
+        const {
+            temperature = {},
+            respiratoryRate,
+            pulseRate,
+            bloodPressure = {},
+            oxygenSaturation = {}
+        } = vitalSigns ;
+        const {tempValue, location} = temperature;
+        const {systolic, diastolic} = bloodPressure;
+        const {oxygenValue, oxygenOptions} = oxygenSaturation;
+        const {value, unknown} = bodyMassIndex;
+        const {motherAbnomValue, specifics} = motherAbnormality;
+        const {
+            deliveryDate,
+            deliveryTime,
+            deliveryPlace = {},
+            deliveryPersonnel = {},
+            deliveryMode = {}
+        } = deliveryHistory;
+        const {deliveryChoices,otherLocation,otherFacility} = deliveryPlace;
+        const {deliveryPersValue, otherPersonnel} = deliveryPersonnel;
+        const {choices, otherMode, csectionIndication = {}} = deliveryMode;
+        const {csectOptions, otherOption} = csectionIndication;
 
         if (!deliveryScreeningId || !interviewDate) {
             return res.status(400).json({ "message": "Please fill in required fields: deliveryScreeningId and interviewDate" });
@@ -63,8 +87,8 @@ const getdeliveryForms = async (req, res) => {
 
 const getOneDeliveryForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const delFormData = await deliveryForm.findOne({ deliveryScreeningId: id });
+        const { deliveryScreeningId } = req.params;
+        const delFormData = await deliveryForm.findOne({ deliveryScreeningId: deliveryScreeningId });
 
         if (!delFormData) {
             return res.status(404).json({ "message": "Form not found !!" });
@@ -78,14 +102,12 @@ const getOneDeliveryForm = async (req, res) => {
 
 const updateDeliveryForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-
-        const oldValue = await deliveryForm.findOne({ deliveryScreeningId: id });
+        const newDelivery = req.body;
+        const oldValue = await deliveryForm.findOne({ deliveryScreeningId: newDelivery.deliveryScreeningId});
         const updatedData = await deliveryForm.findOneAndUpdate(
-            { deliveryScreeningId: id },
-            req.body,
-            { new: true }
+            { deliveryScreeningId: newDelivery.deliveryScreeningId },
+            newDelivery,
+            { new: true, runValidators:true}
         );
 
         if (!updatedData) {
@@ -94,11 +116,11 @@ const updateDeliveryForm = async (req, res) => {
             await logAudit({
                 action: 'UPDATE',
                 module: 'Delivery Form',
-                recordId: id,
+                recordId: newDelivery.deliveryScreeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue,
-                newValue: updatedData,
-                reason: reason || 'Data update'
+                oldValue: oldvalue,
+                newValue: newDelivery,
+                reason: newDelivery.reason || 'Data update'
             });
             return res.status(200).json({ "message": "Updated successfully", data: updatedData });
         }
@@ -109,20 +131,18 @@ const updateDeliveryForm = async (req, res) => {
 
 const deleteOneDeliveryForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-
-        const oldValue = await deliveryForm.findOne({ deliveryScreeningId: id });
-        const deleted = await deliveryForm.findOneAndDelete({ deliveryScreeningId: id });
+        const newDelivery = req.body;
+        const deleted = await deliveryForm.findOneAndDelete({ deliveryScreeningId: newDelivery.deliveryScreeningId });
         if (!deleted) {
             return res.status(404).json({ "message": "Form not found" });
         } else {
             await logAudit({
                 action: 'DELETE',
                 module: 'Delivery Form',
-                recordId: id,
+                recordId: newDelivery.deliveryScreeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue,
+                oldValue: newDelivery,
+                newValue: null,
                 reason: reason || 'Record deletion'
             });
             return res.status(200).json({ success: true, message: 'Deleted successfully' });

@@ -79,20 +79,20 @@ const getAllAnc = async (req, res) => {
 
 const deleteOneAnc = async (req, res) => {
     try{
-        const {visitNumber} = req.params;
-        const { userInitials, reason } = req.body;
-        const existing = await ancVisit.findOne({visitNumber});
+        const delAnc = req.body
+        const { userInitials } = req.body;
+        const existing = await ancVisit.findOne({ visitNumber: delAnc.visitNumber});
         if (!existing){
             return res.status(404).json({"message":"ANC Form Not Found !!!"});
         }else{
-            await ancVisit.findOneAndDelete({visitNumber});
+            await ancVisit.findOneAndDelete({visitNumber: delAnc.visitNumber});
             await logAudit({
                 action: 'DELETE',
                 module: 'ANC Visit',
-                recordId: visitNumber,
+                recordId: delAnc.visitNumber,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue: existing,
-                reason: reason || 'Record deletion'
+                oldValue: delAnc,
+                reason: 'Record deletion'
             });
             return res.status(200).json({"message":"ANC Form Successfully Deleted "});
         }

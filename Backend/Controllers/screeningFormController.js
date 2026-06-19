@@ -27,36 +27,46 @@ const createScreeningForm = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        
+        const {months, years} = Age;
+        const { 
+            temperature = {},
+            respiratoryRate,
+            pulseRate,
+            bloodPressure = {}
+        } = vitalSigns;
+        const {date, unknown} = lastMenstrualPeriod;
+        const {value, location} = temperature;
+        const {systolic,diastolic} = bloodPressure;
+        const {
+            residentWithin15km,
+            pregnancyConfirmed,
+            gestationLessThan31Weeks,
+            consentsToHIVTesting,
+            willingToDeliverAtStudyHospital
+        } = inclusionCriteria;
+        const {multiplePregancy, fisturaRepairOrSpinalDeformity, unableToGiveInformedConsent} = exclusionCriteria;
+        const {
+            meetsAllCriteria,
+            consentedToParticipate,
+            reasonForRefusal
+        } = eligibility
 
         // Validate required fields FIRST
         if (!screeningId || !interviewDate || !healthFacility || !DoB) {
             return res.status(400).json({ "message": "Please fill in the required fields !!" });
         }
 
-        // Check if form already exists
-        const exists = await screeningForm.findOne({
-            screeningId: screeningId
-        });
+        const exists = await screeningForm.findOne({screeningId: screeningId});
 
         if (exists) {
             return res.status(409).json({ "message": "This form already exists" });
         }
 
-        const sanitizeExclusionCriteria = {
-            multiplePregancy: exclusionCriteria.multiplePregancy || 'No',
-            fisturaRepairOrSpinalDeformity: exclusionCriteria.fisturaRepairOrSpinalDeformity || 'No',
-            unableToGiveInformedConsent: exclusionCriteria.unableToGiveInformedConsent || 'No'
-        };
-
-        const sanitizeEligibility = {
-            meetsAllCriteria: eligibility.meetsAllCriteria || 'No',
-            consentedToParticipate: eligibility.consentedToParticipate || 'No',
-            reasonForRefusal: eligibility.reasonForRefusal || null
-        };
-
         const newScreeningForm = new screeningForm({
             screeningId,
             interviewDate,
+            userInitials,
             healthFacility,
             DoB,
             Age,
@@ -67,8 +77,8 @@ const createScreeningForm = async (req, res) => {
             lastMenstrualPeriod,
             fundalHeight,
             inclusionCriteria,
-            exclusionCriteria: sanitizeExclusionCriteria,
-            eligibility: sanitizeEligibility,
+            exclusionCriteria,
+            eligibility,
             createdAt,
             updatedAt
         });
@@ -118,14 +128,12 @@ const getAllSreeningForms = async (req, res) => {
 
 const updateScreeningForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
-
-        const oldValue = await screeningForm.findOne({ screeningId: id });
+        const newForm = req.body;
+        const oldValue = await screeningForm.findOne({ screeningId: newForm.screeningId});
         const updatedData = await screeningForm.findOneAndUpdate(
-            { screeningId: id },
-            req.body,
-            { new: true }
+            { screeningId: newForm.screeningId },
+            newForm,
+            {new: true, runValidators:true}
         );
 
         if (!updatedData) {
@@ -149,11 +157,12 @@ const updateScreeningForm = async (req, res) => {
 
 const deleteScreeningForm = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { userInitials, reason } = req.body;
+        const { screeningId } = req.params;
+        const { userInitials} = req.body;
+        const reason = "Record deletion (Cascaded)";
 
-        const oldValue = await screeningForm.findOne({ screeningId: id });
-        const deleted = await screeningForm.findOneAndDelete({ screeningId: id });
+        const oldValue = await screeningForm.findOne({ screeningId: screeningId });
+        const deleted = await screeningForm.findOneAndDelete({ screeningId: screeningId });
 
         if (!deleted) {
             return res.status(404).json({ "message": "Screening form does not exist" });
@@ -161,17 +170,16 @@ const deleteScreeningForm = async (req, res) => {
             await logAudit({
                 action: 'DELETE',
                 module: 'Screening Form',
-                recordId: id,
+                recordId: screeningId,
                 userInitials: userInitials || 'SYSTEM',
                 oldValue,
-                reason: reason || 'Record deletion (Cascaded)'
+                reason: reason
             });
             // Cascade delete ALL associated records across all study modules
             await Promise.all([
-                EnrollmentForm.deleteMany({ screeningId: id }),
-                deliveryForm.deleteMany({ deliveryScreeningId: id }),
-                closeoutForm.deleteMany({ sreeningId: id }),
-                gestationAge.deleteMany({ screeningId: id })
+                EnrollmentForm.deleteMany({ screeningId: screeningId }),
+                closeoutForm.deleteMany({ sreeningId: screeningId }),
+                gestationAge.deleteMany({ screeningId: screeningId })
             ]);
 
             return res.status(200).json({ "message": "Deleted successfully and cascaded to all modules", success: true });

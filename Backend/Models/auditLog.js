@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 const auditLogSchema = new mongoose.Schema({
     action: {
         type: String,
-        required: true, // 'CREATE', 'UPDATE', 'DELETE'
+        required: true,
     },
     module: {
         type: String,
-        required: true, // 'Screening', 'Enrollment', etc.
+        required: true,
     },
     recordId: {
         type: String,
@@ -19,10 +19,12 @@ const auditLogSchema = new mongoose.Schema({
     },
     oldValue: {
         type: mongoose.Schema.Types.Mixed,
+        required: true,
         default: null,
     },
     newValue: {
         type: mongoose.Schema.Types.Mixed,
+        required: true,
         default: null,
     },
     reason: {
