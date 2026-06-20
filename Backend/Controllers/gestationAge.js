@@ -40,6 +40,7 @@ const createGestAge = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        const { userInitials } = req.body;
 
         const {usWeeks, usDays} = ultrasoundDate;
         const {gestweeks, gestdays} = currentGestAge;
@@ -80,6 +81,7 @@ const createGestAge = async (req, res) => {
 const updateGestAge = async (req, res) => {
     try {
         const newForm = req.body;
+        const { userInitials } = req.body;
         const oldValue = await gestationAge.findOne({ screeningId: newForm.screeningId });
         const updated = await gestationAge.findOneAndUpdate(
             { screeningId: newForm.screeningId },
@@ -96,7 +98,7 @@ const updateGestAge = async (req, res) => {
             module: 'Gestation Age',
             recordId: screeningId,
             userInitials: userInitials || 'SYSTEM',
-            oldValue,
+            oldValue: oldValue,
             newValue: updated,
             reason: 'Data update'
         });
@@ -123,7 +125,7 @@ const deleteGestAge = async (req, res) => {
                 module: 'Gestation Age',
                 recordId: screeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue,
+                oldValue: oldvalue,
                 reason:'Record deletion'
             });
             return res.status(200).json({"message":"Success!!!"})

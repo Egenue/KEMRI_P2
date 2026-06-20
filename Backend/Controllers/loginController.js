@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 const createLogin = async (req, res) => {
     try {
-        const {fullName, email, userName, password, dateCreated, userRole } = req.body;
+        const {fullName, email, userName, password, dateCreated, userRole, userInitials } = req.body;
 
         const exists = await login.findOne({
             $or:[{email: req.body.email},{userName: req.body.userName},{fullName: req.body.fullName}]

@@ -38,6 +38,7 @@ const createCloseoutForm = async (req, res) => {
                 participantStatus,
                 submittedBy
             });
+            const { userInitials } = req.body;
             await newCloseoutForm.save();
             await logAudit({
                 action: 'CREATE',
@@ -113,6 +114,7 @@ const updateCloseoutForm = async (req, res) => {
 const deleteCloseoutForm = async (req, res) => {
     try {
         const newClose = req.body;
+        const { userInitials } = req.body;
         const oldValue = await closeoutForm.findOne({ sreeningId: newClose.screeningId });
         const deleted = await closeoutForm.findOneAndDelete({ sreeningId: newClose.screeningId });
         if (!deleted) {

@@ -37,6 +37,7 @@ const createDeliveryForm = async (req, res) => {
         const {deliveryPersValue, otherPersonnel} = deliveryPersonnel;
         const {choices, otherMode, csectionIndication = {}} = deliveryMode;
         const {csectOptions, otherOption} = csectionIndication;
+        const { userInitials } = req.body;
 
         if (!deliveryScreeningId || !interviewDate) {
             return res.status(400).json({ "message": "Please fill in required fields: deliveryScreeningId and interviewDate" });
@@ -103,6 +104,7 @@ const getOneDeliveryForm = async (req, res) => {
 const updateDeliveryForm = async (req, res) => {
     try {
         const newDelivery = req.body;
+        const { userInitials } = req.body;
         const oldValue = await deliveryForm.findOne({ deliveryScreeningId: newDelivery.deliveryScreeningId});
         const updatedData = await deliveryForm.findOneAndUpdate(
             { deliveryScreeningId: newDelivery.deliveryScreeningId },
@@ -132,6 +134,7 @@ const updateDeliveryForm = async (req, res) => {
 const deleteOneDeliveryForm = async (req, res) => {
     try {
         const newDelivery = req.body;
+        const { userInitials } = req.body;
         const deleted = await deliveryForm.findOneAndDelete({ deliveryScreeningId: newDelivery.deliveryScreeningId });
         if (!deleted) {
             return res.status(404).json({ "message": "Form not found" });

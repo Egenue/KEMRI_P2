@@ -42,6 +42,7 @@ const newEnrollmentForm = async (req, res) => {
         } = vitalSigns;
         const {value, location} = temperature;
         const {systolic,diastolic} = bloodPressure;
+        const { userInitials } = req.body;
 
         if (!screeningId || !DoB || !healthFacility) {
             return res.status(400).json({
@@ -113,6 +114,7 @@ const getOneEnrollmentForm = async (req, res) => {
 const updateEnrollmentForm = async (req, res) => {
     try {
         const newForm = req.body;
+        const { userInitials } = req.body;
         const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
         const updatedData = await EnrollmentForm.findOneAndUpdate(
             {screeningId: newForm.screeningId},
@@ -142,6 +144,7 @@ const updateEnrollmentForm = async (req, res) => {
 const deleteEnrollmentForm = async (req, res) => {
     try {
         const delNew = req.body;
+        const { userInitials } = req.body;
         const oldValue = await EnrollmentForm.findOne({ screeningId: delNew.screeningId });
         const deleted = await EnrollmentForm.findOneAndDelete({ screeningId: delNew.screeningId });
         if (!deleted) {

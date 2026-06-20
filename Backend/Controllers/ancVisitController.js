@@ -17,6 +17,7 @@ const createAncVisit = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        const { userInitials } = req.body;
 
         const {gestationWeeks, gestDays} = gestationAge;
         const {systolic, diastolic} = bloodPressure;

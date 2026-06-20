@@ -13,7 +13,6 @@ const connection = async () => {
     try{
         await mongoose.connect(MONGO_UR);
         return console.log('Successful Connection to MongoDB',
-            'Database USER', MONGO_USER,
             'Database ', MONGO_DB);
     }
     catch(error){

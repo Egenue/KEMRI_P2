@@ -27,6 +27,7 @@ const createScreeningForm = async (req, res) => {
             userInitials,
             reason
         } = req.body;
+        const { userInitials } = req.body;
         
         const {months, years} = Age;
         const { 
@@ -129,6 +130,7 @@ const getAllSreeningForms = async (req, res) => {
 const updateScreeningForm = async (req, res) => {
     try {
         const newForm = req.body;
+        const { userInitials } = req.body;
         const oldValue = await screeningForm.findOne({ screeningId: newForm.screeningId});
         const updatedData = await screeningForm.findOneAndUpdate(
             { screeningId: newForm.screeningId },
@@ -172,7 +174,7 @@ const deleteScreeningForm = async (req, res) => {
                 module: 'Screening Form',
                 recordId: screeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue,
+                oldValue: oldValue,
                 reason: reason
             });
             // Cascade delete ALL associated records across all study modules
