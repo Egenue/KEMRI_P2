@@ -73,40 +73,46 @@ const getLoginById = async (req, res) => {
 
 const userLogin = async (req, res) => {
     try {
-        const { email, userName, fullName, password, dateLoggedIn, userInitials } = req.body;
+        // 1. Properly extract the user input fields from the request body
+        const { email, userName, password } = req.body;
         
-        let user = await login.findOne({ email });
-        if (!user) {
-            user = await login.findOne({ userName });
+        // 2. Locate the user document in the database
+        let user = await login.findOne({ email: email });
+        if (!user && userName) {
+            user = await login.findOne({ userName: userName });
         }
         
+        // Return early if no account matches
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         
+        // 3. FIX BCRYPT: Check plain-text password against the database hash
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
-        } else {
-            user.dateLoggedIn = new Date(dateLoggedIn);
-            if (fullName) {
-                user.fullName = fullName;
-            }
-            await user.save();
-            res.status(200).json({ 
-                message: 'Login successful', 
-                user: {
-                    email: user.email,
-                    userName: user.userName,
-                    fullName: user.fullName,
-                    userRole: user.userRole,
-                    dateLoggedIn: user.dateLoggedIn,
-                    userInitials: user.userInitials
-                },
-                dateLoggedIn: new Date(dateLoggedIn).toDateString()
-            });
         }
+
+        // 4. Update the actual Mongoose document instance, not req.body
+        user.dateLoggedIn = new Date(); 
+        await user.save(); // This safely updates your database document
+        
+        // 5. Send back the clean user profile info to Blazor
+        res.status(200).json({ 
+            message: 'Login successful', 
+            user: {
+                email: user.email,
+                userName: user.userName,
+                fullName: user.fullName,
+                userRole: user.userRole,
+                dateLoggedIn: user.dateLoggedIn,
+                userInitials: user.userInitials
+            },
+            dateLoggedIn: user.dateLoggedIn.toDateString()
+        });
+
     } catch (error) {
+        console.error("Login Error Handler:", error); // Keeps visibility in backend logs
         res.status(500).json({ message: error.message });
     }
 };

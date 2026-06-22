@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const login = mongoose.Schema({
+const login = new mongoose.Schema({
     email: {
         type: String,
         required: true,
