@@ -3,7 +3,11 @@ import { logAudit } from '../Utils/auditHelper.js';
 
 const createAncVisit = async (req, res) => {
     try{
-        const{
+        let data = req.body;
+        if (req.body.record) {
+            data = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
+        }
+        const {
             visitNumber,
             visitDate,
             gestationAge = {},
@@ -16,7 +20,7 @@ const createAncVisit = async (req, res) => {
             nextAppointment,
             userInitials,
             reason
-        } = req.body;
+        } = data;
 
         const {gestationWeeks, gestDays} = gestationAge;
         const {systolic, diastolic} = bloodPressure;
@@ -79,20 +83,21 @@ const getAllAnc = async (req, res) => {
 
 const deleteOneAnc = async (req, res) => {
     try{
-        const delAnc = req.body
-        const { userInitials } = req.body;
-        const existing = await ancVisit.findOne({ visitNumber: delAnc.visitNumber});
+        const visitNumber = req.params.visitNumber;
+        const { userInitials, reason } = req.body;
+        const existing = await ancVisit.findOne({ visitNumber });
         if (!existing){
             return res.status(404).json({"message":"ANC Form Not Found !!!"});
         }else{
-            await ancVisit.findOneAndDelete({visitNumber: delAnc.visitNumber});
+            await ancVisit.findOneAndDelete({visitNumber});
             await logAudit({
                 action: 'DELETE',
                 module: 'ANC Visit',
-                recordId: delAnc.visitNumber,
+                recordId: visitNumber,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue: delAnc,
-                reason: 'Record deletion'
+                oldValue: existing,
+                newValue: null,
+                reason: reason || 'Record deletion'
             });
             return res.status(200).json({"message":"ANC Form Successfully Deleted "});
         }

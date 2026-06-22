@@ -3,6 +3,10 @@ import { logAudit } from '../Utils/auditHelper.js';
 
 const createDeliveryForm = async (req, res) => {
     try {
+        let data = req.body;
+        if (req.body.record) {
+            data = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
+        }
         const {
             interviewDate,
             deliveryScreeningId,
@@ -12,7 +16,7 @@ const createDeliveryForm = async (req, res) => {
             deliveryHistory = {},
             userInitials,
             reason
-        } = req.body;
+        } = data;
         const {motherWeight, vitalSigns = {} } = physicalExam;
         const {
             temperature = {},
@@ -102,26 +106,29 @@ const getOneDeliveryForm = async (req, res) => {
 
 const updateDeliveryForm = async (req, res) => {
     try {
-        const newDelivery = req.body;
-        const { userInitials } = req.body;
+        let newDelivery = req.body;
+        if (req.body.record) {
+            newDelivery = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
+        }
+        const { userInitials, reason } = newDelivery;
         const oldValue = await deliveryForm.findOne({ deliveryScreeningId: newDelivery.deliveryScreeningId});
         const updatedData = await deliveryForm.findOneAndUpdate(
             { deliveryScreeningId: newDelivery.deliveryScreeningId },
             newDelivery,
-            { new: true, runValidators:true}
+            { new: true, runValidators: true }
         );
 
         if (!updatedData) {
-            return res.status(404).json({ "message": "Delivery form not found" });
+            return res.status(404).json({ "message": "Delivery form not found !!" });
         } else {
             await logAudit({
                 action: 'UPDATE',
                 module: 'Delivery Form',
                 recordId: newDelivery.deliveryScreeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue: oldvalue,
-                newValue: newDelivery,
-                reason: newDelivery.reason || 'Data update'
+                oldValue,
+                newValue: updatedData,
+                reason: reason || 'Data update'
             });
             return res.status(200).json({ "message": "Updated successfully", data: updatedData });
         }
@@ -132,18 +139,19 @@ const updateDeliveryForm = async (req, res) => {
 
 const deleteOneDeliveryForm = async (req, res) => {
     try {
-        const newDelivery = req.body;
-        const { userInitials } = req.body;
-        const deleted = await deliveryForm.findOneAndDelete({ deliveryScreeningId: newDelivery.deliveryScreeningId });
+        const deliveryScreeningId = req.params.id || req.params.deliveryScreeningId;
+        const { userInitials, reason } = req.body;
+        const oldValue = await deliveryForm.findOne({ deliveryScreeningId });
+        const deleted = await deliveryForm.findOneAndDelete({ deliveryScreeningId });
         if (!deleted) {
             return res.status(404).json({ "message": "Form not found" });
         } else {
             await logAudit({
                 action: 'DELETE',
                 module: 'Delivery Form',
-                recordId: newDelivery.deliveryScreeningId,
+                recordId: deliveryScreeningId,
                 userInitials: userInitials || 'SYSTEM',
-                oldValue: newDelivery,
+                oldValue: oldValue,
                 newValue: null,
                 reason: reason || 'Record deletion'
             });

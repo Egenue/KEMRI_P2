@@ -7,6 +7,10 @@ import { logAudit } from '../Utils/auditHelper.js';
 
 const createScreeningForm = async (req, res) => {
     try {
+        let data = req.body;
+        if (req.body.record) {
+            data = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
+        }
         const {
             screeningId,
             interviewDate,
@@ -26,7 +30,7 @@ const createScreeningForm = async (req, res) => {
             updatedAt,
             userInitials,
             reason
-        } = req.body;
+        } = data;
         
         const {months, years} = Age;
         const { 
@@ -50,7 +54,7 @@ const createScreeningForm = async (req, res) => {
             meetsAllCriteria,
             consentedToParticipate,
             reasonForRefusal
-        } = eligibility
+        } = eligibility;
 
         // Validate required fields FIRST
         if (!screeningId || !interviewDate || !healthFacility || !DoB) {
@@ -120,7 +124,7 @@ const getOneScreeningForm = async (req, res) => {
 const getAllSreeningForms = async (req, res) => {
     try {
         const screeningDocs = await screeningForm.find({});
-        return res.status(200).json(screeningDocs);
+        return res.status(200).json({ screeningDocs });
     } catch (error) {
         return res.status(500).json({ "message": "Failed operation", error: error.message });
     }
@@ -128,8 +132,11 @@ const getAllSreeningForms = async (req, res) => {
 
 const updateScreeningForm = async (req, res) => {
     try {
-        const newForm = req.body;
-        const { userInitials } = req.body;
+        let newForm = req.body;
+        if (req.body.record) {
+            newForm = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
+        }
+        const { userInitials, reason } = newForm;
         const oldValue = await screeningForm.findOne({ screeningId: newForm.screeningId});
         const updatedData = await screeningForm.findOneAndUpdate(
             { screeningId: newForm.screeningId },
@@ -143,7 +150,7 @@ const updateScreeningForm = async (req, res) => {
             await logAudit({
                 action: 'UPDATE',
                 module: 'Screening Form',
-                recordId: id,
+                recordId: newForm.screeningId,
                 userInitials: userInitials || 'SYSTEM',
                 oldValue,
                 newValue: updatedData,
@@ -158,8 +165,8 @@ const updateScreeningForm = async (req, res) => {
 
 const deleteScreeningForm = async (req, res) => {
     try {
-        const { screeningId } = req.params;
-        const { userInitials} = req.body;
+        const screeningId = req.params.id || req.params.screeningId;
+        const {userInitials} = req.body;
         const reason = "Record deletion (Cascaded)";
 
         const oldValue = await screeningForm.findOne({ screeningId: screeningId });
