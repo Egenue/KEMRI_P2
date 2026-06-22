@@ -7,7 +7,14 @@ const login = new mongoose.Schema({
     },
     userInitials:{
         type: String,
-        required: true
+        default: function() {
+            const name = this.fullName || this.userName || 'XX';
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+            return name.length >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase();
+        }
     },
     userName: {
         type: String,
@@ -16,12 +23,14 @@ const login = new mongoose.Schema({
     },
     fullName: {
         type: String,
-        required: true
+        default: function() {
+            return this.userName || 'Unknown User';
+        }
     },
     userRole: {
         type: String,
         enum: ['Data Manager', 'Field Technician', 'Admin'],
-        required: true
+        default: 'Field Technician'
     },
     password: {
         type: String,

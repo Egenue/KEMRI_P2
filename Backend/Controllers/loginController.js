@@ -5,9 +5,12 @@ const createLogin = async (req, res) => {
     try {
         const {fullName, email, userName, password, dateCreated, userRole, userInitials } = req.body;
 
-        const exists = await login.findOne({
-            $or:[{email: req.body.email},{userName: req.body.userName},{fullName: req.body.fullName}]
-        });
+        const queryOr = [];
+        if (email) queryOr.push({ email });
+        if (userName) queryOr.push({ userName });
+        if (fullName) queryOr.push({ fullName });
+
+        const exists = queryOr.length > 0 ? await login.findOne({ $or: queryOr }) : null;
         const validPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
         if (!validPass.test(password)){
             return res.status(400).json({"message":"Password does not meet requirement"});
@@ -15,7 +18,7 @@ const createLogin = async (req, res) => {
             return res.status(401).json({"message":"User already exists"});
         }else{
             const hashedPassword = await bcrypt.hash(password, 10);
-            const dateCreate = await new Date();
+            const dateCreate = new Date();
             const newLogin = new login({
                 fullName,
                 email,
@@ -74,7 +77,7 @@ const getLoginById = async (req, res) => {
 const userLogin = async (req, res) => {
     try {
         // 1. Properly extract the user input fields from the request body
-        const { email, userName, password } = req.body;
+        const { email, userName, password, fullName } = req.body;
         
         // 2. Locate the user document in the database
         let user = await login.findOne({ email: email });
@@ -91,6 +94,24 @@ const userLogin = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Populate missing fields for legacy/existing users to avoid validation issues
+        if (!user.fullName) {
+            user.fullName = fullName || user.userName || email.split('@')[0] || 'Unknown User';
+        }
+        if (!user.userRole) {
+            user.userRole = 'Field Technician';
+        }
+        if (!user.userInitials) {
+            const nameInput = user.fullName || user.userName || 'XX';
+            const cleanName = nameInput.trim();
+            const parts = cleanName.split(/\s+/).filter(Boolean);
+            if (parts.length >= 2) {
+                user.userInitials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            } else {
+                user.userInitials = cleanName.length >= 2 ? cleanName.substring(0, 2).toUpperCase() : cleanName.toUpperCase();
+            }
         }
 
         // 4. Update the actual Mongoose document instance, not req.body
