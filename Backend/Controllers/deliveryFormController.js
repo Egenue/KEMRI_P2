@@ -37,7 +37,6 @@ const createDeliveryForm = async (req, res) => {
         const {deliveryPersValue, otherPersonnel} = deliveryPersonnel;
         const {choices, otherMode, csectionIndication = {}} = deliveryMode;
         const {csectOptions, otherOption} = csectionIndication;
-        const { userInitials } = req.body;
 
         if (!deliveryScreeningId || !interviewDate) {
             return res.status(400).json({ "message": "Please fill in required fields: deliveryScreeningId and interviewDate" });

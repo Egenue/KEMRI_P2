@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild server.js --bundle --platform=node --target=node20 --outfile=dist/bundle.js"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +19,8 @@
     "express": "^5.2.1",
     "mongoose": "^9.6.2",
     "nodemon": "^3.1.14"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }

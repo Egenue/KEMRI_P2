@@ -42,7 +42,6 @@ const newEnrollmentForm = async (req, res) => {
         } = vitalSigns;
         const {value, location} = temperature;
         const {systolic,diastolic} = bloodPressure;
-        const { userInitials } = req.body;
 
         if (!screeningId || !DoB || !healthFacility) {
             return res.status(400).json({

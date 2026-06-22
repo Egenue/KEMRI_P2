@@ -22,8 +22,6 @@ const createCloseoutForm = async (req, res) => {
             withdrawalReason,
             otherReason
         } = incompleteReason;
-
-        const {userInitials} = req.body;
         const exists = await closeoutForm.findOne({ sreeningId: formClose.sreeningId });
 
         if (!formClose.sreeningId || !formClose.closeOutInterviewDate || !formClose.dateOfTermination || !participantStatus) {

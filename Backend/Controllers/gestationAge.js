@@ -40,7 +40,6 @@ const createGestAge = async (req, res) => {
             userInitials,
             reason
         } = req.body;
-        const { userInitials } = req.body;
 
         const {usWeeks, usDays} = ultrasoundDate;
         const {gestweeks, gestdays} = currentGestAge;
