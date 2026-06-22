@@ -11,6 +11,7 @@ const createScreeningForm = async (req, res) => {
         if (req.body.record) {
             data = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
         }
+        
         const {
             screeningId,
             interviewDate,
@@ -31,63 +32,115 @@ const createScreeningForm = async (req, res) => {
             userInitials,
             reason
         } = data;
-        
-        const {months, years} = Age;
-        const { 
-            temperature = {},
-            respiratoryRate,
-            pulseRate,
-            bloodPressure = {}
-        } = vitalSigns;
-        const {date, unknown} = lastMenstrualPeriod;
-        const {value, location} = temperature;
-        const {systolic,diastolic} = bloodPressure;
-        const {
-            residentWithin15km,
-            pregnancyConfirmed,
-            gestationLessThan31Weeks,
-            consentsToHIVTesting,
-            willingToDeliverAtStudyHospital
-        } = inclusionCriteria;
-        const {multiplePregancy, fisturaRepairOrSpinalDeformity, unableToGiveInformedConsent} = exclusionCriteria;
-        const {
-            meetsAllCriteria,
-            consentedToParticipate,
-            reasonForRefusal
-        } = eligibility;
 
-        // Validate required fields FIRST
-        if (!screeningId || !interviewDate || !healthFacility || !DoB) {
-            return res.status(400).json({ "message": "Please fill in the required fields !!" });
+        // 1. Root Level Validation
+        if (!screeningId || !interviewDate || !healthFacility || !DoB || !height || !weight || !BMI || !fundalHeight) {
+            return res.status(400).json({ "message": "Please fill in all required root-level metrics!" });
         }
 
-        const exists = await screeningForm.findOne({screeningId: screeningId});
+        // 2. Nested Age Object Validation
+        if (Age.months === undefined || Age.years === undefined) {
+            return res.status(400).json({ "message": "Missing required age information (months and years)." });
+        }
 
+        // 3. Nested Vital Signs Validation
+        const { temperature = {}, respiratoryRate, pulseRate, bloodPressure = {} } = vitalSigns;
+        if (temperature.value === undefined || !temperature.location) {
+            return res.status(400).json({ "message": "Temperature value and recording location are required." });
+        }
+        if (respiratoryRate === undefined || pulseRate === undefined) {
+            return res.status(400).json({ "message": "Respiratory rate and pulse rate metrics are required." });
+        }
+        if (bloodPressure.systolic === undefined || bloodPressure.diastolic === undefined) {
+            return res.status(400).json({ "message": "Blood pressure measurements (systolic/diastolic) are required." });
+        }
+
+        // 4. Inclusion Criteria Validation
+        if (!inclusionCriteria.residentWithin15km || 
+            !inclusionCriteria.pregnancyConfirmed || 
+            !inclusionCriteria.gestationLessThan31Weeks || 
+            !inclusionCriteria.consentsToHIVTesting || 
+            !inclusionCriteria.willingToDeliverAtStudyHospital) {
+            return res.status(400).json({ "message": "All inclusion criteria responses must be completed." });
+        }
+
+        // 5. Exclusion Criteria Validation
+        if (!exclusionCriteria.multiplePregancy || 
+            !exclusionCriteria.fisturaRepairOrSpinalDeformity || 
+            !exclusionCriteria.unableToGiveInformedConsent) {
+            return res.status(400).json({ "message": "All exclusion criteria responses must be completed." });
+        }
+
+        // 6. Eligibility Validation (Matches Schema custom logic)
+        if (!eligibility.meetsAllCriteria) {
+            return res.status(400).json({ "message": "Eligibility status evaluation is required." });
+        }
+        if (eligibility.meetsAllCriteria === "Yes" && !eligibility.consentedToParticipate) {
+            return res.status(400).json({ "message": "Consent response is required when eligibility requirements are met." });
+        }
+        if (eligibility.consentedToParticipate === "No" && !eligibility.reasonForRefusal) {
+            return res.status(400).json({ "message": "A reason for refusal must be provided if consent is declined." });
+        }
+
+        // Check for existing duplicate records
+        const exists = await screeningForm.findOne({ screeningId: screeningId });
         if (exists) {
             return res.status(409).json({ "message": "This form already exists" });
         }
 
+        // Explicit schema structure generation to ensure no rogue properties flow into the DB
         const newScreeningForm = new screeningForm({
             screeningId,
             interviewDate,
-            userInitials,
             healthFacility,
             DoB,
-            Age,
+            Age: {
+                months: Age.months,
+                years: Age.years
+            },
             height,
             weight,
             BMI,
-            vitalSigns,
-            lastMenstrualPeriod,
+            vitalSigns: {
+                temperature: {
+                    value: temperature.value,
+                    location: temperature.location
+                },
+                respiratoryRate,
+                pulseRate,
+                bloodPressure: {
+                    systolic: bloodPressure.systolic,
+                    diastolic: bloodPressure.diastolic
+                }
+            },
+            lastMenstrualPeriod: {
+                date: lastMenstrualPeriod.date || Date.now(),
+                unknown: lastMenstrualPeriod.unknown || false
+            },
             fundalHeight,
-            inclusionCriteria,
-            exclusionCriteria,
-            eligibility,
-            createdAt,
-            updatedAt
+            inclusionCriteria: {
+                residentWithin15km: inclusionCriteria.residentWithin15km,
+                pregnancyConfirmed: inclusionCriteria.pregnancyConfirmed,
+                gestationLessThan31Weeks: inclusionCriteria.gestationLessThan31Weeks,
+                consentsToHIVTesting: inclusionCriteria.consentsToHIVTesting,
+                willingToDeliverAtStudyHospital: inclusionCriteria.willingToDeliverAtStudyHospital
+            },
+            exclusionCriteria: {
+                multiplePregancy: exclusionCriteria.multiplePregancy,
+                fisturaRepairOrSpinalDeformity: exclusionCriteria.fisturaRepairOrSpinalDeformity,
+                unableToGiveInformedConsent: exclusionCriteria.unableToGiveInformedConsent
+            },
+            eligibility: {
+                meetsAllCriteria: eligibility.meetsAllCriteria,
+                consentedToParticipate: eligibility.consentedToParticipate || null,
+                reasonForRefusal: eligibility.reasonForRefusal || null
+            },
+            createdAt: createdAt || Date.now(),
+            updatedAt: updatedAt || Date.now()
         });
 
         await newScreeningForm.save();
+
         await logAudit({
             action: 'CREATE',
             module: 'Screening Form',
@@ -97,6 +150,7 @@ const createScreeningForm = async (req, res) => {
             newValue: newScreeningForm,
             reason: reason || 'Initial Entry'
         });
+
         return res.status(200).json({ "message": "Successful!! Form saved", data: newScreeningForm });
 
     } catch (error) {
