@@ -22,7 +22,8 @@ const createLogin = async (req, res) => {
                 userName,
                 password: hashedPassword,
                 dateCreated: dateCreate,
-                userRole
+                userRole,
+                userInitials
             });
             await newLogin.save();
             res.status(201).json(newLogin);
@@ -72,7 +73,7 @@ const getLoginById = async (req, res) => {
 
 const userLogin = async (req, res) => {
     try {
-        const { email, userName, fullName, password, dateLoggedIn } = req.body;
+        const { email, userName, fullName, password, dateLoggedIn, userInitials } = req.body;
         
         let user = await login.findOne({ email });
         if (!user) {
@@ -99,7 +100,8 @@ const userLogin = async (req, res) => {
                     userName: user.userName,
                     fullName: user.fullName,
                     userRole: user.userRole,
-                    dateLoggedIn: user.dateLoggedIn
+                    dateLoggedIn: user.dateLoggedIn,
+                    userInitials: user.userInitials
                 },
                 dateLoggedIn: new Date(dateLoggedIn).toDateString()
             });
