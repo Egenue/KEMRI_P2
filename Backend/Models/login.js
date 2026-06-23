@@ -1,45 +1,40 @@
 import mongoose from 'mongoose';
-const login = new mongoose.Schema({
+const login = mongoose.Schema({
     email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+
+    userName: {
         type: String,
         required: true,
         unique: true
     },
     userInitials:{
         type: String,
-        default: function() {
-            const name = this.fullName || this.userName || 'XX';
-            const parts = name.trim().split(/\s+/).filter(Boolean);
-            if (parts.length >= 2) {
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-            }
-            return name.length >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase();
-        }
-    },
-    userName: {
-        type: String,
-        required: true,
-        unique: true
+        required: false
     },
     fullName: {
         type: String,
-        default: function() {
-            return this.userName || 'Unknown User';
-        }
+        required: true
     },
+
     userRole: {
         type: String,
         enum: ['Data Manager', 'Field Technician', 'Admin'],
-        default: 'Field Technician'
+        required: true
     },
+
     password: {
         type: String,
         required: true
     },
+
     dateLoggedIn: {
-        type: Date,
-        default: Date.now
+        type: Date
     },
+
     dateCreated: {
         type: Date
     }

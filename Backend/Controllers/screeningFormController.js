@@ -55,7 +55,6 @@ const createScreeningForm = async (req, res) => {
             return res.status(400).json({ "message": "Blood pressure measurements (systolic/diastolic) are required." });
         }
 
-        // 4. Inclusion Criteria Validation
         if (!inclusionCriteria.residentWithin15km || 
             !inclusionCriteria.pregnancyConfirmed || 
             !inclusionCriteria.gestationLessThan31Weeks || 
@@ -64,14 +63,12 @@ const createScreeningForm = async (req, res) => {
             return res.status(400).json({ "message": "All inclusion criteria responses must be completed." });
         }
 
-        // 5. Exclusion Criteria Validation
         if (!exclusionCriteria.multiplePregancy || 
             !exclusionCriteria.fisturaRepairOrSpinalDeformity || 
             !exclusionCriteria.unableToGiveInformedConsent) {
             return res.status(400).json({ "message": "All exclusion criteria responses must be completed." });
         }
 
-        // 6. Eligibility Validation (Matches Schema custom logic)
         if (!eligibility.meetsAllCriteria) {
             return res.status(400).json({ "message": "Eligibility status evaluation is required." });
         }
@@ -82,13 +79,11 @@ const createScreeningForm = async (req, res) => {
             return res.status(400).json({ "message": "A reason for refusal must be provided if consent is declined." });
         }
 
-        // Check for existing duplicate records
         const exists = await screeningForm.findOne({ screeningId: screeningId });
         if (exists) {
             return res.status(409).json({ "message": "This form already exists" });
         }
 
-        // Explicit schema structure generation to ensure no rogue properties flow into the DB
         const newScreeningForm = new screeningForm({
             screeningId,
             interviewDate,
