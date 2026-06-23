@@ -11,7 +11,7 @@ const auditLogSchema = new mongoose.Schema({
     },
     recordId: {
         type: String,
-        required: true,
+        required: false,
     },
     userInitials: {
         type: String,

@@ -35,6 +35,15 @@ const createLogin = async (req, res) => {
                 userInitials: userInitials ?? nameInitials(nameParts)
             });
             await newLogin.save();
+            await logAudit({
+                action: 'Create',
+                module: 'Login',
+                recordId: null,
+                userInitials: userInitials ?? nameInitials(nameParts),
+                oldValue: null,
+                newValue: null,
+                reason: "Create Login"
+            });
             res.status(201).json(newLogin);
         }
     } catch (error) {
@@ -57,8 +66,19 @@ const deleteLogin = async (req, res) => {
         const deletedLogin = await login.findByIdAndDelete(loginId);
         if (!deletedLogin) {
             return res.status(404).json({ message: 'Login not found' });
+        }else{
+            const Logreason = 'Deleted Login'
+            await logAudit({
+                action: 'DELETE',
+                module: 'Login',
+                recordId: null,
+                userInitials: userInitials ?? nameInitials(nameParts),
+                oldValue: deletedLogin,
+                newValue: null,
+                reason: Logreason
+            });
+            return res.status(200).json({ message: 'Login deleted successfully' });
         }
-        res.status(200).json({ message: 'Login deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }  
@@ -110,6 +130,16 @@ const userLogin = async (req, res) => {
             user.userInitials = nameInitials(nameParts)
             }
             await user.save();
+            const Logreason = userRole + " Login"
+            await logAudit({
+                action: 'UPDATE',
+                module: 'Login',
+                recordId: null,
+                userInitials: userInitials ?? nameInitials(nameParts),
+                oldValue: null,
+                newValue: null,
+                reason: Logreason
+            });
             res.status(200).json({ 
                 message: 'Login successful', 
                 user: {
