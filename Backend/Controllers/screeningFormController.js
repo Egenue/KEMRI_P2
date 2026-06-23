@@ -4,7 +4,6 @@ import deliveryForm from "../Models/deliveryForm.js";
 import closeoutForm from "../Models/closeoutForm.js";
 import gestationAge from "../Models/gestationAge.js";
 import { logAudit } from '../Utils/auditHelper.js';
-import { cleanEmptyStrings } from '../Utils/cleanHelper.js';
 
 const createScreeningForm = async (req, res) => {
     try {
