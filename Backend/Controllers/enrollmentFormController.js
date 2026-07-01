@@ -117,7 +117,7 @@ const updateEnrollmentForm = async (req, res) => {
     try {
         const screeningId = req.params.screeningId || req.body.screeningId;
         if(!screeningId){
-            return req.status(400).json({"message":"screeningId is required"});
+            return res.status(400).json({"message":"screeningId is required"});
         }else{
             const newForm = req.body;
             const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
