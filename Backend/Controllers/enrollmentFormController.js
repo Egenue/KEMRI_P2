@@ -120,6 +120,7 @@ const updateEnrollmentForm = async (req, res) => {
             return res.status(400).json({"message":"screeningId is required"});
         }else{
             const newForm = req.body;
+            const { userInitials, reason } = req.params;
             const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
             const updatedData = await EnrollmentForm.findOneAndUpdate(
                 {screeningId: newForm.screeningId},
