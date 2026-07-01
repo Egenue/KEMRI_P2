@@ -8,10 +8,9 @@ KEMRI_P2*
 .vscode
 BMICalc.txt
 .env.example
-dist
 ./api/bin/
 ./api/obj
 ./api/Properties/
 ./api/*.log
 NewBlazor
-.fake
+new.*
