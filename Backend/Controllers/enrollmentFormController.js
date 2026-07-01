@@ -115,31 +115,32 @@ const getOneEnrollmentForm = async (req, res) => {
 
 const updateEnrollmentForm = async (req, res) => {
     try {
-        let newForm = req.body;
-        if (req.body.record) {
-            newForm = { ...req.body.record, userInitials: req.body.userInitials, reason: req.body.reason };
-        }
-        const { userInitials, reason } = newForm;
-        const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
-        const updatedData = await EnrollmentForm.findOneAndUpdate(
-            {screeningId: newForm.screeningId},
-            newForm,
-            {new: true, runValidators: true}
-        );
+        const screeningId = req.params.screeningId || req.body.screeningId;
+        if(!screeningId){
+            return req.status(400).json({"message":"screeningId is required"});
+        }else{
+            const newForm = req.body;
+            const oldValue = await EnrollmentForm.findOne({ screeningId: newForm.screeningId });
+            const updatedData = await EnrollmentForm.findOneAndUpdate(
+                {screeningId: newForm.screeningId},
+                newForm,
+                {new: true, runValidators: true}
+            );
 
-        if (!updatedData) {
-            return res.status(404).json({ "message": "Enrollment form not found" });
-        } else {
-            await logAudit({
-                action: 'UPDATE',
-                module: 'Enrollment Form',
-                recordId: newForm.screeningId,
-                userInitials: userInitials || 'SYSTEM',
-                oldValue,
-                newValue: updatedData,
-                reason: reason || 'Data update'
-            });
-            return res.status(200).json({ "message": "Updated successfully", data: updatedData });
+            if (!updatedData) {
+                return res.status(404).json({ "message": "Enrollment form not found" });
+            } else {
+                await logAudit({
+                    action: 'UPDATE',
+                    module: 'Enrollment Form',
+                    recordId: newForm.screeningId,
+                    userInitials: userInitials || 'SYSTEM',
+                    oldValue,
+                    newValue: updatedData,
+                    reason: reason || 'Data update'
+                });
+                return res.status(200).json({ "message": "Updated successfully", data: updatedData });
+            }
         }
     } catch (error) {
         return res.status(500).json({ "message": "Error updating enrollment form", error: error.message });
@@ -148,7 +149,7 @@ const updateEnrollmentForm = async (req, res) => {
 
 const deleteEnrollmentForm = async (req, res) => {
     try {
-        const screeningId = req.params.id || req.params.screeningId;
+        const screeningId = req.params.screeningId || req.body.screeningId;
         const { userInitials, reason } = req.body;
         const oldValue = await EnrollmentForm.findOne({ screeningId });
         const deleted = await EnrollmentForm.findOneAndDelete({ screeningId });
