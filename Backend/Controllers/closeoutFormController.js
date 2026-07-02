@@ -1,9 +1,9 @@
 import closeoutForm from '../Models/closeoutForm.js';
-import {deleteOneDeliveryForm} from '../Controllers/deliveryFormController.js';
-import {deleteEnrollmentForm} from '../Controllers/enrollmentFormController.js';
-import {deleteScreeningForm} from '../Controllers/screeningFormController.js';
-import {deleteGestAge} from '../Controllers/gestationAge.js';
-import {deleteOneAnc} from '../Controllers/ancVisitController.js';
+import deliveryForm from '../Models/deliveryForm.js';
+import EnrollmentForm from '../Models/enrollmentForm.js';
+import screeningForm from '../Models/screeningForm.js';
+import gestationAge from '../Models/gestationAge.js';
+import ancVisit from '../Models/ancVisit.js';
 import { logAudit } from '../Utils/auditHelper.js';
 
 const createCloseoutForm = async (req, res) => {
@@ -60,11 +60,11 @@ const createCloseoutForm = async (req, res) => {
             });
 
             await Promise.all([
-                deleteOneDeliveryForm(sreeningId),
-                deleteEnrollmentForm(sreeningId),
-                deleteScreeningForm(sreeningId),
-                deleteGestAge(sreeningId),
-                deleteOneAnc(sreeningId)
+                deliveryForm.deleteMany({ deliveryScreeningId: sreeningId }),
+                EnrollmentForm.deleteMany({ screeningId: sreeningId }),
+                screeningForm.deleteMany({ screeningId: sreeningId }),
+                gestationAge.deleteMany({ screeningId: sreeningId }),
+                ancVisit.deleteMany({ screeningId: sreeningId }),
             ]);
 
             return res.status(200).json({ "message": "Closeout data saved successfully", data: newCloseoutForm });
