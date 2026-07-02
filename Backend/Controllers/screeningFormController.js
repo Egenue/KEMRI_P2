@@ -33,17 +33,14 @@ const createScreeningForm = async (req, res) => {
             reason
         } = data;
 
-        // 1. Root Level Validation
         if (!screeningId || !interviewDate || !healthFacility || !DoB || !height || !weight || !BMI || !fundalHeight) {
             return res.status(400).json({ "message": "Please fill in all required root-level metrics!" });
         }
 
-        // 2. Nested Age Object Validation
         if (Age.months === undefined || Age.years === undefined) {
             return res.status(400).json({ "message": "Missing required age information (months and years)." });
         }
 
-        // 3. Nested Vital Signs Validation
         const { temperature = {}, respiratoryRate, pulseRate, bloodPressure = {} } = vitalSigns;
         if (temperature.value === undefined || !temperature.location) {
             return res.status(400).json({ "message": "Temperature value and recording location are required." });
@@ -232,10 +229,10 @@ const deleteScreeningForm = async (req, res) => {
                 oldValue: oldValue,
                 reason: reason
             });
-            // Cascade delete ALL associated records across all study modules
             await Promise.all([
                 EnrollmentForm.deleteMany({ screeningId: screeningId }),
                 closeoutForm.deleteMany({ sreeningId: screeningId }),
+                deliveryForm.deleteMany({ deliveryScreeningId: screeningId }),
                 gestationAge.deleteMany({ screeningId: screeningId })
             ]);
 

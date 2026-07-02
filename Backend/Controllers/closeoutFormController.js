@@ -1,4 +1,9 @@
 import closeoutForm from '../Models/closeoutForm.js';
+import {deleteOneDeliveryForm} from '../Controllers/deliveryFormController.js';
+import {deleteEnrollmentForm} from '../Controllers/enrollmentFormController.js';
+import {deleteScreeningForm} from '../Controllers/screeningFormController.js';
+import {deleteGestAge} from '../Controllers/gestationAge.js';
+import {deleteOneAnc} from '../Controllers/ancVisitController.js';
 import { logAudit } from '../Utils/auditHelper.js';
 
 const createCloseoutForm = async (req, res) => {
@@ -53,6 +58,15 @@ const createCloseoutForm = async (req, res) => {
                 newValue: newCloseoutForm,
                 reason: reason || 'Initial Entry'
             });
+
+            await Promise.all([
+                deleteOneDeliveryForm(sreeningId),
+                deleteEnrollmentForm(sreeningId),
+                deleteScreeningForm(sreeningId),
+                deleteGestAge(sreeningId),
+                deleteOneAnc(sreeningId)
+            ]);
+
             return res.status(200).json({ "message": "Closeout data saved successfully", data: newCloseoutForm });
         }
     } catch (error) {
