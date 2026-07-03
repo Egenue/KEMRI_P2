@@ -60,11 +60,11 @@ const createCloseoutForm = async (req, res) => {
             });
 
             await Promise.all([
-                deliveryForm.deleteMany({ deliveryScreeningId: sreeningId }),
-                EnrollmentForm.deleteMany({ screeningId: sreeningId }),
-                screeningForm.deleteMany({ screeningId: sreeningId }),
-                gestationAge.deleteMany({ screeningId: sreeningId }),
-                ancVisit.deleteMany({ screeningId: sreeningId }),
+                deliveryForm.findOneAndDelete({ deliveryScreeningId: sreeningId }),
+                EnrollmentForm.findOneAndDelete({ screeningId: sreeningId }),
+                screeningForm.findOneAndDelete({ screeningId: sreeningId }),
+                gestationAge.findOneAndDelete({ screeningId: sreeningId }),
+                ancVisit.deleteMany({ visitNumber: { $regex: `-${sreeningId}$` } }),
             ]);
 
             return res.status(200).json({ "message": "Closeout data saved successfully", data: newCloseoutForm });
